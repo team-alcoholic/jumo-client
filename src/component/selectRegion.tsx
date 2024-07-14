@@ -17,8 +17,11 @@ interface RegionOption {
   label: String;
   admcd: String;
 }
+interface Props {
+  onChange: (region: String|undefined) => void;
+}
 
-export default function SelectRegion() {
+export default function SelectRegion({ onChange }: Props) {
   const [majorList, setMajorList] = useState<RegionOption[]>([]);
   const [middleList, setMiddleList] = useState<RegionOption[]>([]);
   const [minorList, setMinorList] = useState<RegionOption[]>([]);
@@ -42,7 +45,9 @@ export default function SelectRegion() {
   
   useEffect(() => {
     const getMiddleRegionList = async () => {
-      if (!major) setMiddleList([]);
+      if (!major) {
+        setMiddle(null);
+      }
       else {
         const result = await fetch(`http://${url}/region/subList/${major.admcd}`);
         const json: Region[] = await result.json();
@@ -53,13 +58,15 @@ export default function SelectRegion() {
         setMiddleList(middleList);
       }
     }
-    setMiddle(null);
+    setMiddleList([]);
     getMiddleRegionList();
   }, [major]);
 
   useEffect(() => {
     const getMinorRegionList = async () => {
-      if (!middle) setMinorList([]);
+      if (!middle) {
+        setMinor(null);
+      }
       else {
         const result = await fetch(`http://${url}/region/subList/${middle.admcd}`);
         const json: Region[] = await result.json();
@@ -70,11 +77,15 @@ export default function SelectRegion() {
         setMinorList(minorList);
       }
     }
-    setMinor(null);
+    setMinorList([]);
     getMinorRegionList();
   }, [middle]);
 
-  // useEffect(() => { console.log(major, middle, minor); }, [major, middle, minor]);
+  useEffect(() => {
+    if (minor) onChange(minor.admcd);
+    else if (middle) onChange(middle.admcd);
+    else if (major) onChange(major.admcd);
+  }, [major, middle, minor, onChange]);
 
 
   return (
@@ -102,8 +113,6 @@ export default function SelectRegion() {
         onChange={(event, value) => { setMinor(value); }}
         value={minor}
       />
-
-      
 
     </Box>
   );
