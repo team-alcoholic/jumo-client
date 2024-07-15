@@ -1,49 +1,92 @@
-// src/app/page.tsx
+"use client";
 import * as React from 'react';
-import { Container, Typography, Button, AppBar, Toolbar } from '@mui/material';
-import Image from 'next/image';
+import { Container, Typography, Button, AppBar, Toolbar, Avatar } from '@mui/material';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import styled from '@emotion/styled';
+
+interface Profile {
+  profileNickname: string;
+  profileImage: string;
+}
+
+const MainContainer = styled.main`
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+`;
+
+const AvatarStyle = styled(Avatar)`
+  width: 100px;
+  height: 100px;
+`;
 
 export default function Home() {
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const response = await axios.get('/api/v1/users', { withCredentials: true });
+        setProfile(response.data);
+      } catch (error) {
+        console.error("User not logged in or error fetching profile", error);
+        setProfile(null);
+      }
+    }
+
+    fetchProfile();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('/api/v1/logout', {}, { withCredentials: true });
+      setProfile(null);
+      window.location.href = 'http://localhost:3000/'; // 로그아웃 후 메인 페이지로 이동
+    } catch (error) {
+      console.error("Error logging out", error);
+    }
+  };
+
+  const handleLoginRedirect = () => {
+    window.location.href = 'http://localhost:3000/login'; // 로그인 페이지로 이동
+  };
+
   return (
       <Container maxWidth="lg">
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              My MUI Website
+              주모 홈페이지
             </Typography>
-            <Button color="inherit">Login</Button>
+            {profile ? (
+                <Button color="inherit" onClick={handleLogout}>Logout</Button>
+            ) : (
+                <Button color="inherit" onClick={handleLoginRedirect}>Login</Button>
+            )}
           </Toolbar>
         </AppBar>
 
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
-          <Typography variant="h2" component="h1" gutterBottom>
-            Welcome to My MUI Website
-          </Typography>
-          <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-            <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-              Get started by editing&nbsp;
-              <code className="font-mono font-bold">src/app/page.tsx</code>
-            </p>
-            <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-              <a
-                  className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-                  href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-              >
-                By{" "}
-                <Image
-                    src="/vercel.svg"
-                    alt="Vercel Logo"
-                    className="dark:invert"
-                    width={100}
-                    height={24}
-                    priority
+        <MainContainer>
+          {profile ? (
+              <>
+                <AvatarStyle
+                    alt={profile.profileNickname}
+                    src={profile.profileImage || '/default-profile.png'}
                 />
-              </a>
-            </div>
-          </div>
-        </main>
+                <Typography variant="h5" component="h2">
+                  {profile.profileNickname}
+                </Typography>
+              </>
+          ) : (
+              <Typography variant="h2" component="h1" gutterBottom>
+                주모 홈페이지
+              </Typography>
+          )}
+        </MainContainer>
       </Container>
   );
 }
