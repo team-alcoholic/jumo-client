@@ -16,6 +16,7 @@
     "@mui/material": "^5.16.1",
     "http-proxy-middleware": "^3.0.0",
     "next": "14.2.4",
+    "@mui/material-nextjs": "^5.16.1",
     "react": "^18",
     "react-dom": "^18"
   },
