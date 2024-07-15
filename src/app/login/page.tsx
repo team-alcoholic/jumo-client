@@ -8,7 +8,7 @@ export default function LoginPage() {
     const router = useRouter();
 
     const handleKakaoLogin = () => {
-        router.push('/api/v1/oauth2/authorization/kakao');
+        router.push('http://localhost:8080/api/v1/oauth2/authorization/kakao');
     };
 
     return (

@@ -30,7 +30,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const response = await axios.get('/api/v1/users', { withCredentials: true });
+        const response = await axios.get('http://localhost:8080/api/v1/users', { withCredentials: true });
         setProfile(response.data);
       } catch (error) {
         console.error("User not logged in or error fetching profile", error);
@@ -43,7 +43,7 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('/api/v1/logout', {}, { withCredentials: true });
+      await axios.post('http://localhost:8080/api/v1/logout', {}, { withCredentials: true });
       setProfile(null);
       window.location.href = 'http://localhost:3000/'; // 로그아웃 후 메인 페이지로 이동
     } catch (error) {
