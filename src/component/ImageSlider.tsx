@@ -6,15 +6,11 @@ import useEmblaCarousel from 'embla-carousel-react';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 
-const images = [
-    "https://jinblog.imtrue.co.kr/wp-content/uploads/2024/05/%EC%BD%94%EA%B2%8C%EC%9D%B4-1-optimized.jpg",
-    "https://blog.kakaocdn.net/dn/pyTxL/btsHfYncNdI/juuRga976YHpkUU4jmqbB1/img.png",
-    "https://d2u3dcdbebyaiu.cloudfront.net/uploads/atch_img/870/05917009d23b9fa8d8279585d2d05e95_res.jpeg",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDWI4yr32mbQMhOLp8TZdBKcZsHeSNXWPBOA&s",
-    "https://jinblog.imtrue.co.kr/wp-content/uploads/2024/05/%EC%BD%94%EA%B2%8C%EC%9D%B4-1-optimized.jpg",
-];
+interface ImageSliderProps {
+    images: string[];
+}
 
-const ImageSlider = () => {
+const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
     const theme = useTheme();
     const [emblaRef, embla] = useEmblaCarousel({ loop: false });
     const [selectedIndex, setSelectedIndex] = useState(0);
