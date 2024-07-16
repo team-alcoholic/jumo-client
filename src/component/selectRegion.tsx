@@ -45,10 +45,9 @@ export default function SelectRegion({ onChange }: Props) {
   
   useEffect(() => {
     const getMiddleRegionList = async () => {
-      if (!major) {
-        setMiddle(null);
-      }
-      else {
+      setMiddle(null);
+      setMiddleList([]);
+      if (major) {
         const result = await fetch(`http://${url}/region/subList/${major.admcd}`);
         const json: Region[] = await result.json();
         const middleList = json.map((data) => {
@@ -58,16 +57,14 @@ export default function SelectRegion({ onChange }: Props) {
         setMiddleList(middleList);
       }
     }
-    setMiddleList([]);
     getMiddleRegionList();
   }, [major]);
 
   useEffect(() => {
     const getMinorRegionList = async () => {
-      if (!middle) {
-        setMinor(null);
-      }
-      else {
+      setMinor(null);
+      setMinorList([]);
+      if (middle) {
         const result = await fetch(`http://${url}/region/subList/${middle.admcd}`);
         const json: Region[] = await result.json();
         const minorList = json.map((data) => {
@@ -77,7 +74,6 @@ export default function SelectRegion({ onChange }: Props) {
         setMinorList(minorList);
       }
     }
-    setMinorList([]);
     getMinorRegionList();
   }, [middle]);
 
