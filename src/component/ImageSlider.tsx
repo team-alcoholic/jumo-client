@@ -1,10 +1,10 @@
+"use client";
 import React, { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Box, Typography, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import useEmblaCarousel from 'embla-carousel-react';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import {ArrowBackIos, ArrowForwardIos} from '@mui/icons-material';
 
 interface ImageSliderProps {
     images: string[];
@@ -14,6 +14,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
     const theme = useTheme();
     const [emblaRef, embla] = useEmblaCarousel({ loop: false });
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [showArrows, setShowArrows] = useState(false);
 
     const handleSelect = useCallback(() => {
         if (!embla) return;
@@ -34,10 +35,11 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
     };
 
     return (
-        <Box sx={{ maxWidth: 400, flexGrow: 1, mx: 'auto' }}>
-            <Typography variant="body2" align="right" gutterBottom>
-                이미지 {selectedIndex + 1}/{images.length}
-            </Typography>
+        <Box
+            sx={{ maxWidth: 400, flexGrow: 1, mx: 'auto', position: 'relative' }}
+            onMouseEnter={() => setShowArrows(true)}
+            onMouseLeave={() => setShowArrows(false)}
+        >
             <Box ref={emblaRef} sx={{ overflow: 'hidden' }}>
                 <Box sx={{ display: 'flex' }}>
                     {images.map((src, index) => (
@@ -61,16 +63,16 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
                     />
                 ))}
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                <Button size="small" onClick={handleBack} disabled={selectedIndex === 0}>
-                    <KeyboardArrowLeft />
-                    Back
-                </Button>
-                <Button size="small" onClick={handleNext} disabled={selectedIndex === images.length - 1}>
-                    Next
-                    <KeyboardArrowRight />
-                </Button>
-            </Box>
+            {showArrows && (
+                <Box sx={{ position: 'absolute', top: '50%', width: '100%', display: 'flex', justifyContent: 'space-between', transform: 'translateY(-50%)' }}>
+                    <Button size="small" onClick={handleBack} disabled={selectedIndex === 0} sx={{ visibility: showArrows ? 'visible' : 'hidden' }}>
+                        <ArrowBackIos sx={{ color: 'black' }} />
+                    </Button>
+                    <Button size="small" onClick={handleNext} disabled={selectedIndex === images.length - 1} sx={{ visibility: showArrows ? 'visible' : 'hidden' }}>
+                        <ArrowForwardIos sx={{ color: 'black' }}/>
+                    </Button>
+                </Box>
+            )}
         </Box>
     );
 };
