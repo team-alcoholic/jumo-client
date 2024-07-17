@@ -16,6 +16,7 @@
     "@mui/icons-material": "^5.16.1",
     "@mui/material": "^5.16.1",
     "@mui/material-nextjs": "^5.16.1",
+    "@tanstack/react-query": "^5.51.3",
     "axios": "^1.3.4",
     "embla-carousel-react": "^8.1.6",
     "http-proxy-middleware": "^3.0.0",
