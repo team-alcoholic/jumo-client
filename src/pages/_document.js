@@ -1,4 +1,3 @@
-// src/pages/_document.js
 import * as React from 'react';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 import createEmotionServer from '@emotion/server/create-instance';
@@ -15,7 +14,7 @@ export default class MyDocument extends Document {
                     <link rel="shortcut icon" href="/static/favicon.ico" />
                     <link
                         rel="stylesheet"
-                        href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+                        href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css"
                     />
                     {this.props.emotionStyleTags}
                 </Head>
