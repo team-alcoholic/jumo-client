@@ -1,0 +1,46 @@
+# Node modules 폴더 제외
+node_modules
+
+# Dockerfile 자체는 제외
+Dockerfile
+
+# Git 관련 파일 및 폴더 제외
+.git
+.gitignore
+
+# 환경 변수 파일 제외 (보안 이유)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 로그 파일 제외
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 운영체제 별 파일 제외
+.DS_Store
+Thumbs.db
+
+# 테스트 관련 파일 및 폴더 제외
+__tests__
+__mocks__
+coverage
+*.lcov
+
+# 빌드 결과물 제외
+build
+dist
+out
+
+# 에디터 및 IDE 설정 파일 제외
+.vscode
+.idea
+*.swp
+
+# Next.js 빌드 관련 파일 제외
+.next
