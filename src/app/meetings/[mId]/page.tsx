@@ -45,9 +45,10 @@ interface ResponseData {
 // 데이터를 가져오는 함수
 // 1분마다 캐시를 업데이트
 async function fetchData(mId: string) {
-  const res = await fetch(`http://localhost:3000/api/meetings/${mId}`, {
+  const res = await fetch(`${process.env.API_BASE_URL}/meetings/${mId}`, {
     next: { revalidate: 60 },
   });
+
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
