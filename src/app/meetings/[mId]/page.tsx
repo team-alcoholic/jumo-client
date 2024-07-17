@@ -3,14 +3,12 @@ import {
   StyledBox,
   StyledChip,
   Header,
-  BackButton,
   HighlightBox,
   Highlight,
   RedText,
 } from "./StyledComponents";
 import ImageSlider from "../../../component/ImageSlider";
 import {
-  ArrowBack,
   Event,
   Place,
   TextSnippet,
@@ -48,7 +46,7 @@ interface ResponseData {
 // 1분마다 캐시를 업데이트
 async function fetchData(mId: string) {
   const res = await fetch(`http://localhost:3000/api/meetings/${mId}`, {
-    next: { revalidate: 6 },
+    next: { revalidate: 60 },
   });
   if (!res.ok) {
     throw new Error("Failed to fetch data");
