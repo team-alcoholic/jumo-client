@@ -1,0 +1,52 @@
+name: Build and Deploy Next.js Docker Image
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - 'develop'
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front .
+
+    - name: Docker login
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Push Docker image to Docker Hub
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
+
+  deploy:
+    needs: build-docker-image
+    runs-on: [self-hosted]
+    steps:
+    - name: Clean up Docker system before pulling
+      run: |
+        sudo docker stop $(sudo docker ps -aq) || true
+        sudo docker container prune -f || true
+        sudo docker image prune -a -f || true
+        sudo docker volume prune -f || true
+        sudo docker network prune -f || true
+        sudo docker system prune -a -f || true
+
+    - name: docker pull
+      run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
+
+    - name: docker run new container
+      run: sudo docker run --rm -it -d -p 80:3000 --name jumo_test_front -e API_BASE_URL=${{ secrets.API_BASE_URL_TEST }} ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
+
+    - name: Clean up unused Docker images after deployment
+      run: |
+        sudo docker image prune -a -f || true
