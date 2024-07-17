@@ -46,8 +46,8 @@ interface ResponseData {
 
 // 데이터를 가져오는 함수
 // 1분마다 캐시를 업데이트
-async function fetchData(postId: string) {
-  const res = await fetch(`http://localhost:3000/api/posts/${postId}`, {
+async function fetchData(mId: string) {
+  const res = await fetch(`http://localhost:3000/api/meetings/${mId}`, {
     next: { revalidate: 6 },
   });
   if (!res.ok) {
@@ -59,9 +59,9 @@ async function fetchData(postId: string) {
 export default async function PostPage({
   params,
 }: {
-  params: { postId: string };
+  params: { mId: string };
 }) {
-  const data = await fetchData(params.postId);
+  const data = await fetchData(params.mId);
 
   const {
     images,
@@ -86,9 +86,6 @@ export default async function PostPage({
   return (
     <Container maxWidth="sm" sx={{ padding: 0 }}>
       <Header>
-        <BackButton>
-          <ArrowBack />
-        </BackButton>
         <Typography variant="h4">JUMO</Typography>
       </Header>
       <StyledBox>
