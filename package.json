@@ -22,7 +22,10 @@
     "http-proxy-middleware": "^3.0.0",
     "next": "14.2.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-lazy-load-image-component": "^1.6.2",
+    "react-query": "^3.39.3",
+    "use-local-storage": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
