@@ -1,9 +1,16 @@
 "use client";
-import * as React from 'react';
-import { Container, Typography, Button, AppBar, Toolbar, Avatar } from '@mui/material';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import styled from '@emotion/styled';
+import * as React from "react";
+import {
+  Container,
+  Typography,
+  Button,
+  AppBar,
+  Toolbar,
+  Avatar,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import styled from "@emotion/styled";
 
 interface Profile {
   profileNickname: string;
@@ -30,7 +37,12 @@ export default function Home() {
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const response = await axios.get('http://localhost:8080/api/v1/users', { withCredentials: true });
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+          {
+            withCredentials: true,
+          },
+        );
         setProfile(response.data);
       } catch (error) {
         console.error("User not logged in or error fetching profile", error);
@@ -43,50 +55,60 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:8080/api/v1/logout', {}, { withCredentials: true });
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`,
+        {},
+        { withCredentials: true },
+      );
       setProfile(null);
-      window.location.href = 'http://localhost:3000/'; // 로그아웃 후 메인 페이지로 이동
+      window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}`; // 로그아웃 후 메인 페이지로 이동
     } catch (error) {
       console.error("Error logging out", error);
     }
   };
 
   const handleLoginRedirect = () => {
-    window.location.href = 'http://localhost:3000/login'; // 로그인 페이지로 이동
+    window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/login`; // 로그인 페이지로 이동
   };
 
-  return (
-      <Container maxWidth="lg">
-        <AppBar position="static">
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              주모 홈페이지
-            </Typography>
-            {profile ? (
-                <Button color="inherit" onClick={handleLogout}>Logout</Button>
-            ) : (
-                <Button color="inherit" onClick={handleLoginRedirect}>Login</Button>
-            )}
-          </Toolbar>
-        </AppBar>
+  console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users`);
 
-        <MainContainer>
+  return (
+    <Container maxWidth="lg">
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            주모 홈페이지
+          </Typography>
           {profile ? (
-              <>
-                <AvatarStyle
-                    alt={profile.profileNickname}
-                    src={profile.profileImage || '/default-profile.png'}
-                />
-                <Typography variant="h5" component="h2">
-                  {profile.profileNickname}
-                </Typography>
-              </>
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
+            </Button>
           ) : (
-              <Typography variant="h2" component="h1" gutterBottom>
-                주모 홈페이지
-              </Typography>
+            <Button color="inherit" onClick={handleLoginRedirect}>
+              Login
+            </Button>
           )}
-        </MainContainer>
-      </Container>
+        </Toolbar>
+      </AppBar>
+
+      <MainContainer>
+        {profile ? (
+          <>
+            <AvatarStyle
+              alt={profile.profileNickname}
+              src={profile.profileImage || "/default-profile.png"}
+            />
+            <Typography variant="h5" component="h2">
+              {profile.profileNickname}
+            </Typography>
+          </>
+        ) : (
+          <Typography variant="h2" component="h1" gutterBottom>
+            주모 홈페이지
+          </Typography>
+        )}
+      </MainContainer>
+    </Container>
   );
 }

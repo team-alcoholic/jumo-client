@@ -25,36 +25,43 @@ const EXTERNAL_SERVICE_MESSAGE =
 interface ResponseData {
   images: string[];
   name: string;
-  meeting_at: string | null;
-  fix_at: string | null;
+  meetingAt: string | null;
+  fixAt: string | null;
   region: string | null;
   place: string | null;
-  participants_min: number | null;
-  participants_max: number | null;
+  participatesMin: number | null;
+  participatesMax: number | null;
   liquors: string | null;
   payment: number | null;
-  payment_method: string | null;
+  paymentMethod: string | null;
   byob: boolean;
-  byob_min: number | null;
-  byob_max: number | null;
+  byobMin: number | null;
+  byobMax: number | null;
   description: string;
-  external_service: string | null;
-  external_link: string;
+  externalService: string | null;
+  externalLink: string;
 }
 
 // 데이터를 가져오는 함수
 // 1분마다 캐시를 업데이트
 async function fetchData(mId: string) {
-  const res = await fetch(`${process.env.API_BASE_URL}/meetings/${mId}`, {
-    next: { revalidate: 60 },
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/meeting/${mId}`,
+    {
+      next: { revalidate: 1 },
+    },
+  );
 
   if (!res.ok) {
+    if (res.status === 404) {
+      throw new Error("404");
+    }
     throw new Error("Failed to fetch data");
   }
   const data: ResponseData = await res.json();
   return data;
 }
+
 export default async function PostPage({
   params,
 }: {
@@ -65,21 +72,21 @@ export default async function PostPage({
   const {
     images,
     name,
-    meeting_at,
-    fix_at,
+    meetingAt,
+    fixAt,
     region,
     place,
-    participants_min,
-    participants_max,
+    participatesMin,
+    participatesMax,
     liquors,
     payment,
-    payment_method,
+    paymentMethod,
     byob,
-    byob_min,
-    byob_max,
+    byobMin,
+    byobMax,
     description,
-    external_service,
-    external_link,
+    externalService,
+    externalLink,
   } = data;
 
   return (
@@ -107,7 +114,7 @@ export default async function PostPage({
                 <StyledChip key={index} label={liquor.trim()} />
               ))}{" "}
         </Box>
-        {external_service !== "주모" && (
+        {externalService !== "주모" && (
           <Alert severity="error">{EXTERNAL_SERVICE_MESSAGE}</Alert>
         )}
         <HighlightBox>
@@ -121,11 +128,11 @@ export default async function PostPage({
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Highlight>모임 시작</Highlight>
-            {meeting_at ? `${formatDate(meeting_at)}` : DEFAULT_MESSAGE}
+            {meetingAt ? `${formatDate(meetingAt)}` : DEFAULT_MESSAGE}
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Highlight>모집 마감</Highlight>
-            {fix_at ? `${formatDate(fix_at)}` : DEFAULT_MESSAGE}
+            {fixAt ? `${formatDate(fixAt)}` : DEFAULT_MESSAGE}
           </Typography>
         </HighlightBox>
         <HighlightBox>
@@ -143,7 +150,7 @@ export default async function PostPage({
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Highlight>지불 방식</Highlight>
-            {payment_method || DEFAULT_MESSAGE}
+            {paymentMethod || DEFAULT_MESSAGE}
           </Typography>
         </HighlightBox>
         <HighlightBox>
@@ -167,7 +174,7 @@ export default async function PostPage({
             <Typography variant="body2" gutterBottom>
               <Highlight> 주류 가격 </Highlight>
               {payment
-                ? `${byob_min && formatPrice(byob_min)}원 이상`
+                ? `${byobMin && formatPrice(byobMin)}원 이상`
                 : DEFAULT_MESSAGE}
             </Typography>
           )}
@@ -183,11 +190,11 @@ export default async function PostPage({
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Highlight>최대 인원</Highlight>
-            {participants_max ? `${participants_max}명` : DEFAULT_MESSAGE}
+            {participatesMax ? `${participatesMax}명` : DEFAULT_MESSAGE}
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Highlight>최소 인원</Highlight>
-            {participants_min ? `${participants_min}명` : DEFAULT_MESSAGE}
+            {participatesMin ? `${participatesMin}명` : DEFAULT_MESSAGE}
           </Typography>
         </HighlightBox>
         <HighlightBox>
@@ -229,7 +236,7 @@ export default async function PostPage({
           fullWidth
           color="primary"
           sx={{ marginTop: 2 }}
-          href={external_link}
+          href={externalLink}
         >
           해당 커뮤니티로 이동
         </Button>
