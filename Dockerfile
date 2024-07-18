@@ -28,6 +28,9 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/package.json ./
 COPY --from=build /app/package-lock.json ./
 
+# next.config.js 파일 복사
+COPY --from=build /app/next.config.mjs ./
+
 # 프로덕션 의존성 설치
 RUN npm install --only=production
 
