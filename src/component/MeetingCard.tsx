@@ -9,7 +9,7 @@ import useLocalStorage from "use-local-storage";
 // import { LazyLoadImage } from "react-lazy-load-image-component";
 
 export default function MeetingCard(
-  { key, meeting }: { key: number, meeting: Meeting}
+  { meeting }: { key: number, meeting: Meeting}
 ) {
   const [visible, setVisible] = useState(false);
   const [scrollY, setScrollY] = useLocalStorage("meeting-list-scroll", 0);
@@ -19,12 +19,11 @@ export default function MeetingCard(
   const onIntersect = ([entry]: IntersectionObserverEntry[]) => {
     return entry.isIntersecting ? setVisible(true) : setVisible(false);
   }
-  useObserver({ target, onIntersect, threshold: 0.01 });
+  useObserver({ target, onIntersect, threshold: 0.1 });
 
   return (
     <Link
       href={`/meetings/${meeting.id}`}
-      key={meeting.id}
       onClick={() => setScrollY(window.scrollY)}
     >
       <ListItem ref={target} sx={{ minHeight: "75px" }}>
@@ -37,7 +36,7 @@ export default function MeetingCard(
             <ListItemText primary={meeting.name} secondary={`${meeting.id} ${meeting.region} ${meeting.meetingAt}`} />
           </>
         )}
-      </ListItem>
+      </ListItem>   
     </Link>
   )
 }
