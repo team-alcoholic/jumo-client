@@ -4,8 +4,9 @@ import MeetingCard from "@/component/MeetingCard";
 import useObserver from "@/hook/useObserver";
 import { List } from "@mui/material";
 import axios from "axios";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useInfiniteQuery } from "react-query";
+import useLocalStorage from "use-local-storage";
 
 export interface Meeting {
   id: number;
@@ -34,6 +35,12 @@ const getMeetingList = async ({ pageParam=0 }) => {
 }
 
 export default function MeetingsPage() {
+  // 스크롤 위치 유지
+  const [scrollY] = useLocalStorage("meeting-list-scroll", 0);
+  useEffect(() => {
+    if (+scrollY !== 0) window.scrollTo(0, +scrollY);
+  }, [scrollY]);
+
   // useInfiniteQuery 설정
   const {
     data,

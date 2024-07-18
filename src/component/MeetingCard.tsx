@@ -5,12 +5,14 @@ import { Meeting } from "../app/meetings/page";
 import { useRef, useState } from "react";
 import useObserver from "@/hook/useObserver";
 import Link from "next/link";
+import useLocalStorage from "use-local-storage";
 // import { LazyLoadImage } from "react-lazy-load-image-component";
 
 export default function MeetingCard(
   { key, meeting }: { key: number, meeting: Meeting}
 ) {
   const [visible, setVisible] = useState(false);
+  const [scrollY, setScrollY] = useLocalStorage("meeting-list-scroll", 0);
 
   // IntersectionObserver API 설정: 뷰포트 안에 요소가 들어올 때만 DOM에 마운트
   const target = useRef(null);
@@ -19,9 +21,12 @@ export default function MeetingCard(
   }
   useObserver({ target, onIntersect, threshold: 0.01 });
 
-
   return (
-    <Link href={`/meetings/${meeting.id}`} key={meeting.id}>
+    <Link
+      href={`/meetings/${meeting.id}`}
+      key={meeting.id}
+      onClick={() => setScrollY(window.scrollY)}
+    >
       <ListItem ref={target} sx={{ minHeight: "75px" }}>
         {visible && (
           <>
