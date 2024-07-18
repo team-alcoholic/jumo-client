@@ -53,11 +53,15 @@ async function fetchData(mId: string) {
   );
 
   if (!res.ok) {
+    if (res.status === 404) {
+      throw new Error("404");
+    }
     throw new Error("Failed to fetch data");
   }
   const data: ResponseData = await res.json();
   return data;
 }
+
 export default async function PostPage({
   params,
 }: {
