@@ -1,13 +1,13 @@
 "use client"
 
+import MeetingCard from "@/component/MeetingCard";
 import useObserver from "@/hook/useObserver";
-import { Avatar, List, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
+import { List } from "@mui/material";
 import axios from "axios";
 import { useRef } from "react";
 import { useInfiniteQuery } from "react-query";
-// import { LazyLoadImage } from "react-lazy-load-image-component";
 
-interface MeetingsPage {
+export interface Meeting {
   id: number;
   uuid: string;
   name: string;
@@ -47,11 +47,11 @@ export default function MeetingsPage() {
   );
 
   // IntersectionObserver API 설정: 페이지 마지막 요소 도달 시 다음 페이지 호출
-  const bottom = useRef(null);
-  useObserver({
-    target: bottom,
-    onIntersect: ([entry]: IntersectionObserverEntry[]) => entry.isIntersecting && fetchNextPage()
-  });
+  const target = useRef(null);
+  const onIntersect = ([entry]: IntersectionObserverEntry[]) => {
+    return entry.isIntersecting && fetchNextPage();
+  }
+  useObserver({ target, onIntersect });
 
   return (
     <div>
@@ -61,19 +61,14 @@ export default function MeetingsPage() {
         <List>
           {data.pages.map((page, i) => (
             <div key={i}>
-              {page.map((meeting:MeetingsPage) => (
-                <ListItem key={meeting.id}>
-                  <ListItemAvatar>
-                    <Avatar alt="thumbnail" src={meeting.thumbnail} />
-                    {/* <LazyLoadImage alt="thumbnail" src={meeting.thumbnail} width="40px" height="auto" /> */}
-                  </ListItemAvatar>
-                  <ListItemText primary={meeting.name} secondary={`${meeting.id} ${meeting.meetingAt}`} />
-                </ListItem>))}
+              {page.map((meeting: Meeting) => (
+                <MeetingCard key={meeting.id} meeting={meeting} />
+              ))}
             </div>
           ))}
         </List>}
 
-      <div ref={bottom} />
+      <div ref={target} />
       {isFetchingNextPage && "이어서 불러오는 중..."}
     </div>
   )
