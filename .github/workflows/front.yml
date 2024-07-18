@@ -45,7 +45,7 @@ jobs:
       run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
 
     - name: docker run new container
-      run: sudo docker run --rm -it -d -p 80:3000 --name jumo_test_front -e API_BASE_URL=${{ secrets.API_BASE_URL_TEST }} ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
+      run: sudo docker run --rm -it -d -p 80:3000 --name jumo_test_front -e NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL_DEV }} NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL_DEV }} ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
 
     - name: Clean up unused Docker images after deployment
       run: |
