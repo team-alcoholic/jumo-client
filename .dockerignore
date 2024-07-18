@@ -8,12 +8,6 @@ Dockerfile
 .git
 .gitignore
 
-# 환경 변수 파일 제외 (보안 이유)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 # 로그 파일 제외
 logs
