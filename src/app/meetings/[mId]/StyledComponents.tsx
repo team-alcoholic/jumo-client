@@ -16,18 +16,6 @@ export const StyledChip = styled(Chip)(({ theme }) => ({
     fontWeight: 'bold',
 }));
 
-export const Header = styled(Box)(({ theme }) => ({
-    width: '100%',
-    height: 80,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderBottom: '1px solid #D9D9D9',
-    boxShadow: theme.shadows[1],
-}));
-
 export const BackButton = styled(IconButton)(({ theme }) => ({
     position: 'absolute',
     left: theme.spacing(2),
