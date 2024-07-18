@@ -1,8 +1,7 @@
 name: Build and Deploy Next.js Docker Image
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - 'develop'
 
@@ -15,6 +14,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Create .env file
+      run: |
+        echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL_DEV }}" > .env
+        echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL_DEV }}" >> .env
 
     - name: Build Docker image
       run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front .
@@ -45,7 +49,8 @@ jobs:
       run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
       
     - name: docker run new container
-      run: sudo docker run --rm -it -d -p 80:3000 --name jumo_test_front -e NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL_DEV }} -e NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL_DEV }} ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
+      run: sudo docker run --rm -it -d -p 80:3000 --name jumo_test_front ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
+
     - name: Clean up unused Docker images after deployment
       run: |
         sudo docker image prune -a -f || true
