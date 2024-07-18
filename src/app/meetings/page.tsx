@@ -7,6 +7,7 @@ import axios from "axios";
 import { useEffect, useRef } from "react";
 import { useInfiniteQuery } from "react-query";
 import useLocalStorage from "use-local-storage";
+import MeetingsLayout from "./layout";
 
 export interface Meeting {
   id: number;
@@ -62,6 +63,7 @@ export default function MeetingsPage() {
 
   return (
     <div>
+      <h4 style={{ textAlign: "center", marginBottom: "0" }}>모임 목록</h4>
       {status === "loading" && "불러오는 중..."}
       {status === "error" && "에러"}
       {status === "success" &&
@@ -73,8 +75,8 @@ export default function MeetingsPage() {
               ))}
             </div>
           ))}
-        </List>}
-
+        </List>
+      }
       <div ref={target} />
       {isFetchingNextPage && "이어서 불러오는 중..."}
     </div>

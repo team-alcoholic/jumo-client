@@ -2,7 +2,6 @@ import { Box, Typography, Button, Container, Alert } from "@mui/material";
 import {
   StyledBox,
   StyledChip,
-  Header,
   HighlightBox,
   Highlight,
   RedText,
@@ -91,9 +90,6 @@ export default async function PostPage({
 
   return (
     <Container maxWidth="sm" sx={{ padding: 0 }}>
-      <Header>
-        <Typography variant="h4">JUMO</Typography>
-      </Header>
       <StyledBox>
         <ImageSlider images={images} />
         <Typography
