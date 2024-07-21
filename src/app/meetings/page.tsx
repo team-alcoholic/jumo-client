@@ -7,7 +7,6 @@ import axios from "axios";
 import { useEffect, useRef } from "react";
 import { useInfiniteQuery } from "react-query";
 import useLocalStorage from "use-local-storage";
-import MeetingsLayout from "./layout";
 
 export interface Meeting {
   id: number;
@@ -25,14 +24,20 @@ export interface Meeting {
   thumbnail: string;
   externalService: string;
 }
+interface MeetingResponse {
+  meetings: Meeting[],
+  lastId: number,
+  eof: boolean
+}
 
 const getMeetingList = async ({ pageParam=0 }) => {
-  let result;
-  if (pageParam===-1) return [];
-  if (pageParam===0) result = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/meeting/list/latest`);
-  else result = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/meeting/list/latest/${pageParam}`);
-  console.log(result.data);
-  return result.data;
+  let response;
+  if (pageParam===-1) return { meetings: [] };
+  else response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/meetings`, {
+    params: { cursor: pageParam }
+  });
+  console.log(response.data);
+  return response.data;
 }
 
 export default function MeetingsPage() {
@@ -51,7 +56,7 @@ export default function MeetingsPage() {
   } = useInfiniteQuery(
     "meetingList",
     getMeetingList,
-    { getNextPageParam: (lastPage) => (lastPage.length) ? lastPage[lastPage.length-1].id : -1 }
+    { getNextPageParam: (lastPage: MeetingResponse) => (lastPage.eof) ? -1 : lastPage.lastId }
   );
 
   // IntersectionObserver API 설정: 페이지 마지막 요소 도달 시 다음 페이지 호출
@@ -68,10 +73,10 @@ export default function MeetingsPage() {
       {status === "error" && "에러"}
       {status === "success" &&
         <List>
-          {data.pages.map((page, i) => (
+          {data.pages.map((page: MeetingResponse, i) => (
             <div key={i}>
-              {page.map((meeting: Meeting) => (
-                <MeetingCard key={meeting.id} meeting={meeting} />
+              {page.meetings.map((info: Meeting) => (
+                <MeetingCard key={info.id} meeting={info} />
               ))}
             </div>
           ))}
