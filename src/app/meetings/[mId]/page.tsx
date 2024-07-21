@@ -45,7 +45,7 @@ interface ResponseData {
 // 1분마다 캐시를 업데이트
 async function fetchData(mId: string) {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/meeting/${mId}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/meetings/${mId}`,
     {
       next: { revalidate: 1 },
     },
