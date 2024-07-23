@@ -21,36 +21,40 @@ jobs:
         echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL_DEV }}" >> .env
         echo "NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID }}" >> .env
 
-    - name: Build Docker image
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front .
-
-    - name: Docker login
-      uses: docker/login-action@v2
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Push Docker image to Docker Hub
-      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build and push Docker image to AWS ECR
+      run: |
+        docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jumo_front_dev:latest .
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jumo_front_dev:latest
 
   deploy:
     needs: build-docker-image
-    runs-on: [self-hosted]
+    runs-on: [dev]
     steps:
-    - name: Clean up Docker system before pulling
+
+    - name: ecr get-login-password
+      run: |
+        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jumo_front_dev
+    - name: Pull Docker image from AWS ECR
+      run: |
+        docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jumo_front_dev:latest
+
+    - name: stop Docker container before running new container
       run: |
         sudo docker stop $(sudo docker ps -aq) || true
-        sudo docker container prune -f || true
-        sudo docker image prune -a -f || true
-        sudo docker volume prune -f || true
-        sudo docker network prune -f || true
-        sudo docker system prune -a -f || true
 
-    - name: docker pull
-      run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
-      
-    - name: docker run new container
-      run: sudo docker run --rm -it -d -p 80:3000 --name jumo_test_front ${{ secrets.DOCKERHUB_USERNAME }}/jumo_test_front
+    - name: Run new Docker container
+      run: |
+        docker run --rm -it -d -p 80:3000 --name jumo_front_dev ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jumo_front_dev:latest
 
     - name: Clean up unused Docker images after deployment
       run: |
