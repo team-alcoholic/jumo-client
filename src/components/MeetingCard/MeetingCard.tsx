@@ -24,7 +24,7 @@ export default function MeetingCard(
   useObserver({ target, onIntersect, threshold: 0.1 });
 
   return (
-    <LinkButton ref={target} onClick={() => setScrollY(window.scrollY)} href={`/meetings/${meeting.id}`}>
+    <LinkButton ref={target} onClick={() => setScrollY(window.scrollY)} href={`/meetings/${meeting.id}`} style={{overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis'}}>
         {visible && (
           <Box style={{display:'flex',alignItems:'center',overflow:'hidden',width:'100%'}}>
             <ListItemAvatar>
@@ -34,11 +34,12 @@ export default function MeetingCard(
               primary={`${meeting.id}: ${meeting.name}`}
               secondary={`${formatDateTime(meeting.meetingAt)} ${meeting.region}`}
               primaryTypographyProps={{style:{overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis'}}}
+              secondaryTypographyProps={{style:{overflow:'hidden',whiteSpace:'nowrap',textOverflow:'ellipsis'}}}
             />
           </Box>
         )}
       <DescriptionSpan>
-        {`${meeting.liquors}, 회비 ${meeting.payment}원`}
+        {visible && `${meeting.liquors}, 회비 ${meeting.payment}원`}
       </DescriptionSpan>
     </LinkButton>
   )

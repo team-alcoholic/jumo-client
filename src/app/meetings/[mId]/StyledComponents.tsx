@@ -7,6 +7,7 @@ export const StyledBox = styled(Box)(({ theme }) => ({
     padding: theme.spacing(1),
     backgroundColor: theme.palette.background.paper,
     position: 'relative',
+    marginTop: "20px"
 }));
 
 export const StyledChip = styled(Chip)(({ theme }) => ({
@@ -48,4 +49,11 @@ export const Highlight = styled('span')(({ theme }) => ({
 export const RedText = styled('span')({
     color: 'red',
     fontWeight: 'bold',
+});
+
+export const LoadingContainerBox = styled(Box)({
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
 });

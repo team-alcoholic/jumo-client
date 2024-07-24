@@ -22,7 +22,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Provider>
-          {children}
+          <div className="container">
+            {children}
+          </div>
         </Provider>
       </body>
       { gaId && <GoogleAnalytics gaId={gaId} /> }
