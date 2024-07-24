@@ -9,7 +9,7 @@ export const LinkButton = styled(Link)({
   alignItems: 'flex-start',
   margin: '15px 10px',
   padding: '5px',
-  minHeight: "75px",
+  minHeight: "100px",
   border: '1px solid',
   borderRadius: '5px',
   color: 'inherit',
