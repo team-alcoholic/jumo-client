@@ -7,6 +7,7 @@ export const StyledBox = styled(Box)(({ theme }) => ({
     padding: theme.spacing(1),
     backgroundColor: theme.palette.background.paper,
     position: 'relative',
+    marginTop: "20px"
 }));
 
 export const StyledChip = styled(Chip)(({ theme }) => ({
