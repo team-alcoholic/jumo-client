@@ -4,7 +4,7 @@ import { Avatar, Box, ListItemAvatar, ListItemText, Skeleton } from "@mui/materi
 import { Meeting } from "../../app/meetings/page";
 import { useRef, useState } from "react";
 import useObserver from "@/hooks/useObserver";
-import { CardBox, DescriptionSpan, LinkButton } from "./StyledComponent";
+import { CardBox, DescriptionSpan } from "./StyledComponent";
 
 
 export default function MeetingCardSkeleton() {
