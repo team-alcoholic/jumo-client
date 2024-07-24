@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import styles from "../style/selectRegion.module.css";
+import { SelectRegionContainer } from "./StyledComponent";
 
 interface Region {
   admcd: String;
@@ -86,8 +86,9 @@ export default function SelectRegion({ onChange }: Props) {
     else if (major) onChange(major.admcd);
   }, [major, middle, minor, onChange]);
 
+
   return (
-    <Box className={styles.container}>
+    <SelectRegionContainer>
       <span>활동 지역을 선택해주세요</span>
 
       <Autocomplete
@@ -116,6 +117,6 @@ export default function SelectRegion({ onChange }: Props) {
         }}
         value={minor}
       />
-    </Box>
+    </SelectRegionContainer>
   );
 }
