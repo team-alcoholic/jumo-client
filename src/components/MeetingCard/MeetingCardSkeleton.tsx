@@ -1,7 +1,6 @@
 "use client";
 
 import { Avatar, Box, ListItemAvatar, ListItemText, Skeleton } from "@mui/material";
-import { Meetings } from "../../app/meetings/page";
 import { useRef, useState } from "react";
 import useObserver from "@/hooks/useObserver";
 import { CardBox, DescriptionSpan } from "./StyledComponent";
