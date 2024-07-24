@@ -9,28 +9,6 @@ import { useInfiniteQuery } from "react-query";
 import useLocalStorage from "use-local-storage";
 import MeetingCardSkeleton from "@/components/MeetingCard/MeetingCardSkeleton";
 
-export interface Meeting {
-  id: number;
-  uuid: string;
-  name: string;
-  status: string;
-  meetingAt: string;
-  fixAt: string;
-  region: string;
-  liquors: string;
-  participatesMin: number|null;
-  participatesMax: number|null;
-  payment: number|null;
-  byob: boolean;
-  thumbnail: string;
-  externalService: string;
-}
-
-interface MeetingResponse {
-  meetings: Meeting[],
-  lastId: number,
-  eof: boolean
-}
 
 const getMeetingList = async ({ pageParam=0 }) => {
   let response;
@@ -58,7 +36,7 @@ export default function MeetingsPage() {
   } = useInfiniteQuery({
       queryKey: ["meetingList"],
       queryFn: getMeetingList,
-      getNextPageParam: (lastPage: MeetingResponse) => (lastPage.eof) ? -1 : lastPage.lastId ,
+      getNextPageParam: (lastPage: MeetingListResponse) => (lastPage.eof) ? -1 : lastPage.lastId ,
   });
 
   // IntersectionObserver API 설정: 페이지 마지막 요소 도달 시 다음 페이지 호출
@@ -68,6 +46,8 @@ export default function MeetingsPage() {
   }
   useObserver({ target, onIntersect });
 
+
+  // return
   return (
     <div>
       <h4 style={{ textAlign: "center", marginBottom: "0", marginTop: "20px" }}>모임 목록</h4>
@@ -82,9 +62,9 @@ export default function MeetingsPage() {
           case 'success':
             return (
               <List>
-                {data.pages.map((page: MeetingResponse, i) => (
+                {data.pages.map((page: MeetingListResponse, i) => (
                   <div key={i}>
-                    {page.meetings.map((info: Meeting) => (
+                    {page.meetings.map((info: MeetingInfo) => (
                       <MeetingCard key={info.id} meeting={info} />
                     ))}
                   </div>
