@@ -50,3 +50,10 @@ export const RedText = styled('span')({
     color: 'red',
     fontWeight: 'bold',
 });
+
+export const LoadingContainerBox = styled(Box)({
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+});

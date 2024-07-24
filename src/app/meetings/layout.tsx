@@ -9,6 +9,7 @@ export default function MeetingsLayout({ children }: { children: React.ReactNode
       <Header style={{ backgroundColor: "white" }}>
         <Typography variant="h4">JUMO</Typography>
       </Header>
+      <div style={{ width:"100%", height: "80px" }}></div>
       {children}
     </div>
   );
