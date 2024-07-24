@@ -38,7 +38,7 @@ export default function MeetingCard(
           </Box>
         )}
       <DescriptionSpan>
-        {`${meeting.liquors}, 회비 ${meeting.payment}원`}
+        {visible && `${meeting.liquors}, 회비 ${meeting.payment}원`}
       </DescriptionSpan>
     </LinkButton>
   )
