@@ -1,3 +1,9 @@
+import { CircularProgress } from "@mui/material";
+
 export default function MeetingLoading() {
-  return <h1>Loading..</h1>
+  return (
+    <div style={{ width: "100vw", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <CircularProgress />
+    </div>
+  )
 }
