@@ -1,7 +1,7 @@
 "use client"
 
-import MeetingCard from "@/component/MeetingCard";
-import useObserver from "@/hook/useObserver";
+import MeetingCard from "@/components/MeetingCard/MeetingCard";
+import useObserver from "@/hooks/useObserver";
 import { List } from "@mui/material";
 import axios from "axios";
 import { useEffect, useRef } from "react";
@@ -24,6 +24,7 @@ export interface Meeting {
   thumbnail: string;
   externalService: string;
 }
+
 interface MeetingResponse {
   meetings: Meeting[],
   lastId: number,
@@ -53,11 +54,11 @@ export default function MeetingsPage() {
     fetchNextPage,
     isFetchingNextPage,
     status
-  } = useInfiniteQuery(
-    "meetingList",
-    getMeetingList,
-    { getNextPageParam: (lastPage: MeetingResponse) => (lastPage.eof) ? -1 : lastPage.lastId }
-  );
+  } = useInfiniteQuery({
+      queryKey: ["meetingList"],
+      queryFn: getMeetingList,
+      getNextPageParam: (lastPage: MeetingResponse) => (lastPage.eof) ? -1 : lastPage.lastId ,
+  });
 
   // IntersectionObserver API 설정: 페이지 마지막 요소 도달 시 다음 페이지 호출
   const target = useRef(null);
@@ -69,19 +70,26 @@ export default function MeetingsPage() {
   return (
     <div>
       <h4 style={{ textAlign: "center", marginBottom: "0" }}>모임 목록</h4>
-      {status === "loading" && "불러오는 중..."}
-      {status === "error" && "에러"}
-      {status === "success" &&
-        <List>
-          {data.pages.map((page: MeetingResponse, i) => (
-            <div key={i}>
-              {page.meetings.map((info: Meeting) => (
-                <MeetingCard key={info.id} meeting={info} />
-              ))}
-            </div>
-          ))}
-        </List>
-      }
+      {(()=>{
+        switch(status){
+          case 'error':
+            return '에러'
+          case 'loading':
+            return "불러오는 중..."
+          case 'success':
+            return (<List>
+                    {data.pages.map((page: MeetingResponse, i) => (
+                      <div key={i}>
+                        {page.meetings.map((info: Meeting) => (
+                          <MeetingCard key={info.id} meeting={info} />
+                        ))}
+                      </div>
+                    ))}
+                  </List>)
+          default: 
+            return null
+        }
+      })()}
       <div ref={target} />
       {isFetchingNextPage && "이어서 불러오는 중..."}
     </div>

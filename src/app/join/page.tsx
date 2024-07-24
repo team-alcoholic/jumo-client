@@ -1,9 +1,7 @@
 "use client"
 
-import SelectRegion from "@/component/selectRegion";
-import Box from "@mui/material/Box";
+import SelectRegion from "@/components/SelectRegion/SelectRegion";
 import Button from "@mui/material/Button";
-import styles from "../../style/join.module.css";
 import { useState } from "react";
 
 
@@ -20,17 +18,9 @@ export default function JoinPage() {
   }
 
   return (
-    <Box className={styles.container}>
-
-      <Box className={styles.header}>
-        <h1>JUMO</h1>
-        <span>당신이 찾던 완벽한 주류모임, 주모</span>
-      </Box>
-
+    <>
       <SelectRegion onChange={regionChange} />
-
       <Button variant="contained" onClick={joinButtonClicked}>회원가입하기</Button>
-
-    </Box>
+    </>
   );
 }

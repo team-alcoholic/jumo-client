@@ -6,7 +6,7 @@ import {
   Highlight,
   RedText,
 } from "./StyledComponents";
-import ImageSlider from "../../../component/ImageSlider";
+import ImageSlider from "../../../components/ImageSlider/ImageSlider";
 import {
   Event,
   Place,
@@ -19,7 +19,7 @@ import { formatPrice, formatDate } from "@/utils/format";
 
 const DEFAULT_MESSAGE = <RedText>직접 확인 필요</RedText>;
 const EXTERNAL_SERVICE_MESSAGE =
-  "주모가 아닌 외부 커뮤니티에서 진행하는 주류 모임 입니다. 해당 커뮤티티에서 진행해주세요. (하단에 링크 제공) 해당 커뮤니티 운영 정책에 따라 회원가입 및 추가 절차가 필요할 수 있습니다. 또한 정보가 실제 게시물 정보와 다를 수 있으니 직접 확인해보셔야 합니다.";
+  "주모가 아닌 외부 커뮤니티에서 진행하는 주류 모임 입니다. 해당 커뮤니티에서 진행해주세요. (하단에 링크 제공) 해당 커뮤니티 운영 정책에 따라 회원가입 및 추가 절차가 필요할 수 있습니다. 또한 정보가 실제 게시물 정보와 다를 수 있으니 직접 확인해보셔야 합니다.";
 
 interface ResponseData {
   images: string[];
@@ -40,6 +40,10 @@ interface ResponseData {
   externalService: string | null;
   externalLink: string;
 }
+
+// type PickedData=Pick<ResponseData,'byob'|'byobMax'>
+// type OmittedData=Omit<ResponseData,'byob'|'byobMax'>
+// type PartialData=PartialData<ResponseData>
 
 // 데이터를 가져오는 함수
 // 1분마다 캐시를 업데이트
@@ -62,12 +66,10 @@ async function fetchData(mId: string) {
 }
 
 export default async function PostPage({
-  params,
+  params:{mId},
 }: {
   params: { mId: string };
 }) {
-  const data = await fetchData(params.mId);
-
   const {
     images,
     name,
@@ -82,11 +84,10 @@ export default async function PostPage({
     paymentMethod,
     byob,
     byobMin,
-    byobMax,
     description,
     externalService,
     externalLink,
-  } = data;
+  } = await fetchData(mId);
 
   return (
     <Container maxWidth="sm" sx={{ padding: 0 }}>
