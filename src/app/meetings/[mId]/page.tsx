@@ -16,6 +16,7 @@ import {
   People,
 } from "@mui/icons-material";
 import { formatPrice, formatDateTime } from "@/utils/format";
+import { COMMUNITY_NAME } from "@/constants/communityNames";
 
 const DEFAULT_MESSAGE = <RedText>직접 확인 필요</RedText>;
 const EXTERNAL_SERVICE_MESSAGE =
@@ -89,6 +90,7 @@ export default async function PostPage({
           gutterBottom
           sx={{ fontWeight: "bold" }}
         >
+          {externalService && `[${COMMUNITY_NAME[externalService]}] `}
           {name || DEFAULT_MESSAGE}
         </Typography>
         <Box my={2}>
