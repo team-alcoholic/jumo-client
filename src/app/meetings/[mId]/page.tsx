@@ -16,12 +16,11 @@ import {
   People,
 } from "@mui/icons-material";
 import { formatPrice, formatDateTime } from "@/utils/format";
+import { COMMUNITY_NAME } from "@/constants/communityNames";
 
 const DEFAULT_MESSAGE = <RedText>직접 확인 필요</RedText>;
 const EXTERNAL_SERVICE_MESSAGE =
   "주모가 아닌 외부 커뮤니티에서 진행하는 주류 모임 입니다. 해당 커뮤니티에서 진행해주세요. (하단에 링크 제공) 해당 커뮤니티 운영 정책에 따라 회원가입 및 추가 절차가 필요할 수 있습니다. 또한 정보가 실제 게시물 정보와 다를 수 있으니 직접 확인해보셔야 합니다.";
-
-
 
 // type PickedData=Pick<ResponseData,'byob'|'byobMax'>
 // type OmittedData=Omit<ResponseData,'byob'|'byobMax'>
@@ -48,7 +47,7 @@ async function fetchData(mId: string) {
 }
 
 export default async function PostPage({
-  params:{mId},
+  params: { mId },
 }: {
   params: { mId: string };
 }) {
@@ -70,6 +69,15 @@ export default async function PostPage({
     externalService,
     externalLink,
   } = await fetchData(mId);
+  // const DEFAULT_MESSAGE = "설명이 없습니다.";
+  const formattedDescription = description
+    ? description.split("\n").map((line, index) => (
+        <span key={index}>
+          {line}
+          <br />
+        </span>
+      ))
+    : DEFAULT_MESSAGE;
 
   return (
     <Container maxWidth="sm" sx={{ padding: 0 }}>
@@ -82,6 +90,7 @@ export default async function PostPage({
           gutterBottom
           sx={{ fontWeight: "bold" }}
         >
+          {externalService && `[${COMMUNITY_NAME[externalService]}] `}
           {name || DEFAULT_MESSAGE}
         </Typography>
         <Box my={2}>
@@ -207,7 +216,7 @@ export default async function PostPage({
             상세 설명
           </Typography>
           <Typography variant="body1" paragraph>
-            {description || DEFAULT_MESSAGE}
+            {formattedDescription}
           </Typography>
         </HighlightBox>
         <Button
