@@ -1,10 +1,23 @@
 "use client";
 
-import { Avatar, Box, ListItemAvatar, ListItemText } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  ListItemAvatar,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { useRef, useState } from "react";
 import useObserver from "@/hooks/useObserver";
 import useLocalStorage from "use-local-storage";
-import { DescriptionSpan, LinkButton } from "./StyledComponent";
+import {
+  DescriptionBox,
+  DescriptionSpan,
+  LinkButton,
+  ListItemHeaderBox,
+  ListItemTextBox,
+  ListItemTextTypo,
+} from "./StyledComponent";
 import { formatDate, formatDateWithoutDay } from "@/utils/format";
 import { COMMUNITY_DETAILS } from "@/constants/communityNames";
 import Image from "next/image";
@@ -33,14 +46,9 @@ export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
       ref={target}
       onClick={() => setScrollY(window.scrollY)}
       href={`/meetings/${meeting.id}`}
-      style={{
-        overflow: "hidden",
-        whiteSpace: "nowrap",
-        textOverflow: "ellipsis",
-      }}
     >
       {visible && (
-        <Box
+        <ListItemHeaderBox
           style={{
             display: "flex",
             alignItems: "center",
@@ -52,17 +60,31 @@ export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
             <Image
               src={meeting.thumbnail}
               alt="thumbnail"
-              width={40} // 원하는 너비 설정
-              height={40} // 원하는 높이 설정
+              width={45} // 원하는 너비 설정
+              height={45} // 원하는 높이 설정
               style={{
                 objectFit: "cover",
                 borderRadius: "20%", // 모서리를 둥글게 설정
+                boxShadow: "1px 1px 2px gray",
               }}
             />
           </ListItemAvatar>
           <ListItemText
             primary={`${meeting.name}`}
-            secondary={`${meeting.region !== null ? meeting.region : ""} ${meeting.meetingAt?.length ? formatDate(meeting.meetingAt) : "일시 미정"}`}
+            secondary={
+              <ListItemTextBox>
+                {meeting.createdAt && (
+                  <ListItemTextTypo>
+                    {`${formatDateWithoutDay(meeting.createdAt)} 작성 `}
+                  </ListItemTextTypo>
+                )}
+                {externalServiceName && (
+                  <ListItemTextTypo sx={{ color: externalServiceColor }}>
+                    {externalServiceName}
+                  </ListItemTextTypo>
+                )}
+              </ListItemTextBox>
+            }
             primaryTypographyProps={{
               style: {
                 overflow: "hidden",
@@ -78,24 +100,21 @@ export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
               },
             }}
           />
-        </Box>
+        </ListItemHeaderBox>
       )}
-      <DescriptionSpan>
-        <span style={{ color: "gray" }}>
-          {formatDateWithoutDay(meeting.createdAt)}
-        </span>{" "}
-        작성
-        <span style={{ color: externalServiceColor }}>
-          {" "}
-          {externalServiceName}
-        </span>
-      </DescriptionSpan>
-      <DescriptionSpan>
-        {visible &&
-          (meeting.liquors || meeting.payment
-            ? `${meeting.liquors ? meeting.liquors + " 모임" : ""}${meeting.liquors && meeting.payment ? ", " : ""}${meeting.payment ? `회비 ${meeting.payment}원` : ""}`
-            : "상세 정보를 확인해보세요.")}
-      </DescriptionSpan>
+      {visible && (
+        <DescriptionBox>
+          <DescriptionSpan>
+            {`${meeting.region !== null ? meeting.region : ""} ${meeting.meetingAt?.length ? formatDate(meeting.meetingAt) : "일시 미정"}`}
+          </DescriptionSpan>
+          <DescriptionSpan>
+            {visible &&
+              (meeting.liquors || meeting.payment
+                ? `${meeting.liquors ? meeting.liquors + " 모임" : ""}${meeting.liquors && meeting.payment ? ", " : ""}${meeting.payment ? `회비 ${meeting.payment}원` : ""}`
+                : "상세 정보를 확인해보세요.")}
+          </DescriptionSpan>
+        </DescriptionBox>
+      )}
     </LinkButton>
   );
 }
