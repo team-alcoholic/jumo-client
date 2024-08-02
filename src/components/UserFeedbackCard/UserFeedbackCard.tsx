@@ -29,7 +29,7 @@ export default function UserFeedbackCard() {
 }
 
 const CardContainer = styled(Card)({
-  margin: '40px 0',
+  margin: '20px 0',
   padding: '15px 15px',
   minHeight: '100px',
   display: 'flex',
