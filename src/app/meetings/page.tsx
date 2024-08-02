@@ -2,7 +2,14 @@
 
 import MeetingCard from "@/components/MeetingCard/MeetingCard";
 import useObserver from "@/hooks/useObserver";
-import { List, ButtonGroup, Button, styled, Typography } from "@mui/material";
+import {
+  List,
+  ButtonGroup,
+  Button,
+  styled,
+  Typography,
+  Box,
+} from "@mui/material";
 
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
@@ -138,16 +145,16 @@ export default function MeetingsPage() {
       )}
     </ContainerBox>
   );
-
+}
 const ContainerBox = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center'
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
 });
 
 const Title = styled(Typography)({
-  marginTop: '10px',
-  padding: '0 10px',
-  fontSize: '20px',
-  color: 'gray'
+  marginTop: "10px",
+  padding: "0 10px",
+  fontSize: "20px",
+  color: "gray",
 });
