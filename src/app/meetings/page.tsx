@@ -2,12 +2,13 @@
 
 import MeetingCard from "@/components/MeetingCard/MeetingCard";
 import useObserver from "@/hooks/useObserver";
-import { List } from "@mui/material";
+import { Box, List, styled, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useRef } from "react";
 import { useInfiniteQuery } from "react-query";
 import useLocalStorage from "use-local-storage";
 import MeetingCardSkeleton from "@/components/MeetingCard/MeetingCardSkeleton";
+import UserFeedbackCard from "@/components/UserFeedbackCard/UserFeedbackCard";
 
 
 const getMeetingList = async ({ pageParam=0 }) => {
@@ -49,8 +50,9 @@ export default function MeetingsPage() {
 
   // return
   return (
-    <div>
-      <h4 style={{ textAlign: "center", marginBottom: "0", marginTop: "20px" }}>모임 목록</h4>
+    <ContainerBox>
+      <UserFeedbackCard />
+      <Title>모임 목록</Title>
       {(()=>{
         switch(status){
           case 'error':
@@ -79,6 +81,19 @@ export default function MeetingsPage() {
       {isFetchingNextPage && <div>
                 {Array.from({ length: 30 }).map((_, i) => <MeetingCardSkeleton key={i} /> )}
               </div>}
-    </div>
+    </ContainerBox>
   )
 }
+
+const ContainerBox = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center'
+});
+
+const Title = styled(Typography)({
+  marginTop: '10px',
+  padding: '0 10px',
+  fontSize: '20px',
+  color: 'gray'
+});
