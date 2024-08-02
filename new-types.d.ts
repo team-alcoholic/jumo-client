@@ -22,6 +22,7 @@ interface MeetingInfo {
   byob: boolean;
   thumbnail: string;
   externalService: string | null;
+  createdAt: string;
 }
 
 interface MeetingDetailInfo extends MeetingInfo {
