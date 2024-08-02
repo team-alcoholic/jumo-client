@@ -12,7 +12,7 @@ import useObserver from "@/hooks/useObserver";
 import useLocalStorage from "use-local-storage";
 import {
   DescriptionBox,
-  DescriptionSpan,
+  DescriptionContentBox,
   LinkButton,
   ListItemHeaderBox,
   ListItemTextBox,
@@ -104,15 +104,15 @@ export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
       )}
       {visible && (
         <DescriptionBox>
-          <DescriptionSpan>
+          <DescriptionContentBox>
             {`${meeting.region !== null ? meeting.region : ""} ${meeting.meetingAt?.length ? formatDate(meeting.meetingAt) : "일시 미정"}`}
-          </DescriptionSpan>
-          <DescriptionSpan>
+          </DescriptionContentBox>
+          <DescriptionContentBox>
             {visible &&
               (meeting.liquors || meeting.payment
                 ? `${meeting.liquors ? meeting.liquors + " 모임" : ""}${meeting.liquors && meeting.payment ? ", " : ""}${meeting.payment ? `회비 ${meeting.payment}원` : ""}`
                 : "상세 정보를 확인해보세요.")}
-          </DescriptionSpan>
+          </DescriptionContentBox>
         </DescriptionBox>
       )}
     </LinkButton>

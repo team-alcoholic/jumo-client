@@ -27,7 +27,7 @@ export const CardBox = styled(Box)({
   alignItems: "flex-start",
   margin: "15px 10px",
   padding: "5px",
-  minHeight: "150px",
+  minHeight: "130px",
   border: "0.5px solid",
   borderRadius: "5px",
   borderColor: "gray",
@@ -50,6 +50,9 @@ export const ListItemTextBox = styled(Box)({
 
 export const ListItemTextTypo = styled(Typography)({
   fontSize: "14px",
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
 });
 
 export const DescriptionBox = styled(Box)({
@@ -59,9 +62,12 @@ export const DescriptionBox = styled(Box)({
   padding: "5px 0",
 });
 
-export const DescriptionSpan = emotionStyled.span`
-  padding: 0 2px;
-  word-break: break-word;
-  color: gray;
-  font-size: 15px;
-`;
+export const DescriptionContentBox = styled(Box)({
+  padding: "0 2px",
+  wordBreak: "break-word",
+  color: "gray",
+  fontSize: "15px",
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
+});
