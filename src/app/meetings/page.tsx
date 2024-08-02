@@ -53,6 +53,9 @@ const getMeetingList = async ({
   return response.data;
 };
 
+
+const SORT_OPTIONS=[{option:'created-at',label:'생성일순'},{option:'meeting-at',label:'모임 날짜순'},{option:'meeting-at-asc',label:'모임 임박순'}]
+
 export default function MeetingsPage() {
   // 스크롤 위치 유지
   const [scrollY] = useLocalStorage("meeting-list-scroll", 0);
@@ -64,7 +67,7 @@ export default function MeetingsPage() {
   const [sortOption, setSortOption] = useState("created-at");
 
   // useInfiniteQuery 설정
-  const { data, fetchNextPage, isFetchingNextPage, status, refetch } =
+  const { data, fetchNextPage, isFetchingNextPage, status } =
     useInfiniteQuery({
       queryKey: ["meetingList", sortOption], // sortOption을 queryKey에 포함
       queryFn: ({ pageParam }) =>
@@ -82,11 +85,8 @@ export default function MeetingsPage() {
   };
   useObserver({ target, onIntersect });
 
-  // 정렬 옵션 변경 함수
-  const handleSortChange = (newSort: string) => {
-    setSortOption(newSort);
-    refetch(); // 새로운 정렬 옵션으로 데이터를 다시 불러옴
-  };
+  /** 정렬 옵션 변경 함수 */
+  const handleSortChange = (newSort: string) => setSortOption(newSort);
 
   // return
   return (
@@ -96,24 +96,15 @@ export default function MeetingsPage() {
       <ButtonGroup
         style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}
       >
-        <Button
-          onClick={() => handleSortChange("created-at")}
-          variant={sortOption === "created-at" ? "contained" : "outlined"}
-        >
-          생성일순
-        </Button>
-        <Button
-          onClick={() => handleSortChange("meeting-at")}
-          variant={sortOption === "meeting-at" ? "contained" : "outlined"}
-        >
-          모임 날짜순
-        </Button>
-        <Button
-          onClick={() => handleSortChange("meeting-at-asc")}
-          variant={sortOption === "meeting-at-asc" ? "contained" : "outlined"}
-        >
-          모임 임박순
-        </Button>
+        {SORT_OPTIONS.map(({option,label})=>(
+          <Button
+            key={option}
+            onClick={() => handleSortChange(option)}
+            variant={sortOption === option ? "contained" : "outlined"}
+          >
+            {label}
+          </Button>
+        ))}
       </ButtonGroup>
       {(() => {
         switch (status) {
