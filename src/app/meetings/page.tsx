@@ -8,6 +8,7 @@ import { useEffect, useRef } from "react";
 import { useInfiniteQuery } from "react-query";
 import useLocalStorage from "use-local-storage";
 import MeetingCardSkeleton from "@/components/MeetingCard/MeetingCardSkeleton";
+import UserFeedbackCard from "@/components/UserFeedbackCard/UserFeedbackCard";
 
 
 const getMeetingList = async ({ pageParam=0 }) => {
@@ -50,7 +51,8 @@ export default function MeetingsPage() {
   // return
   return (
     <div>
-      <h4 style={{ textAlign: "center", marginBottom: "0", marginTop: "20px" }}>모임 목록</h4>
+      <UserFeedbackCard />
+      <h4 style={{ textAlign: "center" }}>모임 목록</h4>
       {(()=>{
         switch(status){
           case 'error':
