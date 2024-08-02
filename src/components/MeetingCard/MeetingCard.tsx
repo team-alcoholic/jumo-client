@@ -7,6 +7,7 @@ import useLocalStorage from "use-local-storage";
 import { DescriptionSpan, LinkButton } from "./StyledComponent";
 import { formatDate } from "@/utils/format";
 import { COMMUNITY_NAME } from "@/constants/communityNames";
+import Image from "next/image";
 
 export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
   const [visible, setVisible] = useState(false);
@@ -45,10 +46,15 @@ export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
           }}
         >
           <ListItemAvatar>
-            <Avatar
-              alt="thumbnail"
+            <Image
               src={meeting.thumbnail}
-              slotProps={{ img: { loading: "lazy" } }}
+              alt="thumbnail"
+              width={40} // 원하는 너비 설정
+              height={40} // 원하는 높이 설정
+              style={{
+                objectFit: "cover",
+                borderRadius: "20%", // 모서리를 둥글게 설정
+              }}
             />
           </ListItemAvatar>
           <ListItemText
