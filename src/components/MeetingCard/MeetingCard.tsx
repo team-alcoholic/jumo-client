@@ -62,7 +62,7 @@ export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
           </ListItemAvatar>
           <ListItemText
             primary={`${meeting.name}`}
-            secondary={`${meeting.region} | ${meeting.meetingAt?.length ? formatDate(meeting.meetingAt) : "일시 미정"}`}
+            secondary={`${meeting.region !== null ? meeting.region : ""} ${meeting.meetingAt?.length ? formatDate(meeting.meetingAt) : "일시 미정"}`}
             primaryTypographyProps={{
               style: {
                 overflow: "hidden",

@@ -20,9 +20,17 @@ import UserFeedbackCard from "@/components/UserFeedbackCard/UserFeedbackCard";
 
 // MeetingListResponse와 MeetingInfo 타입 정의 (필요한 경우 추가)
 
+interface pageParamType {
+  id: number | null;
+  date: string | null;
+}
+
 const getMeetingList = async ({
   pageParam = { id: null, date: null },
   sort,
+}: {
+  pageParam: pageParamType;
+  sort: String;
 }) => {
   let response;
   if (pageParam.id === -1) return { meetings: [] };
@@ -53,7 +61,7 @@ export default function MeetingsPage() {
   }, [scrollY]);
 
   // 정렬 옵션 상태 관리
-  const [sortOption, setSortOption] = useState("meeting-at");
+  const [sortOption, setSortOption] = useState("created-at");
 
   // useInfiniteQuery 설정
   const { data, fetchNextPage, isFetchingNextPage, status, refetch } =
@@ -75,7 +83,7 @@ export default function MeetingsPage() {
   useObserver({ target, onIntersect });
 
   // 정렬 옵션 변경 함수
-  const handleSortChange = (newSort) => {
+  const handleSortChange = (newSort: string) => {
     setSortOption(newSort);
     refetch(); // 새로운 정렬 옵션으로 데이터를 다시 불러옴
   };
@@ -89,22 +97,22 @@ export default function MeetingsPage() {
         style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}
       >
         <Button
+          onClick={() => handleSortChange("created-at")}
+          variant={sortOption === "created-at" ? "contained" : "outlined"}
+        >
+          생성일순
+        </Button>
+        <Button
           onClick={() => handleSortChange("meeting-at")}
           variant={sortOption === "meeting-at" ? "contained" : "outlined"}
         >
-          최근 모임
+          모임 날짜순
         </Button>
         <Button
           onClick={() => handleSortChange("meeting-at-asc")}
           variant={sortOption === "meeting-at-asc" ? "contained" : "outlined"}
         >
-          과거 모임
-        </Button>
-        <Button
-          onClick={() => handleSortChange("created-at")}
-          variant={sortOption === "created-at" ? "contained" : "outlined"}
-        >
-          생성일순
+          모임 임박순
         </Button>
       </ButtonGroup>
       {(() => {
