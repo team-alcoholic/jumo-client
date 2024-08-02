@@ -1,9 +1,10 @@
 // Types
 
 interface MeetingListResponse {
-  meetings: MeetingInfo[],
-  lastId: number,
-  eof: boolean
+  meetings: MeetingInfo[];
+  cursorId: number;
+  eof: boolean;
+  cursorDate: string | null;
 }
 
 interface MeetingInfo {
