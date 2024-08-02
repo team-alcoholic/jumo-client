@@ -15,8 +15,15 @@ import {
   Payment,
   People,
 } from "@mui/icons-material";
-import { formatPrice, formatDateTime } from "@/utils/format";
-import { COMMUNITY_NAME } from "@/constants/communityNames";
+import {
+  formatPrice,
+  formatDateTime,
+  formatDateWithoutDay,
+  formatDate,
+} from "@/utils/format";
+import { COMMUNITY_DETAILS } from "@/constants/communityNames";
+import { isNaverCafeUrl, convertToMobileUrl } from "@/utils/urlConverter";
+import { DescriptionSpan } from "@/components/MeetingCard/StyledComponent";
 
 const DEFAULT_MESSAGE = <RedText>직접 확인 필요</RedText>;
 const EXTERNAL_SERVICE_MESSAGE =
@@ -68,6 +75,7 @@ export default async function PostPage({
     description,
     externalService,
     externalLink,
+    createdAt,
   } = await fetchData(mId);
   // const DEFAULT_MESSAGE = "설명이 없습니다.";
   const formattedDescription = description
@@ -90,8 +98,12 @@ export default async function PostPage({
           gutterBottom
           sx={{ fontWeight: "bold" }}
         >
-          {externalService && `[${COMMUNITY_NAME[externalService]}] `}
+          {externalService && `[${COMMUNITY_DETAILS[externalService].name}] `}
           {name || DEFAULT_MESSAGE}
+        </Typography>
+        <Typography variant="body2" gutterBottom>
+          {externalService && `${COMMUNITY_DETAILS[externalService].name}에서 `}
+          {formatDate(createdAt)}에 작성됨
         </Typography>
         <Box my={2}>
           {region && <StyledChip label={region} />}
@@ -219,15 +231,38 @@ export default async function PostPage({
             {formattedDescription}
           </Typography>
         </HighlightBox>
-        <Button
-          variant="contained"
-          fullWidth
-          color="primary"
-          sx={{ marginTop: 2 }}
-          href={externalLink}
-        >
-          해당 커뮤니티로 이동
-        </Button>
+        {!isNaverCafeUrl(externalLink) ? (
+          <Button
+            variant="contained"
+            fullWidth
+            color="primary"
+            sx={{ marginTop: 2 }}
+            href={externalLink}
+          >
+            해당 커뮤니티로 이동
+          </Button>
+        ) : (
+          <>
+            <Button
+              variant="contained"
+              fullWidth
+              color="primary"
+              sx={{ marginTop: 2 }}
+              href={externalLink}
+            >
+              데스크탑 버전으로 커뮤니티 이동
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              color="primary"
+              sx={{ marginTop: 2 }}
+              href={convertToMobileUrl(externalLink) ?? "/"}
+            >
+              모바일 버전으로 커뮤니티 이동
+            </Button>
+          </>
+        )}
       </StyledBox>
     </Container>
   );

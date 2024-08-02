@@ -5,8 +5,9 @@ import { useRef, useState } from "react";
 import useObserver from "@/hooks/useObserver";
 import useLocalStorage from "use-local-storage";
 import { DescriptionSpan, LinkButton } from "./StyledComponent";
-import { formatDate } from "@/utils/format";
-import { COMMUNITY_NAME } from "@/constants/communityNames";
+import { formatDate, formatDateWithoutDay } from "@/utils/format";
+import { COMMUNITY_DETAILS } from "@/constants/communityNames";
+import Image from "next/image";
 
 export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
   const [visible, setVisible] = useState(false);
@@ -18,11 +19,14 @@ export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
     setVisible(entry.isIntersecting);
   useObserver({ target, onIntersect, threshold: 0.1 });
 
-  const externalServiceName =
-    meeting.externalService &&
-    COMMUNITY_NAME.hasOwnProperty(meeting.externalService)
-      ? COMMUNITY_NAME[meeting.externalService]
-      : "";
+  const externalService = meeting.externalService || "";
+  const communityDetails = COMMUNITY_DETAILS[externalService] || {
+    name: "",
+    color: "",
+  };
+
+  const externalServiceName = communityDetails.name;
+  const externalServiceColor = communityDetails.color;
 
   return (
     <LinkButton
@@ -45,15 +49,20 @@ export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
           }}
         >
           <ListItemAvatar>
-            <Avatar
-              alt="thumbnail"
+            <Image
               src={meeting.thumbnail}
-              slotProps={{ img: { loading: "lazy" } }}
+              alt="thumbnail"
+              width={40} // 원하는 너비 설정
+              height={40} // 원하는 높이 설정
+              style={{
+                objectFit: "cover",
+                borderRadius: "20%", // 모서리를 둥글게 설정
+              }}
             />
           </ListItemAvatar>
           <ListItemText
             primary={`${meeting.name}`}
-            secondary={`${meeting.region} | ${meeting.meetingAt?.length ? formatDate(meeting.meetingAt) : "일시 미정"}`}
+            secondary={`${meeting.region !== null ? meeting.region : ""} ${meeting.meetingAt?.length ? formatDate(meeting.meetingAt) : "일시 미정"}`}
             primaryTypographyProps={{
               style: {
                 overflow: "hidden",
@@ -72,11 +81,20 @@ export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
         </Box>
       )}
       <DescriptionSpan>
-        {externalServiceName}
+        <span style={{ color: "gray" }}>
+          {formatDateWithoutDay(meeting.createdAt)}
+        </span>{" "}
+        작성
+        <span style={{ color: externalServiceColor }}>
+          {" "}
+          {externalServiceName}
+        </span>
+      </DescriptionSpan>
+      <DescriptionSpan>
         {visible &&
           (meeting.liquors || meeting.payment
-            ? `, ${meeting.liquors ? meeting.liquors + " 모임" : ""}${meeting.liquors && meeting.payment ? ", " : ""}${meeting.payment ? `회비 ${meeting.payment}원` : ""}`
-            : ", 상세 정보를 확인해보세요.")}
+            ? `${meeting.liquors ? meeting.liquors + " 모임" : ""}${meeting.liquors && meeting.payment ? ", " : ""}${meeting.payment ? `회비 ${meeting.payment}원` : ""}`
+            : "상세 정보를 확인해보세요.")}
       </DescriptionSpan>
     </LinkButton>
   );

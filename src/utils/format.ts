@@ -29,3 +29,8 @@ export const formatDate = (dateString: string): string => {
   const day = days[date.getUTCDay()];
   return `${("0" + (date.getUTCMonth() + 1)).slice(-2)}.${("0" + date.getUTCDate()).slice(-2)}(${day})`;
 };
+
+export const formatDateWithoutDay = (dateString: string): string => {
+  const date = new Date(dateString);
+  return `${("0" + (date.getUTCMonth() + 1)).slice(-2)}.${("0" + date.getUTCDate()).slice(-2)}`;
+};
