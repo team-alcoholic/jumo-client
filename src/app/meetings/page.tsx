@@ -2,12 +2,14 @@
 
 import MeetingCard from "@/components/MeetingCard/MeetingCard";
 import useObserver from "@/hooks/useObserver";
-import { List, ButtonGroup, Button } from "@mui/material";
+import { List, ButtonGroup, Button, styled, Typography } from "@mui/material";
+
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import useLocalStorage from "use-local-storage";
 import MeetingCardSkeleton from "@/components/MeetingCard/MeetingCardSkeleton";
+import UserFeedbackCard from "@/components/UserFeedbackCard/UserFeedbackCard";
 
 // MeetingListResponse와 MeetingInfo 타입 정의 (필요한 경우 추가)
 
@@ -73,10 +75,9 @@ export default function MeetingsPage() {
 
   // return
   return (
-    <div>
-      <h4 style={{ textAlign: "center", marginBottom: "0", marginTop: "20px" }}>
-        모임 목록
-      </h4>
+    <ContainerBox>
+      <UserFeedbackCard />
+      <Title>모임 목록</Title>
       <ButtonGroup
         style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}
       >
@@ -135,6 +136,18 @@ export default function MeetingsPage() {
           ))}
         </div>
       )}
-    </div>
+    </ContainerBox>
   );
-}
+
+const ContainerBox = styled(Box)({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center'
+});
+
+const Title = styled(Typography)({
+  marginTop: '10px',
+  padding: '0 10px',
+  fontSize: '20px',
+  color: 'gray'
+});
