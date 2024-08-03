@@ -3,7 +3,7 @@ name: JUMO client PROD CI/CD
 on:
   push:
     branches:
-      - "main"
+      - "feature/BYOB-148"
 
 jobs:
   build-docker-image:
