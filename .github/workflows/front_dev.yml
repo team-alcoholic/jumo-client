@@ -55,19 +55,24 @@ jobs:
               .filter(runner => runner.labels.some(label => label.name === 'dev'))
               .map(runner => runner.name);
 
-            console.log(devRunners);
-            return JSON.stringify(devRunners);
+            if (devRunners.length === 0) {
+              console.log("No dev runners found.");
+              core.setOutput('runners', '[]');
+            } else {
+              console.log("Dev runners found: ", devRunners);
+              core.setOutput('runners', JSON.stringify(devRunners));
+            }
           result-encoding: string
           github-token: ${{ secrets.MY_GITHUB_PAT }}
 
   deploy:
     needs: [build-docker-image, get-runners]
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         runner: ${{ fromJson(needs.get-runners.outputs.runners) }}
     steps:
-      - name: Select Runner
+      - name: Check Runner Name
         run: |
           echo "Deploying on runner: ${{ matrix.runner }}"
 
