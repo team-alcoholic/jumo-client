@@ -55,7 +55,7 @@ const getMeetingList = async ({
 };
 
 const SORT_OPTIONS = [
-  { option: "created-at", label: "생성일순" },
+  { option: "created-at", label: "최신 작성순" },
   { option: "meeting-at", label: "모임 날짜순" },
   { option: "meeting-at-asc", label: "모임 임박순" },
 ];
