@@ -46,12 +46,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const runners = await github.actions.listSelfHostedRunnersForRepo({
+            const response = await github.request('GET /repos/{owner}/{repo}/actions/runners', {
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
 
-            const devRunners = runners.data.runners
+            const devRunners = response.data.runners
               .filter(runner => runner.labels.some(label => label.name === 'dev'))
               .map(runner => runner.name);
 
