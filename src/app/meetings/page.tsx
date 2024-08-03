@@ -9,6 +9,7 @@ import {
   styled,
   Typography,
   Box,
+  Divider,
 } from "@mui/material";
 
 import axios from "axios";
@@ -46,15 +47,18 @@ const getMeetingList = async ({
 
   response = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/meetings?sort=${sort}`,
-    { params },
+    { params }
   );
 
   console.log(response.data);
   return response.data;
 };
 
-
-const SORT_OPTIONS=[{option:'created-at',label:'생성일순'},{option:'meeting-at',label:'모임 날짜순'},{option:'meeting-at-asc',label:'모임 임박순'}]
+const SORT_OPTIONS = [
+  { option: "created-at", label: "최신 작성순" },
+  { option: "meeting-at", label: "모임 날짜순" },
+  { option: "meeting-at-asc", label: "모임 임박순" },
+];
 
 export default function MeetingsPage() {
   // 스크롤 위치 유지
@@ -67,16 +71,14 @@ export default function MeetingsPage() {
   const [sortOption, setSortOption] = useState("created-at");
 
   // useInfiniteQuery 설정
-  const { data, fetchNextPage, isFetchingNextPage, status } =
-    useInfiniteQuery({
-      queryKey: ["meetingList", sortOption], // sortOption을 queryKey에 포함
-      queryFn: ({ pageParam }) =>
-        getMeetingList({ pageParam, sort: sortOption }),
-      getNextPageParam: (lastPage: MeetingListResponse) =>
-        lastPage.eof
-          ? undefined
-          : { id: lastPage.cursorId, date: lastPage.cursorDate },
-    });
+  const { data, fetchNextPage, isFetchingNextPage, status } = useInfiniteQuery({
+    queryKey: ["meetingList", sortOption], // sortOption을 queryKey에 포함
+    queryFn: ({ pageParam }) => getMeetingList({ pageParam, sort: sortOption }),
+    getNextPageParam: (lastPage: MeetingListResponse) =>
+      lastPage.eof
+        ? undefined
+        : { id: lastPage.cursorId, date: lastPage.cursorDate },
+  });
 
   // IntersectionObserver API 설정: 페이지 마지막 요소 도달 시 다음 페이지 호출
   const target = useRef(null);
@@ -93,10 +95,16 @@ export default function MeetingsPage() {
     <ContainerBox>
       <UserFeedbackCard />
       <Title>모임 목록</Title>
+      <Divider />
       <ButtonGroup
-        style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "30px",
+          marginBottom: "10px",
+        }}
       >
-        {SORT_OPTIONS.map(({option,label})=>(
+        {SORT_OPTIONS.map(({ option, label }) => (
           <Button
             key={option}
             onClick={() => handleSortChange(option)}
@@ -145,6 +153,7 @@ export default function MeetingsPage() {
     </ContainerBox>
   );
 }
+
 const ContainerBox = styled(Box)({
   display: "flex",
   flexDirection: "column",
@@ -152,8 +161,9 @@ const ContainerBox = styled(Box)({
 });
 
 const Title = styled(Typography)({
-  marginTop: "10px",
+  marginTop: "30px",
   padding: "0 10px",
-  fontSize: "20px",
+  fontSize: "25px",
   color: "gray",
+  textAlign: "center",
 });
