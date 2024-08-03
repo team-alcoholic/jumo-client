@@ -9,7 +9,11 @@ import {
 } from "@mui/material";
 import { useRef, useState } from "react";
 import useObserver from "@/hooks/useObserver";
-import { CardBox, DescriptionSpan } from "./StyledComponent";
+import {
+  CardBox,
+  DescriptionBox,
+  DescriptionContentBox,
+} from "./StyledComponent";
 
 export default function MeetingCardSkeleton() {
   const [visible, setVisible] = useState(false);
@@ -32,19 +36,21 @@ export default function MeetingCardSkeleton() {
         }}
       >
         <ListItemAvatar>
-          <Skeleton variant="circular" width={40} height={40} />
+          <Skeleton variant="circular" width={45} height={45} />
         </ListItemAvatar>
         <Box>
-          <Skeleton variant="text" width={400} />
-          <Skeleton variant="text" width={400} />
+          <Skeleton variant="text" width={350} />
+          <Skeleton variant="text" width={300} />
         </Box>
       </Box>
-      <DescriptionSpan>
-        <Skeleton variant="text" width={300} />
-      </DescriptionSpan>
-      <DescriptionSpan>
-        <Skeleton variant="text" width={300} />
-      </DescriptionSpan>
+      <DescriptionBox>
+        <DescriptionContentBox>
+          <Skeleton variant="text" width={300} />
+        </DescriptionContentBox>
+        <DescriptionContentBox>
+          <Skeleton variant="text" width={300} />
+        </DescriptionContentBox>
+      </DescriptionBox>
     </CardBox>
   );
 }

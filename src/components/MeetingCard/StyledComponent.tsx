@@ -1,5 +1,4 @@
-import { Box, ListItemText, styled, Typography } from "@mui/material";
-import emotionStyled from "@emotion/styled";
+import { Box, styled, Typography } from "@mui/material";
 import Link from "next/link";
 
 export const LinkButton = styled(Link)({
@@ -7,10 +6,10 @@ export const LinkButton = styled(Link)({
   flexDirection: "column",
   alignItems: "flex-start",
   justifyContent: "space-between",
-  gap: "5px",
+  gap: "2px",
   margin: "15px 10px",
   padding: "10px 20px",
-  minHeight: "130px",
+  minHeight: "150px",
   border: "0.5px solid",
   borderRadius: "5px",
   borderColor: "gray",
@@ -25,9 +24,11 @@ export const CardBox = styled(Box)({
   display: "flex",
   flexDirection: "column",
   alignItems: "flex-start",
+  justifyContent: "space-between",
+  gap: "5px",
   margin: "15px 10px",
-  padding: "5px",
-  minHeight: "130px",
+  padding: "10px 15px",
+  minHeight: "150px",
   border: "0.5px solid",
   borderRadius: "5px",
   borderColor: "gray",
@@ -59,7 +60,7 @@ export const DescriptionBox = styled(Box)({
   display: "flex",
   flexDirection: "column",
   gap: "5px",
-  padding: "5px 0",
+  padding: "8px 0",
 });
 
 export const DescriptionContentBox = styled(Box)({
