@@ -58,6 +58,7 @@ jobs:
             console.log(devRunners);
             return JSON.stringify(devRunners);
           result-encoding: string
+          github-token: ${{ secrets.MY_GITHUB_PAT }}
 
   deploy:
     needs: [build-docker-image, get-runners]
