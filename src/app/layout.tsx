@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../styles/globals.css";
 import Provider from "./provider";
-import { GoogleAnalytics } from "@next/third-parties/google"
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,14 +20,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Google Search Console */}
+        <meta
+          name="google-site-verification"
+          content="jkoYdn7HV4fimraagC-nhIJYIs8bbgU_K2Q3VmEu-bY"
+        />
+        {/* Naver Search Advisor */}
+        <meta
+          name="naver-site-verification"
+          content="9ac48991deaaa73527ef2d50075aa95f73ce6c73"
+        />
+      </head>
       <body className={inter.className}>
         <Provider>
-          <div className="container">
-            {children}
-          </div>
+          <div className="container">{children}</div>
         </Provider>
       </body>
-      { gaId && <GoogleAnalytics gaId={gaId} /> }
+      {gaId && <GoogleAnalytics gaId={gaId} />}
     </html>
   );
 }
