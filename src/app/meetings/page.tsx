@@ -10,17 +10,19 @@ import {
   Typography,
   Box,
   Divider,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "react-query";
-import useLocalStorage from "use-local-storage";
+// import useLocalStorage from "use-local-storage";
 import MeetingCardSkeleton from "@/components/MeetingCard/MeetingCardSkeleton";
 import UserFeedbackCard from "@/components/UserFeedbackCard/UserFeedbackCard";
 
 // MeetingListResponse와 MeetingInfo 타입 정의 (필요한 경우 추가)
-
 interface pageParamType {
   id: number | null;
   date: string | null;
@@ -29,9 +31,11 @@ interface pageParamType {
 const getMeetingList = async ({
   pageParam = { id: null, date: null },
   sort,
+  // liquors,
 }: {
   pageParam: pageParamType;
   sort: String;
+  // liquors: String;
 }) => {
   let response;
   if (pageParam.id === -1) return { meetings: [] };
@@ -47,6 +51,7 @@ const getMeetingList = async ({
 
   response = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/meetings?sort=${sort}`,
+    // `${process.env.NEXT_PUBLIC_API_BASE_URL}/meetings?sort=${sort}&liqours=${liquors}}`,
     { params }
   );
 
@@ -59,6 +64,10 @@ const SORT_OPTIONS = [
   { option: "meeting-at", label: "모임 날짜순" },
   { option: "meeting-at-asc", label: "모임 임박순" },
 ];
+const LIQUORS_FILTER_OPTIONS = [
+  { option: "wine", label: "와인" },
+  { option: "whisky", label: "위스키" },
+];
 
 export default function MeetingsPage() {
   // 스크롤 위치 유지
@@ -69,6 +78,8 @@ export default function MeetingsPage() {
 
   // 정렬 옵션 상태 관리
   const [sortOption, setSortOption] = useState("created-at");
+  // 필터 상태 관리
+  const [liquorsFilter, setLiquorsFilter] = useState<string[]>([]);
 
   // useInfiniteQuery 설정
   const { data, fetchNextPage, isFetchingNextPage, status } = useInfiniteQuery({
@@ -90,12 +101,30 @@ export default function MeetingsPage() {
   /** 정렬 옵션 변경 함수 */
   const handleSortChange = (newSort: string) => setSortOption(newSort);
 
+  /** liquors 필터 옵션 변경 함수 */
+  const handleLiquorsFilterChange = (option: string) => {
+    setLiquorsFilter((prevFilter) => {
+      if (prevFilter.includes(option))
+        return prevFilter.filter((item) => item !== option);
+      else return [...prevFilter, option];
+    });
+  };
+
+  useEffect(() => {
+    console.log(liquorsFilter);
+  }, [liquorsFilter]);
+
   // return
   return (
     <ContainerBox>
+      {/* 서비스 소개 및 유저 피드백 관련 컴포넌트 */}
       <UserFeedbackCard />
+
+      {/* 페이지 제목 */}
       <Title>모임 목록</Title>
       <Divider />
+
+      {/* 정렬 옵션 */}
       <ButtonGroup
         style={{
           display: "flex",
@@ -114,6 +143,26 @@ export default function MeetingsPage() {
           </Button>
         ))}
       </ButtonGroup>
+
+      {/* 필터 */}
+      <FilterBox>
+        <FilterFormGroup>
+          {LIQUORS_FILTER_OPTIONS.map(({ option, label }) => (
+            <FilterFormControlLabel
+              key={option}
+              control={
+                <Checkbox
+                  onClick={() => handleLiquorsFilterChange(option)}
+                  checked={liquorsFilter.includes(option)}
+                />
+              }
+              label={label}
+            />
+          ))}
+        </FilterFormGroup>
+      </FilterBox>
+
+      {/* 모임 목록 */}
       {(() => {
         switch (status) {
           case "error":
@@ -166,4 +215,20 @@ const Title = styled(Typography)({
   fontSize: "25px",
   color: "gray",
   textAlign: "center",
+});
+
+const FilterBox = styled(Box)({
+  marginTop: "30px",
+});
+
+const FilterFormGroup = styled(FormGroup)({
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "10px",
+});
+
+const FilterFormControlLabel = styled(FormControlLabel)({
+  color: "gray",
 });
