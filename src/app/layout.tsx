@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../styles/globals.css";
 import Provider from "./provider";
-import { GoogleAnalytics } from "@next/third-parties/google"
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,14 +20,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta
+          name="google-site-verification"
+          content="Sr5ZzJFA7kxU36L3SYU7Hn048_Q41M6V7Mo-97VbbEA"
+        />
+      </head>
       <body className={inter.className}>
         <Provider>
-          <div className="container">
-            {children}
-          </div>
+          <div className="container">{children}</div>
         </Provider>
       </body>
-      { gaId && <GoogleAnalytics gaId={gaId} /> }
+      {gaId && <GoogleAnalytics gaId={gaId} />}
     </html>
   );
 }
