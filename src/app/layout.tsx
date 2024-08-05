@@ -21,10 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google Search Console */}
         <meta
           name="google-site-verification"
           content="jkoYdn7HV4fimraagC-nhIJYIs8bbgU_K2Q3VmEu-bY"
         />
+        {/* Naver Search Advisor */}
         <meta
           name="naver-site-verification"
           content="9ac48991deaaa73527ef2d50075aa95f73ce6c73"
