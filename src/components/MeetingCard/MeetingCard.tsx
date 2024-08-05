@@ -24,7 +24,7 @@ import Image from "next/image";
 
 export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
   const [visible, setVisible] = useState(false);
-  const [scrollY, setScrollY] = useLocalStorage("meeting-list-scroll", 0);
+  // const [scrollY, setScrollY] = useLocalStorage("meeting-list-scroll", 0);
 
   // IntersectionObserver API 설정: 뷰포트 안에 요소가 들어올 때만 DOM에 마운트
   const target = useRef(null);
@@ -44,7 +44,7 @@ export default function MeetingCard({ meeting }: { meeting: MeetingInfo }) {
   return (
     <LinkButton
       ref={target}
-      onClick={() => setScrollY(window.scrollY)}
+      // onClick={() => setScrollY(window.scrollY)}
       href={`/meetings/${meeting.id}`}
     >
       {visible && (

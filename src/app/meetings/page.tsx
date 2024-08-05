@@ -62,7 +62,7 @@ const SORT_OPTIONS = [
 
 export default function MeetingsPage() {
   // 스크롤 위치 유지
-  const [scrollY] = useLocalStorage("meeting-list-scroll", 0);
+  // const [scrollY] = useLocalStorage("meeting-list-scroll", 0);
   // useEffect(() => {
   //   if (+scrollY !== 0) window.scrollTo(0, +scrollY);
   // }, [scrollY]);
