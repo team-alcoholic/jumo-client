@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -10,17 +10,15 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      staleTime: 5 * MINUTE
-    }
-  }
-})
+      staleTime: 5 * MINUTE,
+    },
+  },
+});
 
 export default function Provider({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppRouterCacheProvider>
-        {children}
-      </AppRouterCacheProvider>
+      <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
     </QueryClientProvider>
   );
 }
