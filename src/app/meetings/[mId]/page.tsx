@@ -6,7 +6,7 @@ import {
   Highlight,
   RedText,
 } from "./StyledComponents";
-import ImageSlider from "../../../component/ImageSlider";
+import ImageSlider from "../../../components/ImageSlider/ImageSlider";
 import {
   Event,
   Place,
@@ -15,31 +15,18 @@ import {
   Payment,
   People,
 } from "@mui/icons-material";
-import { formatPrice, formatDate } from "@/utils/format";
+import {
+  formatPrice,
+  formatDateTime,
+  formatDateWithoutDay,
+  formatDate,
+} from "@/utils/format";
+import { COMMUNITY_DETAILS } from "@/constants/communityNames";
+import { isNaverCafeUrl, convertToMobileUrl } from "@/utils/urlConverter";
 
 const DEFAULT_MESSAGE = <RedText>직접 확인 필요</RedText>;
 const EXTERNAL_SERVICE_MESSAGE =
-  "주모가 아닌 외부 커뮤니티에서 진행하는 주류 모임 입니다. 해당 커뮤티티에서 진행해주세요. (하단에 링크 제공) 해당 커뮤니티 운영 정책에 따라 회원가입 및 추가 절차가 필요할 수 있습니다. 또한 정보가 실제 게시물 정보와 다를 수 있으니 직접 확인해보셔야 합니다.";
-
-interface ResponseData {
-  images: string[];
-  name: string;
-  meetingAt: string | null;
-  fixAt: string | null;
-  region: string | null;
-  place: string | null;
-  participatesMin: number | null;
-  participatesMax: number | null;
-  liquors: string | null;
-  payment: number | null;
-  paymentMethod: string | null;
-  byob: boolean;
-  byobMin: number | null;
-  byobMax: number | null;
-  description: string;
-  externalService: string | null;
-  externalLink: string;
-}
+  "주모가 아닌 외부 커뮤니티에서 진행하는 주류 모임 입니다. 해당 커뮤니티에서 진행해주세요. (하단에 링크 제공) 해당 커뮤니티 운영 정책에 따라 회원가입 및 추가 절차가 필요할 수 있습니다. 또한 정보가 실제 게시물 정보와 다를 수 있으니 직접 확인해보셔야 합니다.";
 
 // 데이터를 가져오는 함수
 // 1분마다 캐시를 업데이트
@@ -48,7 +35,7 @@ async function fetchData(mId: string) {
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/meetings/${mId}`,
     {
       next: { revalidate: 1 },
-    },
+    }
   );
 
   if (!res.ok) {
@@ -57,17 +44,15 @@ async function fetchData(mId: string) {
     }
     throw new Error("Failed to fetch data");
   }
-  const data: ResponseData = await res.json();
+  const data: MeetingDetailInfo = await res.json();
   return data;
 }
 
 export default async function PostPage({
-  params,
+  params: { mId },
 }: {
   params: { mId: string };
 }) {
-  const data = await fetchData(params.mId);
-
   const {
     images,
     name,
@@ -82,11 +67,20 @@ export default async function PostPage({
     paymentMethod,
     byob,
     byobMin,
-    byobMax,
     description,
     externalService,
     externalLink,
-  } = data;
+    createdAt,
+  } = await fetchData(mId);
+  // const DEFAULT_MESSAGE = "설명이 없습니다.";
+  const formattedDescription = description
+    ? description.split("\n").map((line, index) => (
+        <span key={index}>
+          {line}
+          <br />
+        </span>
+      ))
+    : DEFAULT_MESSAGE;
 
   return (
     <Container maxWidth="sm" sx={{ padding: 0 }}>
@@ -99,7 +93,12 @@ export default async function PostPage({
           gutterBottom
           sx={{ fontWeight: "bold" }}
         >
+          {externalService && `[${COMMUNITY_DETAILS[externalService].name}] `}
           {name || DEFAULT_MESSAGE}
+        </Typography>
+        <Typography variant="body2" gutterBottom>
+          {externalService && `${COMMUNITY_DETAILS[externalService].name}에서 `}
+          {formatDate(createdAt)}에 작성됨
         </Typography>
         <Box my={2}>
           {region && <StyledChip label={region} />}
@@ -124,11 +123,11 @@ export default async function PostPage({
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Highlight>모임 시작</Highlight>
-            {meetingAt ? `${formatDate(meetingAt)}` : DEFAULT_MESSAGE}
+            {meetingAt ? `${formatDateTime(meetingAt)}` : DEFAULT_MESSAGE}
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Highlight>모집 마감</Highlight>
-            {fixAt ? `${formatDate(fixAt)}` : DEFAULT_MESSAGE}
+            {fixAt ? `${formatDateTime(fixAt)}` : DEFAULT_MESSAGE}
           </Typography>
         </HighlightBox>
         <HighlightBox>
@@ -224,18 +223,41 @@ export default async function PostPage({
             상세 설명
           </Typography>
           <Typography variant="body1" paragraph>
-            {description || DEFAULT_MESSAGE}
+            {formattedDescription}
           </Typography>
         </HighlightBox>
-        <Button
-          variant="contained"
-          fullWidth
-          color="primary"
-          sx={{ marginTop: 2 }}
-          href={externalLink}
-        >
-          해당 커뮤니티로 이동
-        </Button>
+        {!isNaverCafeUrl(externalLink) ? (
+          <Button
+            variant="contained"
+            fullWidth
+            color="primary"
+            sx={{ marginTop: 2 }}
+            href={externalLink}
+          >
+            해당 커뮤니티로 이동
+          </Button>
+        ) : (
+          <>
+            <Button
+              variant="contained"
+              fullWidth
+              color="primary"
+              sx={{ marginTop: 2 }}
+              href={externalLink}
+            >
+              데스크탑 버전으로 커뮤니티 이동
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              color="primary"
+              sx={{ marginTop: 2 }}
+              href={convertToMobileUrl(externalLink) ?? "/"}
+            >
+              모바일 버전으로 커뮤니티 이동
+            </Button>
+          </>
+        )}
       </StyledBox>
     </Container>
   );

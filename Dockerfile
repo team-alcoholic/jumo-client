@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # 프로덕션 이미지 생성
-FROM node:18-alpine
+FROM node:18-slim
 
 # 작업 디렉토리 설정
 WORKDIR /app
