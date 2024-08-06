@@ -236,7 +236,7 @@ const Title = styled(Typography)({
 });
 
 const FilterBox = styled(Box)({
-  // marginTop: "30px",
+  marginTop: "10px",
 });
 
 const FilterFormGroup = styled(FormGroup)({
