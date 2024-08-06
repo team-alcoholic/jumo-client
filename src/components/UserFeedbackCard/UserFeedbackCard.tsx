@@ -35,12 +35,12 @@ export default function UserFeedbackCard() {
       <UserFeedbackCardActions>
         <LinkChip
           avatar={<Avatar alt="google logo" src="/Google_logo.png" />}
-          label="Google Form 바로가기"
+          label="의견 제출하기"
           onClick={onClickGoogle}
         />
         <LinkChip
           avatar={<Avatar alt="kakaotalk logo" src="/KakaoTalk_logo.svg" />}
-          label="KakaoTalk 바로가기"
+          label="오픈채팅방 바로가기"
           onClick={onClickKakao}
         />
       </UserFeedbackCardActions>
