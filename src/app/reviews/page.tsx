@@ -1,101 +1,62 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Avatar,
-  Tabs,
-  Tab,
-  TextField,
-  Button,
-  Grid,
-  IconButton,
-} from "@mui/material";
+import { Box, Typography, Avatar, Tabs, Tab, Button } from "@mui/material";
 import { styled } from "@mui/system";
 
 // Import the reusable tab content component
 import TabContentComponent from "@/components/TabContentComponent/TabContentComponent";
-import {
-  SentimentSatisfied,
-  SentimentVeryDissatisfied,
-  SentimentVerySatisfied,
-} from "@mui/icons-material";
 import TotalScoreComponent from "@/components/TabContentComponent/TotalScoreComponent";
 import MoodSelectorComponent from "@/components/TabContentComponent/MoodSelectorComponent";
-
-const Container = styled(Box)({
-  maxWidth: "800px",
-  padding: "10px",
-  backgroundColor: "#ffffff",
-  borderRadius: "12px",
-  boxShadow: "0 6px 12px rgba(0,0,0,0.1)",
-});
-
-const Header = styled(Box)({
-  display: "flex",
-  alignItems: "center",
-  marginBottom: "30px",
-  borderBottom: "2px solid #eee",
-  paddingBottom: "10px",
-});
-
-const WhiskeyImage = styled(Avatar)({
-  width: "100px",
-  height: "100px",
-  marginRight: "20px",
-});
-
-const TabContent = styled(Box)({
-  marginTop: "20px",
-  padding: "20px",
-  backgroundColor: "#f9f9f9",
-  borderRadius: "8px",
-  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-});
-
-const TotalSection = styled(Box)({
-  marginTop: "20px",
-  padding: "20px",
-  backgroundColor: "#ffffff",
-  borderRadius: "8px",
-  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-});
-
-const MoodSection = styled(Box)({
-  marginTop: "20px",
-  padding: "20px",
-  backgroundColor: "#ffffff",
-  borderRadius: "8px",
-  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-});
-
-const SaveButton = styled(Button)({
-  marginTop: "20px",
-  width: "100%",
-  padding: "10px",
-  backgroundColor: "#3f51b5",
-  color: "#ffffff",
-  "&:hover": {
-    backgroundColor: "#303f9f",
-  },
-});
+import {
+  Container,
+  Header,
+  SaveButton,
+  TabContent,
+  TitleHeader,
+  WhiskeyImage,
+} from "@/app/reviews/StyledComponent";
 
 const IndexPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
-  const [relatedNotes, setRelatedNotes] = useState([[], [], []]); // Separate related notes for each tab
+  const [relatedNotes, setRelatedNotes] = useState([[], [], []]);
   const [selectedNotes, setSelectedNotes] = useState([
     new Set(),
     new Set(),
     new Set(),
-  ]); // Separate selected notes for each tab
+  ]);
 
-  const [scores, setScores] = useState(["", "", ""]); // Manage scores for each tab
-  const [memos, setMemos] = useState(["", "", ""]); // Manage memos for each tab
+  const [scores, setScores] = useState(["", "", ""]);
+  const [memos, setMemos] = useState(["", "", ""]);
 
   const [totalScore, setTotalScore] = useState("");
   const [overallNote, setOverallNote] = useState("");
+  const [mood, setMood] = useState("");
+  const [liquorData, setLiquorData] = useState(null);
 
-  const [mood, setMood] = useState(""); // State for mood selection
+  useEffect(() => {
+    // Fetch data from the server when component mounts
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8080/api/v1/search_liquors/23223",
+        );
+        if (!response.ok) throw new Error("Failed to fetch data");
+        const data = await response.json();
+        setLiquorData(data);
+
+        // Initialize related notes with tasting notes from fetched data
+        setRelatedNotes([
+          data.tastingNotesAroma ? data.tastingNotesAroma.split(", ") : [],
+          data.tastingNotesTaste ? data.tastingNotesTaste.split(", ") : [],
+          data.tastingNotesFinish ? data.tastingNotesFinish.split(", ") : [],
+        ]);
+      } catch (error) {
+        console.error("Error fetching liquor data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     // Calculate total score as average
@@ -153,20 +114,16 @@ const IndexPage = () => {
     });
   };
 
-  const handleFetchInitial = async (initialNotes, tabIndex) => {
-    const exclude = Array.from(selectedNotes[tabIndex]).join(",");
-    const newRelatedNotes = await Promise.all(
-      initialNotes.map((note) => fetchRelatedNotes(note, exclude)),
-    );
-    const flattenedNotes = newRelatedNotes.flat();
-    const allNotes = new Set(flattenedNotes);
+  const onAddNote = (note) => {
+    const currentTab = selectedTab;
     setRelatedNotes((prev) => {
-      const updatedRelatedNotes = [...prev];
-      updatedRelatedNotes[tabIndex] = Array.from(allNotes);
-      return updatedRelatedNotes;
+      const newRelatedNotes = [...prev];
+      if (!newRelatedNotes[currentTab].includes(note)) {
+        newRelatedNotes[currentTab] = [...newRelatedNotes[currentTab], note];
+      }
+      return newRelatedNotes;
     });
   };
-
   const handleSave = () => {
     const data = {
       scores,
@@ -179,48 +136,44 @@ const IndexPage = () => {
     alert("Data saved! Check the console for details.");
   };
 
-  // Define the content and initial AI notes for each tab
+  if (!liquorData) {
+    return null;
+  }
+
   const tabContents = [
     {
       title: "향 (Nose)",
       description: "향 (Nose) 관련 내용을 여기에 입력하세요.",
-      initialNotes: ["바나나", "바닐라", "오크"],
     },
     {
       title: "맛 (Palate)",
       description: "맛 (Palate) 관련 내용을 여기에 입력하세요.",
-      initialNotes: ["과일", "꿀", "캐러멜"],
     },
     {
       title: "여운 (Finish)",
       description: "여운 (Finish) 관련 내용을 여기에 입력하세요.",
-      initialNotes: ["스파이시", "우디", "초콜릿"],
     },
   ];
 
-  // Fetch initial related notes for each tab on mount
-  useEffect(() => {
-    tabContents.forEach((tabContent, index) => {
-      handleFetchInitial(tabContent.initialNotes, index);
-    });
-  }, []);
-
   return (
     <Container>
-      <Header>
-        <WhiskeyImage src="/404.png" alt="Whiskey Bottle" />
+      <TitleHeader>
+        <WhiskeyImage src={liquorData.thumbnailImageUrl} alt="Whiskey Bottle" />
         <div>
           <Typography
-            variant="h4"
-            style={{ fontWeight: "bold", color: "#3f51b5" }}
+            variant="h6"
+            style={{ fontWeight: "bold", color: "#424242" }}
           >
-            야마자키 코케이
+            {liquorData.koName}
           </Typography>
           <Typography variant="subtitle1" style={{ color: "#757575" }}>
-            위스키, 도수 43도
+            {liquorData.type}, 도수 {liquorData.abv}
+          </Typography>
+          <Typography variant="subtitle2" style={{ color: "#757575" }}>
+            {liquorData.volume}, {liquorData.country}
           </Typography>
         </div>
-      </Header>
+      </TitleHeader>
 
       <Tabs value={selectedTab} onChange={handleTabChange} centered>
         <Tab label="Nose" />
@@ -232,7 +185,7 @@ const IndexPage = () => {
         <TabContentComponent
           title={tabContents[selectedTab].title}
           description={tabContents[selectedTab].description}
-          initialNotes={tabContents[selectedTab].initialNotes}
+          initialNotes={[]} // No initial notes, they're managed by relatedNotes now
           relatedNotes={relatedNotes[selectedTab]}
           selectedNotes={selectedNotes[selectedTab]}
           onNoteClick={handleNoteClick}
@@ -252,6 +205,7 @@ const IndexPage = () => {
               return newMemos;
             })
           }
+          onAddNote={onAddNote}
         />
       </TabContent>
 

@@ -19,7 +19,7 @@ const TotalScoreComponent = ({ totalScore, overallNote, setOverallNote }) => {
         총점 및 총평
       </Typography>
       <TextField
-        label="총점"
+        label="총점  (위 3개 점수의 평균)"
         value={totalScore || ""}
         InputProps={{
           readOnly: true,
