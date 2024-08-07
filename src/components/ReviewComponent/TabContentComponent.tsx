@@ -1,4 +1,4 @@
-// components/TabContentComponent.js
+// components/ReviewComponent.js
 import React, { useState } from "react";
 import { Typography, TextField, Button, Box } from "@mui/material";
 import { Add, RocketLaunch } from "@mui/icons-material"; // Import the Add icon
@@ -89,11 +89,17 @@ const TabContentComponent = ({
           fullWidth
         />
         <Button
-          variant="contained"
+          variant="outlined" // Use the 'outlined' variant for a visible border
           onClick={handleAddNote}
-          style={{ height: "56px", minWidth: "56px", padding: 0 }} // Set button height and width
+          style={{
+            height: "56px",
+            minWidth: "56px",
+            padding: 0,
+            borderColor: "skyblue", // Set the border color to match the theme
+            color: "#424242", // Set icon color to black
+          }}
         >
-          <Add /> {/* Use the Add icon */}
+          <Add />
         </Button>
       </Box>
 

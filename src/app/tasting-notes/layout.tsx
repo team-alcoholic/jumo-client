@@ -1,7 +1,7 @@
 "use client";
 
 import { Typography } from "@mui/material";
-import { Header } from "./StyledComponent";
+import { Header } from "./new/StyledComponent";
 
 export default function MeetingsLayout({
   children,

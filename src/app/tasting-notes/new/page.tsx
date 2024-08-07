@@ -1,22 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Avatar, Tabs, Tab, Button } from "@mui/material";
-import { styled } from "@mui/system";
+import { Typography, Tabs, Tab } from "@mui/material";
 
 // Import the reusable tab content component
-import TabContentComponent from "@/components/TabContentComponent/TabContentComponent";
-import TotalScoreComponent from "@/components/TabContentComponent/TotalScoreComponent";
-import MoodSelectorComponent from "@/components/TabContentComponent/MoodSelectorComponent";
+import TabContentComponent from "@/components/ReviewComponent/TabContentComponent";
+import TotalScoreComponent from "@/components/ReviewComponent/TotalScoreComponent";
+import MoodSelectorComponent from "@/components/ReviewComponent/MoodSelectorComponent";
 import {
   Container,
-  Header,
   SaveButton,
   TabContent,
   TitleHeader,
   WhiskeyImage,
-} from "@/app/reviews/StyledComponent";
+} from "@/app/tasting-notes/new/StyledComponent";
 
-const IndexPage = () => {
+const TastingNotesNewPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [relatedNotes, setRelatedNotes] = useState([[], [], []]);
   const [selectedNotes, setSelectedNotes] = useState([
@@ -185,7 +183,6 @@ const IndexPage = () => {
         <TabContentComponent
           title={tabContents[selectedTab].title}
           description={tabContents[selectedTab].description}
-          initialNotes={[]} // No initial notes, they're managed by relatedNotes now
           relatedNotes={relatedNotes[selectedTab]}
           selectedNotes={selectedNotes[selectedTab]}
           onNoteClick={handleNoteClick}
@@ -222,4 +219,4 @@ const IndexPage = () => {
   );
 };
 
-export default IndexPage;
+export default TastingNotesNewPage;
