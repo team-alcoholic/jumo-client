@@ -28,7 +28,7 @@ interface LiquorData {
   grapeVariety: string | null;
 }
 
-const LIQUOR_URL = "http://localhost:8080/api/v1/search_liquors/191185";
+const LIQUOR_URL = "http://localhost:8080/api/v1/search_liquors/113067";
 const LIQUOR_NOTES_URL = "http://localhost:8080/api/v1/similar_keywords";
 
 const TastingNotesNewPage = () => {
@@ -48,8 +48,8 @@ const TastingNotesNewPage = () => {
   const [mood, setMood] = useState<string>("");
   const [liquorData, setLiquorData] = useState<LiquorData | null>(null);
 
+  // 맨 처음 주류 데이터 가져옴
   useEffect(() => {
-    // Fetch data from the server when component mounts
     const fetchData = async () => {
       try {
         const response = await fetch(LIQUOR_URL);
@@ -71,8 +71,8 @@ const TastingNotesNewPage = () => {
     fetchData();
   }, []);
 
+  // 총점을 계산하는 함수
   useEffect(() => {
-    // Calculate total score as average
     const validScores = scores.filter((score) => score !== null).map(Number);
     const averageScore =
       validScores.length > 0
@@ -81,10 +81,12 @@ const TastingNotesNewPage = () => {
     setTotalScore(averageScore.toString());
   }, [scores]);
 
+  // 탭 변경 시 호출되는 함수
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
 
+  // 관련 노트를 가져오는 함수
   const fetchRelatedNotes = async (note: string, exclude: string) => {
     try {
       const response = await fetch(
@@ -98,6 +100,7 @@ const TastingNotesNewPage = () => {
     }
   };
 
+  // 노트 클릭 시 호출되는 함수
   const handleNoteClick = async (note: string) => {
     const currentTab = selectedTab;
     if (!selectedNotes[currentTab].has(note)) {
@@ -124,6 +127,7 @@ const TastingNotesNewPage = () => {
     });
   };
 
+  // 사용자가 노트 추가하기
   const onAddNote = (note: string) => {
     const currentTab = selectedTab;
     setRelatedNotes((prev) => {
@@ -142,6 +146,7 @@ const TastingNotesNewPage = () => {
       totalScore,
       overallNote,
       mood,
+      selectedNotes,
     };
     console.log("Saved data:", data);
     alert("Data saved! Check the console for details.");

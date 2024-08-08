@@ -1,4 +1,4 @@
-// components/MoodSelectorComponent.js
+// components/MoodSelectorComponent.tsx
 
 import React from "react";
 import { Typography, Grid, IconButton } from "@mui/material";
@@ -17,7 +17,15 @@ const MoodSection = styled("div")({
   boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
 });
 
-const MoodSelectorComponent = ({ mood, setMood }) => {
+interface MoodSelectorComponentProps {
+  mood: string;
+  setMood: (mood: string) => void;
+}
+
+const MoodSelectorComponent: React.FC<MoodSelectorComponentProps> = ({
+  mood,
+  setMood,
+}) => {
   return (
     <MoodSection>
       <Typography variant="h6" gutterBottom>

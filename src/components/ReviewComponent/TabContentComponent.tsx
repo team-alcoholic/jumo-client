@@ -1,4 +1,4 @@
-// components/ReviewComponent.js
+// components/ReviewComponent.tsx
 import React, { useState } from "react";
 import { Typography, TextField, Button, Box } from "@mui/material";
 import { Add, RocketLaunch } from "@mui/icons-material"; // Import the Add icon
@@ -6,10 +6,23 @@ import { styled } from "@mui/system";
 import AINoteChips from "./AINoteChips"; // Import the AINoteChips component
 
 const ContentContainer = styled("div")({
-  padding: "10px",
+  padding: "0px",
 });
 
-const TabContentComponent = ({
+interface TabContentComponentProps {
+  title: string;
+  description: string;
+  relatedNotes: string[];
+  selectedNotes: Set<string>;
+  onNoteClick: (note: string) => void;
+  score: number | null;
+  setScore: (value: number | null) => void;
+  memo: string;
+  setMemo: (value: string) => void;
+  onAddNote: (note: string) => void;
+}
+
+const TabContentComponent: React.FC<TabContentComponentProps> = ({
   title,
   description,
   relatedNotes,
@@ -24,12 +37,12 @@ const TabContentComponent = ({
   const [newNote, setNewNote] = useState("");
 
   // Function to handle score input validation
-  const handleScoreChange = (e) => {
+  const handleScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     if (value >= 0 && value <= 100) {
       setScore(value);
     } else if (e.target.value === "") {
-      setScore("");
+      setScore(null);
     }
   };
 
@@ -42,7 +55,7 @@ const TabContentComponent = ({
   };
 
   // Function to handle Enter key press for adding a note
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleAddNote();
     }
@@ -62,7 +75,7 @@ const TabContentComponent = ({
       >
         <RocketLaunch style={{ color: "#ff5722", fontSize: "1rem" }} />
         <Typography
-          variant="p4" // Use a larger and more prominent variant
+          variant="subtitle1"
           style={{
             fontWeight: "bold",
             color: "grey",
@@ -108,9 +121,9 @@ const TabContentComponent = ({
       <TextField
         type="number"
         label="점수 (0-100)"
-        value={score}
+        value={score ?? ""}
         onChange={handleScoreChange}
-        inputProps={{ min: 1, max: 100 }}
+        inputProps={{ min: 0, max: 100 }}
         margin="normal"
         fullWidth
       />
