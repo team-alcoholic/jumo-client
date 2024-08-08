@@ -1,8 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { Typography, Tabs, Tab } from "@mui/material";
-
-// Import the reusable tab content component
+import React, { useEffect, useState } from "react";
+import { Tab, Tabs, Typography } from "@mui/material";
 import TabContentComponent from "@/components/ReviewComponent/TabContentComponent";
 import TotalScoreComponent from "@/components/ReviewComponent/TotalScoreComponent";
 import MoodSelectorComponent from "@/components/ReviewComponent/MoodSelectorComponent";
@@ -13,33 +11,50 @@ import {
   TitleHeader,
   WhiskeyImage,
 } from "@/app/tasting-notes/new/StyledComponent";
+import LiquorTitle from "@/components/ReviewComponent/LiquorTitle";
+
+// 서버로부터 넘어오는 주류 데이터
+interface LiquorData {
+  thumbnailImageUrl: string | null;
+  koName: string;
+  type: string | null;
+  abv: string | null;
+  volume: string | null;
+  country: string | null;
+  tastingNotesAroma: string | null;
+  tastingNotesTaste: string | null;
+  tastingNotesFinish: string | null;
+  region: string | null;
+  grapeVariety: string | null;
+}
+
+const LIQUOR_URL = "http://localhost:8080/api/v1/search_liquors/191185";
+const LIQUOR_NOTES_URL = "http://localhost:8080/api/v1/similar_keywords";
 
 const TastingNotesNewPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
-  const [relatedNotes, setRelatedNotes] = useState([[], [], []]);
-  const [selectedNotes, setSelectedNotes] = useState([
+  const [relatedNotes, setRelatedNotes] = useState<string[][]>([[], [], []]);
+  const [selectedNotes, setSelectedNotes] = useState<Set<string>[]>([
     new Set(),
     new Set(),
     new Set(),
   ]);
 
-  const [scores, setScores] = useState(["", "", ""]);
-  const [memos, setMemos] = useState(["", "", ""]);
+  const [scores, setScores] = useState<(number | null)[]>([null, null, null]);
+  const [memos, setMemos] = useState<string[]>(["", "", ""]);
 
-  const [totalScore, setTotalScore] = useState("");
-  const [overallNote, setOverallNote] = useState("");
-  const [mood, setMood] = useState("");
-  const [liquorData, setLiquorData] = useState(null);
+  const [totalScore, setTotalScore] = useState<string>("");
+  const [overallNote, setOverallNote] = useState<string>("");
+  const [mood, setMood] = useState<string>("");
+  const [liquorData, setLiquorData] = useState<LiquorData | null>(null);
 
   useEffect(() => {
     // Fetch data from the server when component mounts
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8080/api/v1/search_liquors/23223",
-        );
+        const response = await fetch(LIQUOR_URL);
         if (!response.ok) throw new Error("Failed to fetch data");
-        const data = await response.json();
+        const data: LiquorData = await response.json();
         setLiquorData(data);
 
         // Initialize related notes with tasting notes from fetched data
@@ -58,35 +73,32 @@ const TastingNotesNewPage = () => {
 
   useEffect(() => {
     // Calculate total score as average
-    const validScores = scores.filter((score) => score !== "").map(Number);
+    const validScores = scores.filter((score) => score !== null).map(Number);
     const averageScore =
       validScores.length > 0
         ? validScores.reduce((a, b) => a + b, 0) / validScores.length
         : "";
-    setTotalScore(averageScore);
+    setTotalScore(averageScore.toString());
   }, [scores]);
 
-  const handleTabChange = (event, newValue) => {
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
 
-  const fetchRelatedNotes = async (note, exclude) => {
+  const fetchRelatedNotes = async (note: string, exclude: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/similar_keywords?keyword=${encodeURIComponent(
-          note,
-        )}&exclude=${encodeURIComponent(exclude)}&limit=5`,
+        `${LIQUOR_NOTES_URL}?keyword=${encodeURIComponent(note)}&exclude=${encodeURIComponent(exclude)}&limit=5`,
       );
       if (!response.ok) throw new Error("Failed to fetch");
-      const data = await response.json();
-      return data;
+      return await response.json();
     } catch (error) {
       console.error("Error fetching related notes:", error);
       return [];
     }
   };
 
-  const handleNoteClick = async (note) => {
+  const handleNoteClick = async (note: string) => {
     const currentTab = selectedTab;
     if (!selectedNotes[currentTab].has(note)) {
       setSelectedNotes((prev) => {
@@ -112,7 +124,7 @@ const TastingNotesNewPage = () => {
     });
   };
 
-  const onAddNote = (note) => {
+  const onAddNote = (note: string) => {
     const currentTab = selectedTab;
     setRelatedNotes((prev) => {
       const newRelatedNotes = [...prev];
@@ -122,6 +134,7 @@ const TastingNotesNewPage = () => {
       return newRelatedNotes;
     });
   };
+
   const handleSave = () => {
     const data = {
       scores,
@@ -155,23 +168,16 @@ const TastingNotesNewPage = () => {
 
   return (
     <Container>
-      <TitleHeader>
-        <WhiskeyImage src={liquorData.thumbnailImageUrl} alt="Whiskey Bottle" />
-        <div>
-          <Typography
-            variant="h6"
-            style={{ fontWeight: "bold", color: "#424242" }}
-          >
-            {liquorData.koName}
-          </Typography>
-          <Typography variant="subtitle1" style={{ color: "#757575" }}>
-            {liquorData.type}, 도수 {liquorData.abv}
-          </Typography>
-          <Typography variant="subtitle2" style={{ color: "#757575" }}>
-            {liquorData.volume}, {liquorData.country}
-          </Typography>
-        </div>
-      </TitleHeader>
+      <LiquorTitle
+        thumbnailImageUrl={liquorData.thumbnailImageUrl}
+        koName={liquorData.koName}
+        type={liquorData.type}
+        abv={liquorData.abv}
+        volume={liquorData.volume}
+        country={liquorData.country}
+        region={liquorData.region}
+        grapeVariety={liquorData.grapeVariety}
+      />
 
       <Tabs value={selectedTab} onChange={handleTabChange} centered>
         <Tab label="Nose" />
@@ -187,15 +193,15 @@ const TastingNotesNewPage = () => {
           selectedNotes={selectedNotes[selectedTab]}
           onNoteClick={handleNoteClick}
           score={scores[selectedTab]}
-          setScore={(value) =>
-            setScores((prev) => {
-              const newScores = [...prev];
+          setScore={(value: number | null) =>
+            setScores((prev: (number | null)[]) => {
+              const newScores: (number | null)[] = [...prev];
               newScores[selectedTab] = value;
               return newScores;
             })
           }
           memo={memos[selectedTab]}
-          setMemo={(value) =>
+          setMemo={(value: string) =>
             setMemos((prev) => {
               const newMemos = [...prev];
               newMemos[selectedTab] = value;
