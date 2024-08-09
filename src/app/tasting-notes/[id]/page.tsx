@@ -1,12 +1,12 @@
 import React from "react";
 import { Box, Container, Typography } from "@mui/material";
 import { GiNoseSide, GiTongue } from "react-icons/gi";
-import LiquorTitle from "@/components/ReviewComponent/LiquorTitle";
+import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
 import { HiOutlineLightBulb } from "react-icons/hi";
-import NotesSection from "@/components/ReviewComponent/NotesSection";
+import NotesSection from "@/components/TastingNotesComponent/NotesSection";
 import { MdOutlineStickyNote2 } from "react-icons/md";
 import { calculateAverageScore, formatDate } from "@/utils/format";
-import MoodSelectedComponent from "@/components/ReviewComponent/MoodSelectedComponent";
+import MoodSelectedComponent from "@/components/TastingNotesComponent/MoodSelectedComponent";
 
 const REVIEW_URL = "http://localhost:3000/api/reviews/hello";
 

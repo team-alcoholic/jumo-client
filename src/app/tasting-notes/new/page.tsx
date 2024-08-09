@@ -1,15 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { CircularProgress, Tab, Tabs } from "@mui/material";
-import TabContentComponent from "@/components/ReviewComponent/TabContentComponent";
-import TotalScoreComponent from "@/components/ReviewComponent/TotalScoreComponent";
-import MoodSelectorComponent from "@/components/ReviewComponent/MoodSelectorComponent";
+import TabContentComponent from "@/components/TastingNotesComponent/TabContentComponent";
+import TotalScoreComponent from "@/components/TastingNotesComponent/TotalScoreComponent";
+import MoodSelectorComponent from "@/components/TastingNotesComponent/MoodSelectorComponent";
 import {
   Container,
   SaveButton,
   TabContent,
 } from "@/app/tasting-notes/new/StyledComponent";
-import LiquorTitle from "@/components/ReviewComponent/LiquorTitle";
+import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
 import { calculateAverageScore } from "@/utils/format";
 import {
   fetchAiNotes,

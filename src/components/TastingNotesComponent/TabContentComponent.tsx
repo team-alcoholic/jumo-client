@@ -1,4 +1,4 @@
-// components/ReviewComponent.tsx
+// components/TastingNotesComponent.tsx
 import React, { useState } from "react";
 import {
   Typography,
