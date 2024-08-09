@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import { GiNoseSide, GiTongue } from "react-icons/gi";
 import LiquorTitle from "@/components/ReviewComponent/LiquorTitle";
 import { HiOutlineLightBulb } from "react-icons/hi";
@@ -58,7 +58,6 @@ async function fetchData(mId: string): Promise<ReviewData> {
 interface PostPageProps {
   params: { mId: string };
 }
-
 export default async function PostPage({ params: { mId } }: PostPageProps) {
   const reviewData = await fetchData(mId);
 
@@ -79,8 +78,6 @@ export default async function PostPage({ params: { mId } }: PostPageProps) {
     liquorData,
   } = reviewData;
 
-  // @ts-ignore
-  // @ts-ignore
   return (
     <Container maxWidth="sm" sx={{ padding: 0 }}>
       <LiquorTitle
@@ -106,14 +103,28 @@ export default async function PostPage({ params: { mId } }: PostPageProps) {
       </Typography>
       <NotesSection
         title="향 (Nose)"
-        icon={<GiNoseSide sx={{ verticalAlign: "middle", marginRight: 1 }} />}
+        icon={
+          <Box
+            component="span"
+            sx={{ verticalAlign: "middle", marginRight: 1 }}
+          >
+            <GiNoseSide />
+          </Box>
+        }
         score={noseScore}
         notes={noseNotes}
         formattedDescription={noseMemo}
       />
       <NotesSection
         title="맛 (Palate)"
-        icon={<GiTongue sx={{ verticalAlign: "middle", marginRight: 1 }} />}
+        icon={
+          <Box
+            component="span"
+            sx={{ verticalAlign: "middle", marginRight: 1 }}
+          >
+            <GiTongue />
+          </Box>
+        }
         score={palateScore}
         notes={palateNotes}
         formattedDescription={palateMemo}
@@ -121,9 +132,12 @@ export default async function PostPage({ params: { mId } }: PostPageProps) {
       <NotesSection
         title="여운 (Finish)"
         icon={
-          <HiOutlineLightBulb
+          <Box
+            component="span"
             sx={{ verticalAlign: "middle", marginRight: 1 }}
-          />
+          >
+            <HiOutlineLightBulb />
+          </Box>
         }
         notes={finishNotes}
         score={finishScore}
@@ -132,12 +146,14 @@ export default async function PostPage({ params: { mId } }: PostPageProps) {
       <NotesSection
         title="총평"
         icon={
-          <MdOutlineStickyNote2
+          <Box
+            component="span"
             sx={{ verticalAlign: "middle", marginRight: 1 }}
-          />
+          >
+            <MdOutlineStickyNote2 />
+          </Box>
         }
         notes={[]}
-        // score={(noseScore + palateScore + finishScore) / 3}
         score={calculateAverageScore(noseScore, palateScore, finishScore)}
         formattedDescription={overallNote}
       />
