@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Tab, Tabs, Typography } from "@mui/material";
+import { CircularProgress, Tab, Tabs } from "@mui/material";
 import TabContentComponent from "@/components/ReviewComponent/TabContentComponent";
 import TotalScoreComponent from "@/components/ReviewComponent/TotalScoreComponent";
 import MoodSelectorComponent from "@/components/ReviewComponent/MoodSelectorComponent";
@@ -8,102 +8,134 @@ import {
   Container,
   SaveButton,
   TabContent,
-  TitleHeader,
-  WhiskeyImage,
 } from "@/app/tasting-notes/new/StyledComponent";
 import LiquorTitle from "@/components/ReviewComponent/LiquorTitle";
 import { calculateAverageScore } from "@/utils/format";
-
-// 서버로부터 넘어오는 주류 데이터
-interface LiquorData {
-  thumbnailImageUrl: string | null;
-  koName: string;
-  type: string | null;
-  abv: string | null;
-  volume: string | null;
-  country: string | null;
-  tastingNotesAroma: string | null;
-  tastingNotesTaste: string | null;
-  tastingNotesFinish: string | null;
-  region: string | null;
-  grapeVariety: string | null;
-  aiNotes: aiNotes | null;
-}
-
-interface aiNotes {
-  tastingNotesAroma: string;
-  tastingNotesTaste: string;
-  tastingNotesFinish: string;
-}
-
-const LIQUOR_URL = "http://localhost:8080/api/v1/search_liquors/113067";
-const LIQUOR_NOTES_URL = "http://localhost:8080/api/v1/similar_keywords";
+import {
+  fetchAiNotes,
+  fetchLiquorData,
+  fetchRelatedNotes,
+  LiquorData,
+  ReviewSavingData,
+  saveReviewData,
+} from "@/api/tastingNotesApi";
 
 const TastingNotesNewPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
-  const [relatedNotes, setRelatedNotes] = useState<string[][]>([[], [], []]);
+  const [relatedNotes, setRelatedNotes] = useState<Set<string>[]>([
+    new Set(),
+    new Set(),
+    new Set(),
+  ]);
   const [selectedNotes, setSelectedNotes] = useState<Set<string>[]>([
     new Set(),
     new Set(),
     new Set(),
   ]);
 
+  const [hasAiNotes, setHasAiNotes] = useState<boolean | null>(null);
+
   const [scores, setScores] = useState<(number | null)[]>([null, null, null]);
   const [memos, setMemos] = useState<string[]>(["", "", ""]);
+
+  const [saving, setSaving] = useState(false); // 추가
 
   const [totalScore, setTotalScore] = useState<string>("");
   const [overallNote, setOverallNote] = useState<string>("");
   const [mood, setMood] = useState<string>("");
   const [liquorData, setLiquorData] = useState<LiquorData | null>(null);
-
-  // 맨 처음 주류 데이터 가져옴
   useEffect(() => {
-    const fetchData = async () => {
+    const loadLiquorData = async () => {
       try {
-        const response = await fetch(LIQUOR_URL);
-        if (!response.ok) throw new Error("Failed to fetch data");
-        const data: LiquorData = await response.json();
+        const data = await fetchLiquorData();
         setLiquorData(data);
+        let tastingNotesAroma = new Set(
+          data.tastingNotesAroma?.split(", ") || [],
+        );
+        let tastingNotesTaste = new Set(
+          data.tastingNotesTaste?.split(", ") || [],
+        );
+        let tastingNotesFinish = new Set(
+          data.tastingNotesFinish?.split(", ") || [],
+        );
 
-        // Initialize related notes with tasting notes from fetched data
+        if (data.aiNotes) {
+          setHasAiNotes(true);
+          data.aiNotes.tastingNotesAroma
+            .split(", ")
+            .forEach((note) => tastingNotesAroma.add(note));
+          data.aiNotes.tastingNotesTaste
+            .split(", ")
+            .forEach((note) => tastingNotesTaste.add(note));
+          data.aiNotes.tastingNotesFinish
+            .split(", ")
+            .forEach((note) => tastingNotesFinish.add(note));
+        } else setHasAiNotes(false);
+
         setRelatedNotes([
-          data.tastingNotesAroma ? data.tastingNotesAroma.split(", ") : [],
-          data.tastingNotesTaste ? data.tastingNotesTaste.split(", ") : [],
-          data.tastingNotesFinish ? data.tastingNotesFinish.split(", ") : [],
+          tastingNotesAroma,
+          tastingNotesTaste,
+          tastingNotesFinish,
         ]);
       } catch (error) {
         console.error("Error fetching liquor data:", error);
       }
     };
 
-    fetchData();
+    loadLiquorData();
   }, []);
 
-  // 총점을 계산하는 함수
+  useEffect(() => {
+    const loadAiNotes = async () => {
+      if (!hasAiNotes) {
+        try {
+          const aiData = await fetchAiNotes();
+          setRelatedNotes((prev) => [
+            new Set([
+              ...Array.from(prev[0]),
+              ...aiData.tastingNotesAroma.split(", "),
+            ]),
+            new Set([
+              ...Array.from(prev[1]),
+              ...aiData.tastingNotesTaste.split(", "),
+            ]),
+            new Set([
+              ...Array.from(prev[2]),
+              ...aiData.tastingNotesFinish.split(", "),
+            ]),
+          ]);
+          setHasAiNotes(true);
+        } catch (error) {
+          console.error("Error fetching AI notes:", error);
+        }
+      }
+    };
+
+    loadAiNotes();
+  }, [hasAiNotes]);
+
   useEffect(() => {
     const averageScore = calculateAverageScore(scores[0], scores[1], scores[2]);
     setTotalScore(averageScore ? averageScore.toString() : "");
   }, [scores]);
-  // 탭 변경 시 호출되는 함수
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
-
-  // 관련 노트를 가져오는 함수
-  const fetchRelatedNotes = async (note: string, exclude: string) => {
-    try {
-      const response = await fetch(
-        `${LIQUOR_NOTES_URL}?keyword=${encodeURIComponent(note)}&exclude=${encodeURIComponent(exclude)}&limit=5`,
-      );
-      if (!response.ok) throw new Error("Failed to fetch");
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching related notes:", error);
-      return [];
-    }
+  const updateSetRelatedNotes = (
+    newRelatedNotes: string[],
+    currentTab: number,
+  ) => {
+    setRelatedNotes((prev) => {
+      const updatedRelatedNotes = [...prev];
+      updatedRelatedNotes[currentTab] = new Set([
+        ...Array.from(prev[currentTab]),
+        ...newRelatedNotes,
+      ]);
+      return updatedRelatedNotes;
+    });
   };
 
-  // 노트 클릭 시 호출되는 함수
   const handleNoteClick = async (note: string) => {
     const currentTab = selectedTab;
     if (!selectedNotes[currentTab].has(note)) {
@@ -122,41 +154,50 @@ const TastingNotesNewPage = () => {
 
     const exclude = Array.from(selectedNotes[currentTab]).join(",");
     const newRelatedNotes = await fetchRelatedNotes(note, exclude);
-    setRelatedNotes((prev) => {
-      const allNotes = new Set([...prev[currentTab], ...newRelatedNotes]);
-      const updatedRelatedNotes = [...prev];
-      updatedRelatedNotes[currentTab] = Array.from(allNotes);
-      return updatedRelatedNotes;
-    });
+
+    updateSetRelatedNotes(newRelatedNotes, currentTab);
   };
 
-  // 사용자가 노트 추가하기
   const onAddNote = (note: string) => {
     const currentTab = selectedTab;
     setRelatedNotes((prev) => {
       const newRelatedNotes = [...prev];
-      if (!newRelatedNotes[currentTab].includes(note)) {
-        newRelatedNotes[currentTab] = [...newRelatedNotes[currentTab], note];
-      }
+      newRelatedNotes[currentTab].add(note);
       return newRelatedNotes;
     });
   };
-
-  const handleSave = () => {
-    const data = {
-      scores,
-      memos,
-      totalScore,
-      overallNote,
-      mood,
-      selectedNotes,
+  const handleSave = async () => {
+    const ReviewSavingData: ReviewSavingData = {
+      productID: 199948,
+      noseScore: scores[0],
+      palateScore: scores[1],
+      finishScore: scores[2],
+      noseMemo: memos[0],
+      palateMemo: memos[1],
+      finishMemo: memos[2],
+      overallNote: overallNote,
+      mood: mood,
+      noseNotes: Array.from(selectedNotes[0]).join(", "),
+      palateNotes: Array.from(selectedNotes[1]).join(", "),
+      finishNotes: Array.from(selectedNotes[2]).join(", "),
     };
-    console.log("Saved data:", data);
-    alert("Data saved! Check the console for details.");
+
+    setSaving(true); // 로딩 상태 시작
+
+    try {
+      await saveReviewData(ReviewSavingData);
+      console.log("Saved data:", ReviewSavingData);
+      alert("Data saved successfully!");
+    } catch (error) {
+      console.error("Error saving data:", error);
+      alert("Failed to save data.");
+    } finally {
+      setSaving(false); // 로딩 상태 종료
+    }
   };
 
   if (!liquorData) {
-    return null;
+    return <CircularProgress size={24} />;
   }
 
   const tabContents = [
@@ -197,10 +238,11 @@ const TastingNotesNewPage = () => {
         <TabContentComponent
           title={tabContents[selectedTab].title}
           description={tabContents[selectedTab].description}
-          relatedNotes={relatedNotes[selectedTab]}
+          relatedNotes={Array.from(relatedNotes[selectedTab])}
           selectedNotes={selectedNotes[selectedTab]}
           onNoteClick={handleNoteClick}
           score={scores[selectedTab]}
+          hasAiNotes={hasAiNotes}
           setScore={(value: number | null) =>
             setScores((prev: (number | null)[]) => {
               const newScores: (number | null)[] = [...prev];
@@ -226,8 +268,8 @@ const TastingNotesNewPage = () => {
         setOverallNote={setOverallNote}
       />
       <MoodSelectorComponent mood={mood} setMood={setMood} />
-      <SaveButton onClick={handleSave} variant="contained">
-        저장하기
+      <SaveButton onClick={handleSave} variant="contained" disabled={saving}>
+        {saving ? <CircularProgress size={24} /> : "저장하기"}
       </SaveButton>
     </Container>
   );

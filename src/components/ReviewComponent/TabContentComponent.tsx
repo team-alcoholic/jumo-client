@@ -1,6 +1,12 @@
 // components/ReviewComponent.tsx
 import React, { useState } from "react";
-import { Typography, TextField, Button, Box } from "@mui/material";
+import {
+  Typography,
+  TextField,
+  Button,
+  Box,
+  CircularProgress,
+} from "@mui/material";
 import { Add, RocketLaunch } from "@mui/icons-material"; // Import the Add icon
 import { styled } from "@mui/system";
 import AINoteChips from "./AINoteChips"; // Import the AINoteChips component
@@ -20,6 +26,7 @@ interface TabContentComponentProps {
   memo: string;
   setMemo: (value: string) => void;
   onAddNote: (note: string) => void;
+  hasAiNotes: boolean | null;
 }
 
 const TabContentComponent: React.FC<TabContentComponentProps> = ({
@@ -33,6 +40,7 @@ const TabContentComponent: React.FC<TabContentComponentProps> = ({
   memo,
   setMemo,
   onAddNote,
+  hasAiNotes,
 }) => {
   const [newNote, setNewNote] = useState("");
 
@@ -91,6 +99,16 @@ const TabContentComponent: React.FC<TabContentComponentProps> = ({
         selectedNotes={selectedNotes}
         onNoteClick={onNoteClick}
       />
+      {!hasAiNotes && (
+        <Box display="flex" alignItems="center" justifyContent="center" mt={2}>
+          <Typography variant="subtitle1" color="textSecondary">
+            GPT-4 notes 불러오는 중...
+          </Typography>
+          <Box ml={1}>
+            <CircularProgress size={24} />
+          </Box>
+        </Box>
+      )}
 
       {/* New Note Input and Button in a Row */}
       <Box display="flex" alignItems="center" gap={1} marginBottom={2}>
