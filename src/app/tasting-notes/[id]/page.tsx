@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography, Container } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import { GiNoseSide, GiTongue } from "react-icons/gi";
 import LiquorTitle from "@/components/ReviewComponent/LiquorTitle";
 import { HiOutlineLightBulb } from "react-icons/hi";
@@ -12,7 +12,7 @@ const REVIEW_URL = "http://localhost:3000/api/reviews/hello";
 
 interface LiquorData {
   thumbnailImageUrl: string | null;
-  koName: string | null;
+  koName: string;
   type: string | null;
   abv: string | null;
   volume: string | null;
@@ -36,7 +36,7 @@ interface ReviewData {
   finishNotes: string[] | null;
   author: string | null;
   date: string;
-  liquorData: LiquorData | null;
+  liquorData: LiquorData;
 }
 
 // 데이터를 가져오는 함수
@@ -52,8 +52,7 @@ async function fetchData(mId: string): Promise<ReviewData> {
     }
     throw new Error("Failed to fetch data");
   }
-  const data: ReviewData = await res.json();
-  return data;
+  return await res.json();
 }
 
 interface PostPageProps {
@@ -80,11 +79,13 @@ export default async function PostPage({ params: { mId } }: PostPageProps) {
     liquorData,
   } = reviewData;
 
+  // @ts-ignore
+  // @ts-ignore
   return (
     <Container maxWidth="sm" sx={{ padding: 0 }}>
       <LiquorTitle
         thumbnailImageUrl={liquorData?.thumbnailImageUrl || null}
-        koName={liquorData?.koName || null}
+        koName={liquorData.koName}
         type={liquorData?.type || null}
         abv={liquorData?.abv || null}
         volume={liquorData?.volume || null}

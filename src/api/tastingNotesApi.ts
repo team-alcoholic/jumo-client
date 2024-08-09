@@ -34,7 +34,7 @@ export interface ReviewSavingData {
   finishNotes: string | null;
 }
 
-const LIQUOR_URL = "http://localhost:8080/api/v1/search_liquors/199948";
+const LIQUOR_URL = "http://localhost:8080/api/v1/search_liquors/113067";
 const LIQUOR_NOTES_URL = "http://localhost:8080/api/v1/similar_keywords";
 const AI_LIQUOR_NOTES_URL =
   "http://localhost:8080/api/v1/ai_similar_keywords/11";
