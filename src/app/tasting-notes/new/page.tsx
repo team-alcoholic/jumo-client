@@ -12,6 +12,7 @@ import {
   WhiskeyImage,
 } from "@/app/tasting-notes/new/StyledComponent";
 import LiquorTitle from "@/components/ReviewComponent/LiquorTitle";
+import { calculateAverageScore } from "@/utils/format";
 
 // 서버로부터 넘어오는 주류 데이터
 interface LiquorData {
@@ -26,6 +27,13 @@ interface LiquorData {
   tastingNotesFinish: string | null;
   region: string | null;
   grapeVariety: string | null;
+  aiNotes: aiNotes | null;
+}
+
+interface aiNotes {
+  tastingNotesAroma: string;
+  tastingNotesTaste: string;
+  tastingNotesFinish: string;
 }
 
 const LIQUOR_URL = "http://localhost:8080/api/v1/search_liquors/113067";
@@ -73,14 +81,9 @@ const TastingNotesNewPage = () => {
 
   // 총점을 계산하는 함수
   useEffect(() => {
-    const validScores = scores.filter((score) => score !== null).map(Number);
-    const averageScore =
-      validScores.length > 0
-        ? validScores.reduce((a, b) => a + b, 0) / validScores.length
-        : "";
-    setTotalScore(averageScore.toString());
+    const averageScore = calculateAverageScore(scores[0], scores[1], scores[2]);
+    setTotalScore(averageScore ? averageScore.toString() : "");
   }, [scores]);
-
   // 탭 변경 시 호출되는 함수
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);

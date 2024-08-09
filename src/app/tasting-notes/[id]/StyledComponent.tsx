@@ -29,7 +29,7 @@ export const Container = styled(Box)({
 export const TitleHeader = styled(Box)({
   display: "flex",
   alignItems: "center",
-  marginBottom: "10px",
+  marginBottom: "30px",
   borderBottom: "2px solid #eee",
   paddingBottom: "10px",
 });

@@ -34,3 +34,17 @@ export const formatDateWithoutDay = (dateString: string): string => {
   const date = new Date(dateString);
   return `${("0" + (date.getUTCMonth() + 1)).slice(-2)}.${("0" + date.getUTCDate()).slice(-2)}`;
 };
+
+export const calculateAverageScore = (
+  score1: number | null,
+  score2: number | null,
+  score3: number | null,
+): number | null => {
+  const scores = [score1, score2, score3];
+  const validScores = scores.filter((score) => score !== null);
+  if (validScores.length === 0) return null;
+
+  const averageScore =
+    validScores.reduce((a, b) => a + b, 0) / validScores.length;
+  return Math.round(averageScore * 10) / 10; // 소수 첫째 자리까지만 반환
+};
