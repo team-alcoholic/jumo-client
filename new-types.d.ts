@@ -34,3 +34,21 @@ interface MeetingDetailInfo extends MeetingInfo {
   externalLink: string;
   images: string[];
 }
+
+interface LiquorInfo {
+  product_id: number;
+  en_name: string;
+  ko_name: string;
+  price: string;
+  thumbnail_image_url: string;
+  tasting_notes_Aroma: string;
+  tasting_notes_Taste: string;
+  tasting_notes_Finish: string;
+  type: string;
+  volume: string;
+  abv: string;
+  country: string;
+  region: string;
+  grape_variety: string;
+  notes_count: number;
+}
