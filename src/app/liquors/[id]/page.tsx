@@ -27,7 +27,7 @@ export default async function LiquorDetailPage({
   const liquor = await getLiquorInfo(id);
 
   return (
-    <Stack sx={{ marginTop: "30px" }}>
+    <Stack sx={{ marginTop: "30px", padding: "0 30px", gap: "30px" }}>
       {/* 주류 이미지 */}
       <Box
         sx={{
@@ -45,13 +45,15 @@ export default async function LiquorDetailPage({
       </Box>
 
       {/* 주류 정보 */}
-      <Stack sx={{ margin: "30px 0", padding: "0 30px", gap: "40px" }}>
+      <Stack sx={{ gap: "40px" }}>
         {/* 이름 */}
         <Stack>
           <Typography sx={{ color: "gray", fontSize: "10px" }}>
             데일리샷 정보
           </Typography>
-          <Typography sx={{ fontSize: "20px" }}>{liquor.ko_name}</Typography>
+          <Typography sx={{ fontSize: "25px", fontWeight: "700" }}>
+            {liquor.ko_name}
+          </Typography>
           <Typography sx={{ color: "gray", fontSize: "15px" }}>
             {liquor.en_name}
           </Typography>
@@ -107,8 +109,14 @@ export default async function LiquorDetailPage({
             <Typography>{liquor.tasting_notes_Finish}</Typography>
           </Box>
         </Stack>
+      </Stack>
 
-        {/* 리뷰 */}
+      {/* 주류 리뷰 */}
+      <Stack sx={{ marginTop: "50px" }}>
+        <Typography sx={{ fontSize: "22px", fontWeight: "600" }}>
+          커뮤니티 리뷰
+        </Typography>
+        <Divider sx={{ margin: "5px 0" }} />
       </Stack>
     </Stack>
   );
