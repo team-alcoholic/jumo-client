@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const getLiquorInfo = async (id: string) => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch/${id}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquors/${id}`
   );
 
   if (!res.ok) {
@@ -13,7 +13,7 @@ const getLiquorInfo = async (id: string) => {
     }
     throw new Error("Failed to fetch data");
   }
-  const data: LiquorInfo = await res.json();
+  const data: LiquorData = await res.json();
   console.log(data);
   return data;
 };
@@ -37,7 +37,7 @@ export default async function LiquorDetailPage({
         }}
       >
         <Image
-          src={liquor.thumbnail_image_url}
+          src={liquor.thumbnailImageUrl ? liquor.thumbnailImageUrl : "default"}
           alt="주류 이미지"
           width={255}
           height={255}
@@ -52,10 +52,10 @@ export default async function LiquorDetailPage({
             데일리샷 정보
           </Typography>
           <Typography sx={{ fontSize: "25px", fontWeight: "700" }}>
-            {liquor.ko_name}
+            {liquor.koName}
           </Typography>
           <Typography sx={{ color: "gray", fontSize: "15px" }}>
-            {liquor.en_name}
+            {liquor.enName}
           </Typography>
           <Divider sx={{ margin: "10px 0" }} />
         </Stack>
@@ -94,19 +94,19 @@ export default async function LiquorDetailPage({
             <Typography sx={{ minWidth: "100px", color: "gray" }}>
               향 (Aroma)
             </Typography>
-            <Typography>{liquor.tasting_notes_Aroma}</Typography>
+            <Typography>{liquor.tastingNotesAroma}</Typography>
           </Box>
           <Box sx={{ display: "flex", flexDirection: "row", gap: "20px" }}>
             <Typography sx={{ minWidth: "100px", color: "gray" }}>
               맛 (Taste)
             </Typography>
-            <Typography>{liquor.tasting_notes_Taste}</Typography>
+            <Typography>{liquor.tastingNotesTaste}</Typography>
           </Box>
           <Box sx={{ display: "flex", flexDirection: "row", gap: "20px" }}>
             <Typography sx={{ minWidth: "100px", color: "gray" }}>
               여운 (Finish)
             </Typography>
-            <Typography>{liquor.tasting_notes_Finish}</Typography>
+            <Typography>{liquor.tastingNotesFinish}</Typography>
           </Box>
         </Stack>
       </Stack>

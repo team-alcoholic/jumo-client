@@ -36,7 +36,7 @@ interface MeetingDetailInfo extends MeetingInfo {
 }
 
 interface LiquorInfo {
-  product_id: number;
+  id: number;
   en_name: string;
   ko_name: string;
   price: string;
