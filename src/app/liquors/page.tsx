@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
+import Link from "next/link";
 import React, { useState } from "react";
 import { useQuery } from "react-query";
 
@@ -55,17 +56,21 @@ export default function LiquorsPage() {
       </LiquorSearchBox>
       {data && data.length ? (
         data.map((liquor: LiquorInfo) => (
-          <LiquorTitle
+          <LiquorCardLink
             key={liquor.product_id}
-            thumbnailImageUrl={liquor.thumbnail_image_url}
-            koName={liquor.ko_name}
-            type={liquor.type}
-            abv={liquor.abv}
-            volume={liquor.volume}
-            country={liquor.country}
-            region={liquor.region}
-            grapeVariety={liquor.grape_variety}
-          />
+            href={`/liquors/${liquor.product_id}`}
+          >
+            <LiquorTitle
+              thumbnailImageUrl={liquor.thumbnail_image_url}
+              koName={liquor.ko_name}
+              type={liquor.type}
+              abv={liquor.abv}
+              volume={liquor.volume}
+              country={liquor.country}
+              region={liquor.region}
+              grapeVariety={liquor.grape_variety}
+            />
+          </LiquorCardLink>
         ))
       ) : (
         <SearchResultBox>
@@ -82,6 +87,10 @@ const LiquorSearchBox = styled(Box)({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+});
+
+const LiquorCardLink = styled(Link)({
+  textDecoration: "none",
 });
 
 const SearchResultBox = styled(Box)({
