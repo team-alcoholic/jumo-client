@@ -26,6 +26,7 @@ const getLiquorList = async (keyword: string) => {
 export default function LiquorsPage() {
   // 검색 키워드 state
   const [keyword, setKeyword] = useState("");
+
   const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeyword(e.target.value);
   };
@@ -54,29 +55,32 @@ export default function LiquorsPage() {
           onChange={handleKeywordChange}
         />
       </LiquorSearchBox>
-      {data && data.length ? (
-        data.map((liquor: LiquorInfo) => (
-          <LiquorCardLink
-            key={liquor.product_id}
-            href={`/liquors/${liquor.product_id}`}
-          >
-            <LiquorTitle
-              thumbnailImageUrl={liquor.thumbnail_image_url}
-              koName={liquor.ko_name}
-              type={liquor.type}
-              abv={liquor.abv}
-              volume={liquor.volume}
-              country={liquor.country}
-              region={liquor.region}
-              grapeVariety={liquor.grape_variety}
-            />
-          </LiquorCardLink>
-        ))
-      ) : (
-        <SearchResultBox>
-          <SearchResultTypography>검색 결과가 없습니다.</SearchResultTypography>
-        </SearchResultBox>
-      )}
+      {status == "success" &&
+        (data && data.length ? (
+          data.map((liquor: LiquorInfo) => (
+            <LiquorCardLink
+              key={liquor.product_id}
+              href={`/liquors/${liquor.product_id}`}
+            >
+              <LiquorTitle
+                thumbnailImageUrl={liquor.thumbnail_image_url}
+                koName={liquor.ko_name}
+                type={liquor.type}
+                abv={liquor.abv}
+                volume={liquor.volume}
+                country={liquor.country}
+                region={liquor.region}
+                grapeVariety={liquor.grape_variety}
+              />
+            </LiquorCardLink>
+          ))
+        ) : (
+          <SearchResultBox>
+            <SearchResultTypography>
+              검색 결과가 없습니다.
+            </SearchResultTypography>
+          </SearchResultBox>
+        ))}
     </Box>
   );
 }
