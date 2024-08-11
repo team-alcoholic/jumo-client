@@ -52,3 +52,38 @@ interface LiquorInfo {
   grape_variety: string;
   notes_count: number;
 }
+
+interface LiquorData {
+  thumbnailImageUrl: string | null;
+  koName: string | null;
+  enName: string | null;
+  type: string | null;
+  abv: string | null;
+  volume: string | null;
+  country: string | null;
+  tastingNotesAroma: string | null;
+  tastingNotesTaste: string | null;
+  tastingNotesFinish: string | null;
+  region: string | null;
+  grapeVariety: string | null;
+  aiNotes: aiNotes | null;
+}
+
+// Props Types
+
+interface LiquorTitleProps {
+  thumbnailImageUrl: string | null;
+  koName: string | null;
+  type: string | null;
+  abv: string | null;
+  volume: string | null;
+  country: string | null;
+  region: string | null;
+  grapeVariety: string | null;
+}
+
+interface KeyValueInfoProps {
+  keyContent: string | null;
+  valueContent: string | null;
+  keyMinWidth: number;
+}

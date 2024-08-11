@@ -1,7 +1,7 @@
 "use client";
 
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
-import { AccountCircle, Search } from "@mui/icons-material";
+import { Search } from "@mui/icons-material";
 import {
   Box,
   InputAdornment,

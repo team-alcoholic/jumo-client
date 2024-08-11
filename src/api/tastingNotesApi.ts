@@ -1,19 +1,3 @@
-export interface LiquorData {
-  thumbnailImageUrl: string | null;
-  koName: string | null;
-  enName: string | null;
-  type: string | null;
-  abv: string | null;
-  volume: string | null;
-  country: string | null;
-  tastingNotesAroma: string | null;
-  tastingNotesTaste: string | null;
-  tastingNotesFinish: string | null;
-  region: string | null;
-  grapeVariety: string | null;
-  aiNotes: aiNotes | null;
-}
-
 export interface aiNotes {
   tastingNotesAroma: string;
   tastingNotesTaste: string;

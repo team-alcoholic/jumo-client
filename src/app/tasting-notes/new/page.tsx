@@ -15,7 +15,6 @@ import {
   fetchAiNotes,
   fetchLiquorData,
   fetchRelatedNotes,
-  LiquorData,
   ReviewSavingData,
   saveReviewData,
 } from "@/api/tastingNotesApi";
@@ -50,26 +49,26 @@ const TastingNotesNewPage = () => {
         const data = await fetchLiquorData();
         setLiquorData(data);
         let tastingNotesAroma = new Set(
-          data.tastingNotesAroma?.split(", ") || [],
+          data.tastingNotesAroma?.split(", ") || []
         );
         let tastingNotesTaste = new Set(
-          data.tastingNotesTaste?.split(", ") || [],
+          data.tastingNotesTaste?.split(", ") || []
         );
         let tastingNotesFinish = new Set(
-          data.tastingNotesFinish?.split(", ") || [],
+          data.tastingNotesFinish?.split(", ") || []
         );
 
         if (data.aiNotes) {
           setHasAiNotes(true);
           data.aiNotes.tastingNotesAroma
             .split(", ")
-            .forEach((note) => tastingNotesAroma.add(note));
+            .forEach((note: string) => tastingNotesAroma.add(note));
           data.aiNotes.tastingNotesTaste
             .split(", ")
-            .forEach((note) => tastingNotesTaste.add(note));
+            .forEach((note: string) => tastingNotesTaste.add(note));
           data.aiNotes.tastingNotesFinish
             .split(", ")
-            .forEach((note) => tastingNotesFinish.add(note));
+            .forEach((note: string) => tastingNotesFinish.add(note));
         } else setHasAiNotes(false);
 
         setRelatedNotes([
@@ -124,7 +123,7 @@ const TastingNotesNewPage = () => {
   };
   const updateSetRelatedNotes = (
     newRelatedNotes: string[],
-    currentTab: number,
+    currentTab: number
   ) => {
     setRelatedNotes((prev) => {
       const updatedRelatedNotes = [...prev];
