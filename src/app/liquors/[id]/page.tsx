@@ -28,7 +28,7 @@ export default async function LiquorDetailPage({
   const liquor = await getLiquorInfo(id);
 
   return (
-    <Stack sx={{ marginTop: "30px", padding: "0 30px", gap: "30px" }}>
+    <Stack sx={{ marginTop: "30px", gap: "30px" }}>
       {/* 주류 이미지 */}
       <Box
         sx={{
@@ -46,18 +46,21 @@ export default async function LiquorDetailPage({
       </Box>
 
       {/* 주류 정보 */}
-      <Stack sx={{ gap: "50px" }}>
+      <Stack sx={{ gap: "40px" }}>
         {/* 이름 */}
         <Stack>
-          <Typography sx={{ color: "gray", fontSize: "10px" }}>
-            데일리샷 정보
-          </Typography>
-          <Typography sx={{ fontSize: "25px", fontWeight: "700" }}>
-            {liquor.koName}
-          </Typography>
-          <Typography sx={{ color: "gray", fontSize: "15px" }}>
-            {liquor.enName}
-          </Typography>
+          <Stack sx={{ padding: "10px 20px" }}>
+            <Typography sx={{ color: "gray", fontSize: "10px" }}>
+              데일리샷 정보
+            </Typography>
+            <Typography sx={{ fontSize: "25px", fontWeight: "700" }}>
+              {liquor.koName}
+            </Typography>
+            <Typography sx={{ color: "gray", fontSize: "15px" }}>
+              {liquor.enName}
+            </Typography>
+          </Stack>
+
           <Divider sx={{ margin: "10px 0" }} />
         </Stack>
 
@@ -66,8 +69,10 @@ export default async function LiquorDetailPage({
       </Stack>
 
       {/* 주류 리뷰: 컴포넌트 구현 필요 */}
-      <Stack sx={{ marginTop: "50px" }}>
-        <Typography sx={{ fontSize: "22px", fontWeight: "600" }}>
+      <Stack sx={{ marginTop: "40px" }}>
+        <Typography
+          sx={{ padding: "10px 20px", fontSize: "22px", fontWeight: "600" }}
+        >
           커뮤니티 리뷰
         </Typography>
         <Divider sx={{ margin: "5px 0" }} />
