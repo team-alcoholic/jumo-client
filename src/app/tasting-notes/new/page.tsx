@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { CircularProgress, Tab, Tabs } from "@mui/material";
 import TabContentComponent from "@/components/TastingNotesComponent/TabContentComponent";
 import TotalScoreComponent from "@/components/TastingNotesComponent/TotalScoreComponent";
@@ -20,7 +20,7 @@ import {
 } from "@/api/tastingNotesApi";
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 
-const TastingNotesNewPage = () => {
+const TastingNotesNewPageComponent = () => {
   const params = useSearchParams();
   const router = useRouter();
 
@@ -328,4 +328,10 @@ const TastingNotesNewPage = () => {
   );
 };
 
-export default TastingNotesNewPage;
+export default function TastingNotesNewPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TastingNotesNewPageComponent />
+    </Suspense>
+  );
+}
