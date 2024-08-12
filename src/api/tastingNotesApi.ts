@@ -1,7 +1,7 @@
 export interface aiNotes {
-  tastingNotesAroma: string;
-  tastingNotesTaste: string;
-  tastingNotesFinish: string;
+  noseNotes: string[];
+  palateNotes: string[];
+  finishNotes: string[];
 }
 
 export interface ReviewSavingData {
@@ -21,7 +21,7 @@ export interface ReviewSavingData {
 
 const LIQUOR_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquors/`;
 const LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/similar-tasting-notes`;
-const AI_LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ai_similar_keywords/11`;
+const AI_LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ai-similar-tasting-notes`;
 const SAVE_REVIEW_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes`;
 
 export const fetchLiquorData = async (
@@ -29,12 +29,13 @@ export const fetchLiquorData = async (
 ): Promise<LiquorData> => {
   const response = await fetch(LIQUOR_URL + liquorId);
   if (!response.ok) throw new Error("Failed to fetch data");
+
   return await response.json();
 };
 
-export const fetchAiNotes = async (): Promise<aiNotes> => {
-  const response = await fetch(AI_LIQUOR_NOTES_URL);
-  if (!response.ok) throw new Error("Failed to fetch AI notes");
+export const fetchAiNotes = async (liquorId: string): Promise<aiNotes> => {
+  const response = await fetch(AI_LIQUOR_NOTES_URL + "/" + liquorId);
+  if (!response.ok) console.log("Failed to fetch AI notes");
   return await response.json();
 };
 

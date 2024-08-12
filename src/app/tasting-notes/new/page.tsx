@@ -103,7 +103,9 @@ const TastingNotesNewPageComponent = () => {
           data.aiNotes.tastingNotesFinish
             .split(", ")
             .forEach((note: string) => tastingNotesFinish.add(note));
-        } else setHasAiNotes(false);
+        } else {
+          getAiNotes(liquorId);
+        }
 
         setRelatedNotes([
           tastingNotesAroma,
@@ -119,34 +121,36 @@ const TastingNotesNewPageComponent = () => {
     loadLiquorData();
   }, []);
 
-  useEffect(() => {
-    const loadAiNotes = async () => {
-      if (!hasAiNotes) {
-        try {
-          const aiData = await fetchAiNotes();
-          setRelatedNotes((prev) => [
-            new Set([
-              ...Array.from(prev[0]),
-              ...aiData.tastingNotesAroma.split(", "),
-            ]),
-            new Set([
-              ...Array.from(prev[1]),
-              ...aiData.tastingNotesTaste.split(", "),
-            ]),
-            new Set([
-              ...Array.from(prev[2]),
-              ...aiData.tastingNotesFinish.split(", "),
-            ]),
-          ]);
-          setHasAiNotes(true);
-        } catch (error) {
-          console.error("Error fetching AI notes:", error);
-        }
-      }
-    };
+  const getAiNotes = async (liquorId: string) => {
+    setHasAiNotes(false);
+    const aiData = await fetchAiNotes(liquorId);
+    setRelatedNotes((prev) => [
+      new Set([...Array.from(prev[0]), ...aiData.noseNotes]),
+      new Set([...Array.from(prev[1]), ...aiData.palateNotes]),
+      new Set([...Array.from(prev[2]), ...aiData.finishNotes]),
+    ]);
+    setHasAiNotes(true);
+  };
 
-    loadAiNotes();
-  }, [hasAiNotes]);
+  // useEffect(() => {
+  //   const loadAiNotes = async () => {
+  //     if (!hasAiNotes) {
+  //       try {
+  //         const aiData = await fetchAiNotes(liquorId);
+  //         setRelatedNotes((prev) => [
+  //           new Set([...Array.from(prev[0]), ...aiData.noseNotes]),
+  //           new Set([...Array.from(prev[1]), ...aiData.palateNotes]),
+  //           new Set([...Array.from(prev[2]), ...aiData.finishNotes]),
+  //         ]);
+  //         setHasAiNotes(true);
+  //       } catch (error) {
+  //         console.error("Error fetching AI notes:", error);
+  //       }
+  //     }
+  //   };
+  //
+  //   loadAiNotes();
+  // }, [hasAiNotes]);
 
   useEffect(() => {
     const averageScore = calculateAverageScore(scores[0], scores[1], scores[2]);

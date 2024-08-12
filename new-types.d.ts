@@ -102,6 +102,12 @@ interface TastingNoteList {
   user: User;
 }
 
+interface aiNotes {
+  tastingNotesAroma: string;
+  tastingNotesTaste: string;
+  tastingNotesFinish: string;
+}
+
 // Props Types
 
 /** LiquorTitle 컴포넌트 호출 시 사용되는 props type */
