@@ -17,7 +17,7 @@ import {
 } from "@mui/icons-material";
 import {
   formatPrice,
-  formatDateTime,
+  formatDateTimeMeeting,
   formatDateWithoutDay,
   formatDate,
 } from "@/utils/format";
@@ -123,11 +123,13 @@ export default async function PostPage({
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Highlight>모임 시작</Highlight>
-            {meetingAt ? `${formatDateTime(meetingAt)}` : DEFAULT_MESSAGE}
+            {meetingAt
+              ? `${formatDateTimeMeeting(meetingAt)}`
+              : DEFAULT_MESSAGE}
           </Typography>
           <Typography variant="body2" gutterBottom>
             <Highlight>모집 마감</Highlight>
-            {fixAt ? `${formatDateTime(fixAt)}` : DEFAULT_MESSAGE}
+            {fixAt ? `${formatDateTimeMeeting(fixAt)}` : DEFAULT_MESSAGE}
           </Typography>
         </HighlightBox>
         <HighlightBox>
