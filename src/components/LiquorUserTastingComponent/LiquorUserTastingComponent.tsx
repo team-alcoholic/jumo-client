@@ -34,6 +34,7 @@ export default function LiquorUserTastingComponent({
         (data && data.length ? (
           data.map((tasting: TastingNoteList) => (
             <Link
+              key={tasting.id}
               href={`/tasting-notes/${tasting.id}`}
               style={{ textDecoration: "none", color: "inherit" }}
             >
@@ -47,7 +48,6 @@ export default function LiquorUserTastingComponent({
               >
                 {/* 작성자 정보 */}
                 <Box
-                  key={tasting.id}
                   sx={{
                     display: "flex",
                     flexDirection: "row",
