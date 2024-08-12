@@ -13,16 +13,17 @@ export default function LoginPage() {
     "테이스팅 노트 작성을 기록하기 위해서는 로그인이 필요합니다 ㅠㅠ";
 
   useEffect(() => {
-    const redirectUrl = params.get("redirectTo") || "/";
-    if (redirectUrl.includes("tasting-notes")) {
+    const redirectUrl = params.get("redirectTo");
+    if (redirectUrl && redirectUrl.includes("tasting-notes")) {
       setInfo(tastingNotesInfo);
     }
   }, [params]);
 
   const handleKakaoLogin = () => {
-    const redirectUrl = params.get("redirectTo") || "/";
+    const redirectUrl = params.get("redirectTo");
     router.push(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao?redirectTo=${encodeURIComponent(redirectUrl)}`,
+      // `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao?redirectTo=${encodeURIComponent(redirectUrl)}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao${redirectUrl ? `?redirectTo=${encodeURIComponent(redirectUrl)}` : ""}`,
     );
   };
 
