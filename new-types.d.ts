@@ -69,6 +69,35 @@ interface LiquorData {
   aiNotes: aiNotes | null;
 }
 
+interface User {
+  id: number;
+  provider: string | null;
+  providerId: string | null;
+  profileNickname: string | null;
+  profileImage: string | null;
+  profileThumbnailImage: string | null;
+}
+
+interface TastingNoteList {
+  id: number;
+  liquor: LiquorData;
+  noseScore: number | null;
+  palateScore: number | null;
+  finishScore: number | null;
+  noseMemo: string | null;
+  palateMemo: string | null;
+  finishMemo: string | null;
+  overallNote: string | null;
+  mood: string | null;
+  noseNotes: string | null;
+  palateNotes: string | null;
+  finishNotes: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+  createdBy: string | null;
+  user: User;
+}
+
 // Props Types
 
 interface LiquorTitleProps {

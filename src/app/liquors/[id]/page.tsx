@@ -1,4 +1,5 @@
 import LiquorInfoCardComponent from "@/components/LiquorInfoCardComponent/LiquorInfoCardComponent";
+import LiquorUserTastingComponent from "@/components/LiquorUserTastingComponent/LiquorUserTastingComponent";
 import { Box, Divider, Stack, styled, Typography } from "@mui/material";
 import Image from "next/image";
 
@@ -49,7 +50,7 @@ export default async function LiquorDetailPage({
       <Stack sx={{ gap: "40px" }}>
         {/* 이름 */}
         <Stack>
-          <Stack sx={{ padding: "10px 20px" }}>
+          <Stack sx={{ padding: "10px" }}>
             <Typography sx={{ color: "gray", fontSize: "10px" }}>
               데일리샷 정보
             </Typography>
@@ -68,7 +69,7 @@ export default async function LiquorDetailPage({
         <LiquorInfoCardComponent liquor={liquor} />
       </Stack>
 
-      {/* 주류 리뷰: 컴포넌트 구현 필요 */}
+      {/* 주류 리뷰 */}
       <Stack sx={{ marginTop: "40px" }}>
         <Typography
           sx={{ padding: "10px 20px", fontSize: "22px", fontWeight: "600" }}
@@ -76,6 +77,7 @@ export default async function LiquorDetailPage({
           커뮤니티 리뷰
         </Typography>
         <Divider sx={{ margin: "5px 0" }} />
+        <LiquorUserTastingComponent liquorId={id} />
       </Stack>
     </Stack>
   );
