@@ -18,8 +18,11 @@ import {
   ReviewSavingData,
   saveReviewData,
 } from "@/api/tastingNotesApi";
+import { useSearchParams } from "next/navigation";
 
 const TastingNotesNewPage = () => {
+  const params = useSearchParams();
+  const liquorId = params.get("liquorId");
   const [selectedTab, setSelectedTab] = useState(0);
   const [relatedNotes, setRelatedNotes] = useState<Set<string>[]>([
     new Set(),
@@ -46,16 +49,16 @@ const TastingNotesNewPage = () => {
   useEffect(() => {
     const loadLiquorData = async () => {
       try {
-        const data = await fetchLiquorData();
+        const data = await fetchLiquorData(liquorId);
         setLiquorData(data);
         let tastingNotesAroma = new Set(
-          data.tastingNotesAroma?.split(", ") || []
+          data.tastingNotesAroma?.split(", ") || [],
         );
         let tastingNotesTaste = new Set(
-          data.tastingNotesTaste?.split(", ") || []
+          data.tastingNotesTaste?.split(", ") || [],
         );
         let tastingNotesFinish = new Set(
-          data.tastingNotesFinish?.split(", ") || []
+          data.tastingNotesFinish?.split(", ") || [],
         );
 
         if (data.aiNotes) {
@@ -123,7 +126,7 @@ const TastingNotesNewPage = () => {
   };
   const updateSetRelatedNotes = (
     newRelatedNotes: string[],
-    currentTab: number
+    currentTab: number,
   ) => {
     setRelatedNotes((prev) => {
       const updatedRelatedNotes = [...prev];
