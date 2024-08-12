@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "../styles/globals.css";
 import Provider from "./provider";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import HeaderComponent from "@/components/LayoutComponents/HeaderComponent";
+import NavigationComponent from "@/components/LayoutComponents/NavigationComponent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,7 +36,11 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Provider>
-          <div className="container">{children}</div>
+          <div className="container">
+            <HeaderComponent />
+            {children}
+            <NavigationComponent />
+          </div>
         </Provider>
       </body>
       {gaId && <GoogleAnalytics gaId={gaId} />}
