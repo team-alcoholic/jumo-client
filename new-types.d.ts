@@ -35,6 +35,7 @@ interface MeetingDetailInfo extends MeetingInfo {
   images: string[];
 }
 
+/** 주류 type: ES 버전 */
 interface LiquorInfo {
   id: number;
   en_name: string;
@@ -53,6 +54,7 @@ interface LiquorInfo {
   notes_count: number;
 }
 
+/** 주류 type: DB 버전 */
 interface LiquorData {
   thumbnailImageUrl: string | null;
   koName: string | null;
@@ -69,8 +71,40 @@ interface LiquorData {
   aiNotes: aiNotes | null;
 }
 
+/** 사용자 type */
+interface User {
+  id: number;
+  provider: string | null;
+  providerId: string | null;
+  profileNickname: string | null;
+  profileImage: string | null;
+  profileThumbnailImage: string | null;
+}
+
+/** 테이스팅노트 type: 주류 상세정보 페이지에서 보이는 유저 테이스팅 리뷰 목록 API 응답 객체 타입 */
+interface TastingNoteList {
+  id: number;
+  liquor: LiquorData;
+  noseScore: number | null;
+  palateScore: number | null;
+  finishScore: number | null;
+  noseMemo: string | null;
+  palateMemo: string | null;
+  finishMemo: string | null;
+  overallNote: string | null;
+  mood: string | null;
+  noseNotes: string | null;
+  palateNotes: string | null;
+  finishNotes: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+  createdBy: string | null;
+  user: User;
+}
+
 // Props Types
 
+/** LiquorTitle 컴포넌트 호출 시 사용되는 props type */
 interface LiquorTitleProps {
   thumbnailImageUrl: string | null;
   koName: string | null;
@@ -82,6 +116,7 @@ interface LiquorTitleProps {
   grapeVariety: string | null;
 }
 
+/** KeyValueInfoComponent 호출 시 사용되는 props type */
 interface KeyValueInfoProps {
   keyContent: string | null;
   valueContent: string | null;

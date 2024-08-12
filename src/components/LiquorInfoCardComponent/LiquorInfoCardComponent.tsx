@@ -1,5 +1,5 @@
 import { Box, Divider, Stack, Typography } from "@mui/material";
-import KeyValueInfoComponent from "./KeyValueInfoComponent";
+import KeyValueInfoComponent from "../KeyValueInfoComponent/KeyValueInfoComponent";
 
 export default function LiquorInfoCardComponent({
   liquor,
@@ -22,9 +22,9 @@ export default function LiquorInfoCardComponent({
   return (
     <Stack
       sx={{
-        border: "solid 1px #cccccc",
-        borderRadius: "5px 5px",
-        padding: "30px",
+        // border: "solid 1px #cccccc",
+        // borderRadius: "5px 5px",
+        padding: "10px",
         gap: "50px",
       }}
     >
