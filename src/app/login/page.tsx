@@ -4,8 +4,9 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import { Container, Box, Typography, Button } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+function LoginComponent() {
   const router = useRouter();
   const params = useSearchParams();
   const [info, setInfo] = useState("");
@@ -22,7 +23,6 @@ export default function LoginPage() {
   const handleKakaoLogin = () => {
     const redirectUrl = params.get("redirectTo");
     router.push(
-      // `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao?redirectTo=${encodeURIComponent(redirectUrl)}`,
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao${redirectUrl ? `?redirectTo=${encodeURIComponent(redirectUrl)}` : ""}`,
     );
   };
@@ -61,5 +61,13 @@ export default function LoginPage() {
         카카오로 1초 로그인하기
       </Button>
     </Container>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginComponent />
+    </Suspense>
   );
 }
