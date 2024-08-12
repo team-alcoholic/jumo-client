@@ -52,10 +52,13 @@ const TastingNotesNewPageComponent = () => {
   useEffect(() => {
     const getAuth = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/v1/users", {
-          method: "GET",
-          credentials: "include", // 세션 기반 인증에 필요한 경우 추가
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+          {
+            method: "GET",
+            credentials: "include", // 세션 기반 인증에 필요한 경우 추가
+          },
+        );
 
         if (response.status === 401) {
           alert(
