@@ -5,7 +5,7 @@ export interface aiNotes {
 }
 
 export interface ReviewSavingData {
-  productID: number;
+  liquorId: string;
   noseScore: number | null;
   palateScore: number | null;
   finishScore: number | null;
@@ -19,14 +19,15 @@ export interface ReviewSavingData {
   finishNotes: string | null;
 }
 
-const LIQUOR_URL = "http://localhost:8080/api/v1/search_liquors/113067";
-const LIQUOR_NOTES_URL = "http://localhost:8080/api/v1/similar_keywords";
-const AI_LIQUOR_NOTES_URL =
-  "http://localhost:8080/api/v1/ai_similar_keywords/11";
-const SAVE_REVIEW_URL = "http://localhost:8080/api/v1/save_review";
+const LIQUOR_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquors/`;
+const LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/similar-tasting-notes`;
+const AI_LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ai_similar_keywords/11`;
+const SAVE_REVIEW_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes`;
 
-export const fetchLiquorData = async (): Promise<LiquorData> => {
-  const response = await fetch(LIQUOR_URL);
+export const fetchLiquorData = async (
+  liquorId: string,
+): Promise<LiquorData> => {
+  const response = await fetch(LIQUOR_URL + liquorId);
   if (!response.ok) throw new Error("Failed to fetch data");
   return await response.json();
 };
@@ -39,13 +40,15 @@ export const fetchAiNotes = async (): Promise<aiNotes> => {
 
 export const fetchRelatedNotes = async (
   note: string,
-  exclude: string
+  exclude: string,
 ): Promise<string[]> => {
   const response = await fetch(
-    `${LIQUOR_NOTES_URL}?keyword=${encodeURIComponent(note)}&exclude=${encodeURIComponent(exclude)}&limit=5`
+    `${LIQUOR_NOTES_URL}?keyword=${encodeURIComponent(note)}&exclude=${encodeURIComponent(exclude)}&limit=5`,
   );
+
   if (!response.ok) throw new Error("Failed to fetch related notes");
-  return await response.json();
+
+  return (await response.json())["tastingNotes"];
 };
 
 export const saveReviewData = async (data: ReviewSavingData): Promise<void> => {
@@ -54,10 +57,17 @@ export const saveReviewData = async (data: ReviewSavingData): Promise<void> => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include", // 쿠키를 포함하여 요청
+
     body: JSON.stringify(data),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to save review data");
+    throw await response.json();
+    // console.log("adsfasdfasdfadsfasd", await response.json());
+    // console.log(await response.json());
+    // throw new Error("Failed to save review data");
   }
+  // router.push("/tasting-notes");
+  return await response.json();
 };

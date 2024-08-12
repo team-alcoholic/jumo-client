@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { CircularProgress, Tab, Tabs } from "@mui/material";
 import TabContentComponent from "@/components/TastingNotesComponent/TabContentComponent";
 import TotalScoreComponent from "@/components/TastingNotesComponent/TotalScoreComponent";
@@ -18,8 +18,14 @@ import {
   ReviewSavingData,
   saveReviewData,
 } from "@/api/tastingNotesApi";
+import { notFound, useRouter, useSearchParams } from "next/navigation";
 
-const TastingNotesNewPage = () => {
+const TastingNotesNewPageComponent = () => {
+  const params = useSearchParams();
+  const router = useRouter();
+
+  const liquorId = params.get("liquorId");
+
   const [selectedTab, setSelectedTab] = useState(0);
   const [relatedNotes, setRelatedNotes] = useState<Set<string>[]>([
     new Set(),
@@ -44,18 +50,46 @@ const TastingNotesNewPage = () => {
   const [mood, setMood] = useState<string>("");
   const [liquorData, setLiquorData] = useState<LiquorData | null>(null);
   useEffect(() => {
+    const getAuth = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/v1/users", {
+          method: "GET",
+          credentials: "include", // 세션 기반 인증에 필요한 경우 추가
+        });
+
+        if (response.status === 401) {
+          alert(
+            "리뷰 작성은 로그인이 필요합니다.(카카오로 1초 로그인 하러 가기)",
+          );
+          const redirectUrl = window.location.href;
+          router.push(`/login?redirectTo=${encodeURIComponent(redirectUrl)}`);
+        } else {
+          await response.json();
+        }
+      } catch (error) {
+        console.error("Error fetching auth data:", error);
+      }
+    };
+
+    getAuth();
+
     const loadLiquorData = async () => {
       try {
-        const data = await fetchLiquorData();
+        if (!liquorId) {
+          alert("리뷰 작성을 위해서는 주류 검색이 필요합니다.");
+          router.push("/liquors");
+          return;
+        }
+        const data = await fetchLiquorData(liquorId);
         setLiquorData(data);
         let tastingNotesAroma = new Set(
-          data.tastingNotesAroma?.split(", ") || []
+          data.tastingNotesAroma?.split(", ") || [],
         );
         let tastingNotesTaste = new Set(
-          data.tastingNotesTaste?.split(", ") || []
+          data.tastingNotesTaste?.split(", ") || [],
         );
         let tastingNotesFinish = new Set(
-          data.tastingNotesFinish?.split(", ") || []
+          data.tastingNotesFinish?.split(", ") || [],
         );
 
         if (data.aiNotes) {
@@ -77,7 +111,8 @@ const TastingNotesNewPage = () => {
           tastingNotesFinish,
         ]);
       } catch (error) {
-        console.error("Error fetching liquor data:", error);
+        alert("주류 정보를 불러오는데 실패했습니다. 주류를 다시 선택해주세요.");
+        router.push("/liquors");
       }
     };
 
@@ -123,7 +158,7 @@ const TastingNotesNewPage = () => {
   };
   const updateSetRelatedNotes = (
     newRelatedNotes: string[],
-    currentTab: number
+    currentTab: number,
   ) => {
     setRelatedNotes((prev) => {
       const updatedRelatedNotes = [...prev];
@@ -165,31 +200,50 @@ const TastingNotesNewPage = () => {
       return newRelatedNotes;
     });
   };
+
+  if (!liquorId) {
+    return null; // 또는 로딩 인디케이터나 에러 메시지를 표시할 수 있습니다.
+  }
+
   const handleSave = async () => {
+    const convertEmptyStringToNull = (value: string | null) => {
+      return value === "" ? null : value;
+    };
+
     const ReviewSavingData: ReviewSavingData = {
-      productID: 199948,
+      liquorId: liquorId,
       noseScore: scores[0],
       palateScore: scores[1],
       finishScore: scores[2],
-      noseMemo: memos[0],
-      palateMemo: memos[1],
-      finishMemo: memos[2],
-      overallNote: overallNote,
-      mood: mood,
-      noseNotes: Array.from(selectedNotes[0]).join(", "),
-      palateNotes: Array.from(selectedNotes[1]).join(", "),
-      finishNotes: Array.from(selectedNotes[2]).join(", "),
+      noseMemo: convertEmptyStringToNull(memos[0]),
+      palateMemo: convertEmptyStringToNull(memos[1]),
+      finishMemo: convertEmptyStringToNull(memos[2]),
+      overallNote: convertEmptyStringToNull(overallNote),
+      mood: convertEmptyStringToNull(mood),
+      noseNotes: convertEmptyStringToNull(
+        Array.from(selectedNotes[0]).join(", "),
+      ),
+      palateNotes: convertEmptyStringToNull(
+        Array.from(selectedNotes[1]).join(", "),
+      ),
+      finishNotes: convertEmptyStringToNull(
+        Array.from(selectedNotes[2]).join(", "),
+      ),
     };
 
     setSaving(true); // 로딩 상태 시작
 
     try {
-      await saveReviewData(ReviewSavingData);
+      const tastingNotesId = await saveReviewData(ReviewSavingData);
+      router.push(`/tasting-notes/${tastingNotesId}`);
       console.log("Saved data:", ReviewSavingData);
-      alert("Data saved successfully!");
-    } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Failed to save data.");
+      alert("저장 성공");
+    } catch (error: any) {
+      // 'error'를 'any' 타입으로 명시적으로 선언
+      let errorMessage = error.errors
+        .map((e: any) => e.field + e.message)
+        .join("\n");
+      alert(`저장 실패: ${errorMessage}`);
     } finally {
       setSaving(false); // 로딩 상태 종료
     }
@@ -274,4 +328,10 @@ const TastingNotesNewPage = () => {
   );
 };
 
-export default TastingNotesNewPage;
+export default function TastingNotesNewPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TastingNotesNewPageComponent />
+    </Suspense>
+  );
+}

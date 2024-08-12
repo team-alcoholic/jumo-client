@@ -1,14 +1,29 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { Container, Box, Typography, Button } from "@mui/material";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+function LoginComponent() {
   const router = useRouter();
+  const params = useSearchParams();
+  const [info, setInfo] = useState("");
+  const tastingNotesInfo =
+    "테이스팅 노트 작성을 기록하기 위해서는 로그인이 필요합니다 ㅠㅠ";
+
+  useEffect(() => {
+    const redirectUrl = params.get("redirectTo");
+    if (redirectUrl && redirectUrl.includes("tasting-notes")) {
+      setInfo(tastingNotesInfo);
+    }
+  }, [params]);
+
   const handleKakaoLogin = () => {
+    const redirectUrl = params.get("redirectTo");
     router.push(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao${redirectUrl ? `?redirectTo=${encodeURIComponent(redirectUrl)}` : ""}`,
     );
   };
 
@@ -31,6 +46,11 @@ export default function LoginPage() {
         <Typography variant="body1" color="textSecondary">
           간단하게 로그인하고 다양한 서비스를 즐겨보세요.
         </Typography>
+        {info && (
+          <Typography variant="body1" color="textSecondary">
+            {info}
+          </Typography>
+        )}
       </Box>
       <Button
         variant="contained"
@@ -38,8 +58,16 @@ export default function LoginPage() {
         sx={{ mb: 2, backgroundColor: "#FEE500", color: "#000" }}
         onClick={handleKakaoLogin}
       >
-        카카오로 로그인하기
+        카카오로 1초 로그인하기
       </Button>
     </Container>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginComponent />
+    </Suspense>
   );
 }
