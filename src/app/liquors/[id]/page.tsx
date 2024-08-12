@@ -1,7 +1,8 @@
 import LiquorInfoCardComponent from "@/components/LiquorInfoCardComponent/LiquorInfoCardComponent";
 import LiquorUserTastingComponent from "@/components/LiquorUserTastingComponent/LiquorUserTastingComponent";
-import { Box, Divider, Stack, styled, Typography } from "@mui/material";
+import { Box, Button, Divider, Stack, styled, Typography } from "@mui/material";
 import Image from "next/image";
+import Link from "next/link";
 
 /** 주류 상세정보 API 요청 함수 */
 const getLiquorInfo = async (id: string) => {
@@ -71,11 +72,27 @@ export default async function LiquorDetailPage({
 
       {/* 주류 리뷰 */}
       <Stack sx={{ marginTop: "40px" }}>
-        <Typography
-          sx={{ padding: "10px 20px", fontSize: "22px", fontWeight: "600" }}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "row",
+            gap: "20px",
+            padding: "10px",
+          }}
         >
-          커뮤니티 리뷰
-        </Typography>
+          <Typography sx={{ fontSize: "22px", fontWeight: "600" }}>
+            테이스팅 리뷰
+          </Typography>
+          <Link
+            href={`/tasting-notes/new?liquorId=${id}`}
+            style={{ color: "inherit", textDecoration: "none" }}
+          >
+            <Button variant="outlined" size="small">
+              작성하기
+            </Button>
+          </Link>
+        </Box>
         <Divider sx={{ margin: "5px 0" }} />
         <LiquorUserTastingComponent liquorId={id} />
       </Stack>
