@@ -8,7 +8,7 @@ import { MdOutlineStickyNote2 } from "react-icons/md";
 import { calculateAverageScore, formatDate } from "@/utils/format";
 import MoodSelectedComponent from "@/components/TastingNotesComponent/MoodSelectedComponent";
 
-const REVIEW_URL = "http://localhost:3000/api/reviews/hello";
+const REVIEW_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
 
 interface LiquorData {
   thumbnailImageUrl: string | null;
@@ -35,17 +35,18 @@ interface ReviewData {
   palateNotes: string[] | null;
   finishNotes: string[] | null;
   author: string | null;
-  date: string;
-  liquorData: LiquorData;
+  createdAt: string;
+  liquor: LiquorData;
 }
 
 // 데이터를 가져오는 함수
 // 1분마다 캐시를 업데이트
-async function fetchData(mId: string): Promise<ReviewData> {
-  const res = await fetch(REVIEW_URL, {
+async function fetchData(id: string): Promise<ReviewData> {
+  const res = await fetch(REVIEW_URL + id, {
     next: { revalidate: 1 },
   });
 
+  console.log("res url", REVIEW_URL + id);
   if (!res.ok) {
     if (res.status === 404) {
       throw new Error("404");
@@ -56,10 +57,12 @@ async function fetchData(mId: string): Promise<ReviewData> {
 }
 
 interface PostPageProps {
-  params: { mId: string };
+  params: { id: string };
 }
-export default async function PostPage({ params: { mId } }: PostPageProps) {
-  const reviewData = await fetchData(mId);
+export default async function PostPage({ params: { id } }: PostPageProps) {
+  console.log("mId", id);
+  const reviewData = await fetchData(id);
+  console.log("reviewData", reviewData);
 
   const {
     noseScore,
@@ -74,21 +77,21 @@ export default async function PostPage({ params: { mId } }: PostPageProps) {
     palateNotes,
     finishNotes,
     author,
-    date,
-    liquorData,
+    createdAt,
+    liquor,
   } = reviewData;
 
   return (
     <Container maxWidth="sm" sx={{ padding: 0 }}>
       <LiquorTitle
-        thumbnailImageUrl={liquorData?.thumbnailImageUrl || null}
-        koName={liquorData.koName}
-        type={liquorData?.type || null}
-        abv={liquorData?.abv || null}
-        volume={liquorData?.volume || null}
-        country={liquorData?.country || null}
-        region={liquorData?.region || null}
-        grapeVariety={liquorData?.grapeVariety || null}
+        thumbnailImageUrl={liquor?.thumbnailImageUrl || null}
+        koName={liquor.koName}
+        type={liquor?.type || null}
+        abv={liquor?.abv || null}
+        volume={liquor?.volume || null}
+        country={liquor?.country || null}
+        region={liquor?.region || null}
+        grapeVariety={liquor?.grapeVariety || null}
       />
       <Typography
         variant="body2"
@@ -99,7 +102,7 @@ export default async function PostPage({ params: { mId } }: PostPageProps) {
           fontStyle: "italic",
         }}
       >
-        {author}님이 {formatDate(date)}에 작성함
+        {author}님이 {formatDate(createdAt)}에 작성함
       </Typography>
       <NotesSection
         title="향 (Nose)"

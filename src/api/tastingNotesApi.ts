@@ -5,7 +5,7 @@ export interface aiNotes {
 }
 
 export interface ReviewSavingData {
-  productID: number;
+  liquorId: string;
   noseScore: number | null;
   palateScore: number | null;
   finishScore: number | null;
@@ -45,7 +45,9 @@ export const fetchRelatedNotes = async (
   const response = await fetch(
     `${LIQUOR_NOTES_URL}?keyword=${encodeURIComponent(note)}&exclude=${encodeURIComponent(exclude)}&limit=5`,
   );
+
   if (!response.ok) throw new Error("Failed to fetch related notes");
+
   return (await response.json())["tastingNotes"];
 };
 
@@ -55,10 +57,17 @@ export const saveReviewData = async (data: ReviewSavingData): Promise<void> => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include", // 쿠키를 포함하여 요청
+
     body: JSON.stringify(data),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to save review data");
+    throw await response.json();
+    // console.log("adsfasdfasdfadsfasd", await response.json());
+    // console.log(await response.json());
+    // throw new Error("Failed to save review data");
   }
+  // router.push("/tasting-notes");
+  return await response.json();
 };
