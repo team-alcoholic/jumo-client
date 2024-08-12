@@ -1,18 +1,3 @@
-export interface LiquorData {
-  thumbnailImageUrl: string | null;
-  koName: string;
-  type: string | null;
-  abv: string | null;
-  volume: string | null;
-  country: string | null;
-  tastingNotesAroma: string | null;
-  tastingNotesTaste: string | null;
-  tastingNotesFinish: string | null;
-  region: string | null;
-  grapeVariety: string | null;
-  aiNotes: aiNotes | null;
-}
-
 export interface aiNotes {
   tastingNotesAroma: string;
   tastingNotesTaste: string;
@@ -54,10 +39,10 @@ export const fetchAiNotes = async (): Promise<aiNotes> => {
 
 export const fetchRelatedNotes = async (
   note: string,
-  exclude: string,
+  exclude: string
 ): Promise<string[]> => {
   const response = await fetch(
-    `${LIQUOR_NOTES_URL}?keyword=${encodeURIComponent(note)}&exclude=${encodeURIComponent(exclude)}&limit=5`,
+    `${LIQUOR_NOTES_URL}?keyword=${encodeURIComponent(note)}&exclude=${encodeURIComponent(exclude)}&limit=5`
   );
   if (!response.ok) throw new Error("Failed to fetch related notes");
   return await response.json();

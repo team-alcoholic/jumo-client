@@ -5,17 +5,6 @@ import {
   WhiskeyImage,
 } from "@/app/tasting-notes/new/StyledComponent";
 
-interface LiquorTitleProps {
-  thumbnailImageUrl: string | null;
-  koName: string;
-  type: string | null;
-  abv: string | null;
-  volume: string | null;
-  country: string | null;
-  region: string | null;
-  grapeVariety: string | null;
-}
-
 const LiquorTitle: React.FC<LiquorTitleProps> = ({
   thumbnailImageUrl,
   koName,

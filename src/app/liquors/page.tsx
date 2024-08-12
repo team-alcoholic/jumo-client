@@ -1,7 +1,7 @@
 "use client";
 
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
-import { AccountCircle, Search } from "@mui/icons-material";
+import { Search } from "@mui/icons-material";
 import {
   Box,
   InputAdornment,
@@ -58,10 +58,7 @@ export default function LiquorsPage() {
       {status == "success" &&
         (data && data.length ? (
           data.map((liquor: LiquorInfo) => (
-            <LiquorCardLink
-              key={liquor.product_id}
-              href={`/liquors/${liquor.product_id}`}
-            >
+            <LiquorCardLink key={liquor.id} href={`/liquors/${liquor.id}`}>
               <LiquorTitle
                 thumbnailImageUrl={liquor.thumbnail_image_url}
                 koName={liquor.ko_name}
