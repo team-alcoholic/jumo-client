@@ -238,7 +238,8 @@ const TastingNotesNewPage = () => {
       router.push(`/tasting-notes/${tastingNotesId}`);
       console.log("Saved data:", ReviewSavingData);
       alert("저장 성공");
-    } catch (error) {
+    } catch (error: any) {
+      // 'error'를 'any' 타입으로 명시적으로 선언
       let errorMessage = error.errors
         .map((e: any) => e.field + e.message)
         .join("\n");
