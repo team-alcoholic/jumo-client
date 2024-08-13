@@ -18,7 +18,7 @@ import { useQuery } from "react-query";
 const getLiquorList = async (keyword: string) => {
   if (!keyword) return null;
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`,
   );
   return response.data;
 };
@@ -51,8 +51,17 @@ export default function LiquorsPage() {
                 <Search />
               </InputAdornment>
             ),
+            sx: {
+              height: "56px", // 텍스트 필드의 높이를 증가시킴
+              fontSize: "16px", // 텍스트 크기를 키움
+              padding: "0 12px", // 내부 패딩을 조정하여 더 넓게 보이도록 함
+            },
           }}
           onChange={handleKeywordChange}
+          sx={{
+            fontSize: "16px", // 입력 텍스트의 크기를 증가시킴
+            height: "56px", // 텍스트 필드 전체 높이를 키움
+          }}
         />
       </LiquorSearchBox>
       {status == "success" &&
@@ -83,8 +92,6 @@ export default function LiquorsPage() {
 }
 
 const LiquorSearchBox = styled(Box)({
-  margin: "20px 0",
-  padding: "20px 40px",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
