@@ -7,6 +7,7 @@ export default function HeaderComponent() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const threshold = 50; // 헤더가 나타나기 위한 스크롤 임계값
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = () => {
     const currentScrollY = window.scrollY;
 
@@ -25,7 +26,7 @@ export default function HeaderComponent() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [lastScrollY]);
+  }, [handleScroll, lastScrollY]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
