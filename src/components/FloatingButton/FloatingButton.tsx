@@ -45,7 +45,7 @@ export default function FloatingButton({ link }: { link: string }) {
           sx={{ padding: "0 12px" }}
         >
           <EditIcon fontSize="small" sx={{ mr: 1 }} />
-          <Typography sx={{ fontSize: "12px" }}>리뷰 작성하기</Typography>
+          <Typography sx={{ fontSize: "12px" }}>테이스팅 리뷰 작성</Typography>
         </Fab>
       </Stack>
     </Link>
