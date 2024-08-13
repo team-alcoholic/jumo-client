@@ -1,8 +1,19 @@
 import LiquorInfoCardComponent from "@/components/LiquorInfoCardComponent/LiquorInfoCardComponent";
 import LiquorUserTastingComponent from "@/components/LiquorUserTastingComponent/LiquorUserTastingComponent";
-import { Box, Button, Divider, Stack, styled, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  Fab,
+  Stack,
+  styled,
+  Typography,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import Image from "next/image";
 import Link from "next/link";
+import FloatingButton from "@/components/FloatingButton/FloatingButton";
+import { Edit } from "@mui/icons-material";
 
 /** 주류 상세정보 API 요청 함수 */
 const getLiquorInfo = async (id: string) => {
@@ -30,7 +41,13 @@ export default async function LiquorDetailPage({
   const liquor = await getLiquorInfo(id);
 
   return (
-    <Stack sx={{ marginTop: "30px", gap: "30px" }}>
+    <Stack
+      sx={{
+        margin: "30px 0",
+        gap: "30px",
+        position: "relative",
+      }}
+    >
       {/* 주류 이미지 */}
       <Box
         sx={{
@@ -84,18 +101,21 @@ export default async function LiquorDetailPage({
           <Typography sx={{ fontSize: "22px", fontWeight: "600" }}>
             테이스팅 리뷰
           </Typography>
-          <Link
+          {/* <Link
             href={`/tasting-notes/new?liquorId=${id}`}
             style={{ color: "inherit", textDecoration: "none" }}
           >
-            <Button variant="outlined" size="small">
+            <Button variant="outlined" size="small" startIcon={<Edit />}>
               작성하기
             </Button>
-          </Link>
+          </Link> */}
         </Box>
         <Divider sx={{ margin: "5px 0" }} />
         <LiquorUserTastingComponent liquorId={id} />
       </Stack>
+
+      {/* 테이스팅 리뷰 작성 버튼 */}
+      <FloatingButton link={`/tasting-notes/new?liquorId=${id}`} />
     </Stack>
   );
 }

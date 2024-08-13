@@ -82,7 +82,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
   } = reviewData;
 
   return (
-    <Container maxWidth="sm" sx={{ padding: 0 }}>
+    <Container maxWidth="sm" sx={{ margin: "40px 0", padding: 0 }}>
       <LiquorTitle
         thumbnailImageUrl={liquor?.thumbnailImageUrl || null}
         koName={liquor.koName}
@@ -97,6 +97,8 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
         variant="body2"
         gutterBottom
         sx={{
+          paddingTop: "30px",
+          paddingBottom: "5px",
           textAlign: "right",
           color: "grey.600",
           fontStyle: "italic",

@@ -21,4 +21,5 @@ body::-webkit-scrollbar {
   max-width: 600px; /* 원하는 최대 너비 설정 */
   margin: 0 auto; /* 중앙 정렬 */
   padding: 0 16px; /* 양쪽 여백 추가 */
+  position: relative;
 }

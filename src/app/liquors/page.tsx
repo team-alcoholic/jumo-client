@@ -18,7 +18,7 @@ import { useQuery } from "react-query";
 const getLiquorList = async (keyword: string) => {
   if (!keyword) return null;
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`
   );
   return response.data;
 };
@@ -39,6 +39,7 @@ export default function LiquorsPage() {
 
   return (
     <Box>
+      {/* 주류 검색창 */}
       <LiquorSearchBox>
         <TextField
           fullWidth
@@ -64,6 +65,8 @@ export default function LiquorsPage() {
           }}
         />
       </LiquorSearchBox>
+
+      {/* 검색 결과 */}
       {status == "success" &&
         (data && data.length ? (
           data.map((liquor: LiquorInfo) => (
@@ -92,6 +95,7 @@ export default function LiquorsPage() {
 }
 
 const LiquorSearchBox = styled(Box)({
+  margin: "10px 5px",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
