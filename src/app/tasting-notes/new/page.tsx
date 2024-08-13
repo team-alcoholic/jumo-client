@@ -1,6 +1,6 @@
 "use client";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
-import { CircularProgress, Tab, Tabs } from "@mui/material";
+import { CircularProgress, Skeleton, Tab, Tabs } from "@mui/material";
 import TabContentComponent from "@/components/TastingNotesComponent/TabContentComponent";
 import TotalScoreComponent from "@/components/TastingNotesComponent/TotalScoreComponent";
 import MoodSelectorComponent from "@/components/TastingNotesComponent/MoodSelectorComponent";
@@ -239,9 +239,65 @@ const TastingNotesNewPageComponent = () => {
   };
 
   if (!liquorData) {
-    return <CircularProgress size={24} />;
-  }
+    return (
+      <Container sx={{ margin: "30px 0" }}>
+        {/* 주류 이미지 스켈레톤 */}
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={200}
+          sx={{ marginBottom: 2 }}
+        />
 
+        {/* 주류 이름 스켈레톤 */}
+        <Skeleton width="60%" height={40} sx={{ marginBottom: 2 }} />
+        <Skeleton width="30%" height={30} sx={{ marginBottom: 4 }} />
+
+        {/* 탭 스켈레톤 */}
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={48}
+          sx={{ marginBottom: 4 }}
+        />
+
+        {/* 탭 내용 스켈레톤 */}
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={120}
+          sx={{ marginBottom: 2 }}
+        />
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={120}
+          sx={{ marginBottom: 2 }}
+        />
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={120}
+          sx={{ marginBottom: 2 }}
+        />
+
+        {/* 총 점수와 메모 스켈레톤 */}
+        <Skeleton width="100%" height={60} sx={{ marginBottom: 4 }} />
+        <Skeleton width="100%" height={60} sx={{ marginBottom: 4 }} />
+
+        {/* 무드 선택 스켈레톤 */}
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={48}
+          sx={{ marginBottom: 4 }}
+        />
+
+        {/* 저장 버튼 스켈레톤 */}
+        <Skeleton variant="rectangular" width="100%" height={48} />
+      </Container>
+    );
+  }
   const tabContents = [
     {
       title: "향 (Nose)",
@@ -258,7 +314,7 @@ const TastingNotesNewPageComponent = () => {
   ];
 
   return (
-      <Container sx={{ margin: "30px 0" }}>
+    <Container sx={{ margin: "30px 0" }}>
       <LiquorTitle
         thumbnailImageUrl={liquorData.thumbnailImageUrl}
         koName={liquorData.koName}
