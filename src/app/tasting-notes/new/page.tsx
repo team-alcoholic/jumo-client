@@ -1,12 +1,14 @@
 "use client";
-import React, { Suspense, useEffect, useState } from "react";
-import { CircularProgress, Tab, Tabs } from "@mui/material";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
+import { CircularProgress, Skeleton, Tab, Tabs } from "@mui/material";
 import TabContentComponent from "@/components/TastingNotesComponent/TabContentComponent";
 import TotalScoreComponent from "@/components/TastingNotesComponent/TotalScoreComponent";
 import MoodSelectorComponent from "@/components/TastingNotesComponent/MoodSelectorComponent";
 import {
   Container,
   SaveButton,
+  StyledTab,
+  StyledTabs,
   TabContent,
 } from "@/app/tasting-notes/new/StyledComponent";
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
@@ -18,7 +20,7 @@ import {
   ReviewSavingData,
   saveReviewData,
 } from "@/api/tastingNotesApi";
-import { notFound, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const TastingNotesNewPageComponent = () => {
   const params = useSearchParams();
@@ -49,80 +51,82 @@ const TastingNotesNewPageComponent = () => {
   const [overallNote, setOverallNote] = useState<string>("");
   const [mood, setMood] = useState<string>("");
   const [liquorData, setLiquorData] = useState<LiquorData | null>(null);
-  useEffect(() => {
-    const getAuth = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
-          {
-            method: "GET",
-            credentials: "include", // 세션 기반 인증에 필요한 경우 추가
-          }
-        );
+  const getAuth = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+        {
+          method: "GET",
+          credentials: "include", // 세션 기반 인증에 필요한 경우 추가
+        },
+      );
 
-        if (response.status === 401) {
-          alert(
-            "리뷰 작성은 로그인이 필요합니다.(카카오로 1초 로그인 하러 가기)"
-          );
-          const redirectUrl = window.location.href;
-          router.push(`/login?redirectTo=${encodeURIComponent(redirectUrl)}`);
-        } else {
-          await response.json();
-        }
-      } catch (error) {
-        console.error("Error fetching auth data:", error);
+      if (response.status === 401) {
+        alert(
+          "리뷰 작성은 로그인이 필요합니다.(카카오로 1초 로그인 하러 가기)",
+        );
+        const redirectUrl = window.location.href;
+        router.push(`/login?redirectTo=${encodeURIComponent(redirectUrl)}`);
+      } else {
+        await response.json();
       }
-    };
+    } catch (error) {
+      console.error("Error fetching auth data:", error);
+    }
+  }, [router]);
 
-    getAuth();
-
-    const loadLiquorData = async () => {
-      try {
-        if (!liquorId) {
-          alert("리뷰 작성을 위해서는 주류 검색이 필요합니다.");
-          router.push("/liquors");
-          return;
-        }
-        const data = await fetchLiquorData(liquorId);
-        setLiquorData(data);
-        let tastingNotesAroma = new Set(
-          data.tastingNotesAroma?.split(", ") || []
-        );
-        let tastingNotesTaste = new Set(
-          data.tastingNotesTaste?.split(", ") || []
-        );
-        let tastingNotesFinish = new Set(
-          data.tastingNotesFinish?.split(", ") || []
-        );
-
-        if (data.aiNotes) {
-          setHasAiNotes(true);
-          data.aiNotes.tastingNotesAroma
-            .split(", ")
-            .forEach((note: string) => tastingNotesAroma.add(note));
-          data.aiNotes.tastingNotesTaste
-            .split(", ")
-            .forEach((note: string) => tastingNotesTaste.add(note));
-          data.aiNotes.tastingNotesFinish
-            .split(", ")
-            .forEach((note: string) => tastingNotesFinish.add(note));
-        } else {
-          getAiNotes(liquorId);
-        }
-
-        setRelatedNotes([
-          tastingNotesAroma,
-          tastingNotesTaste,
-          tastingNotesFinish,
-        ]);
-      } catch (error) {
-        alert("주류 정보를 불러오는데 실패했습니다. 주류를 다시 선택해주세요.");
+  const loadLiquorData = useCallback(async () => {
+    try {
+      if (!liquorId) {
+        alert("리뷰 작성을 위해서는 주류 검색이 필요합니다.");
         router.push("/liquors");
+        return;
       }
-    };
+      const data = await fetchLiquorData(liquorId);
+      setLiquorData(data);
 
-    loadLiquorData();
-  }, []);
+      let tastingNotesAroma = new Set(
+        data.tastingNotesAroma?.split(", ") || [],
+      );
+      let tastingNotesTaste = new Set(
+        data.tastingNotesTaste?.split(", ") || [],
+      );
+      let tastingNotesFinish = new Set(
+        data.tastingNotesFinish?.split(", ") || [],
+      );
+
+      if (data.aiNotes) {
+        setHasAiNotes(true);
+        data.aiNotes.tastingNotesAroma
+          .split(", ")
+          .forEach((note: string) => tastingNotesAroma.add(note));
+        data.aiNotes.tastingNotesTaste
+          .split(", ")
+          .forEach((note: string) => tastingNotesTaste.add(note));
+        data.aiNotes.tastingNotesFinish
+          .split(", ")
+          .forEach((note: string) => tastingNotesFinish.add(note));
+      } else {
+        getAiNotes(liquorId);
+      }
+
+      setRelatedNotes([
+        tastingNotesAroma,
+        tastingNotesTaste,
+        tastingNotesFinish,
+      ]);
+    } catch (error) {
+      alert("주류 정보를 불러오는데 실패했습니다. 주류를 다시 선택해주세요.");
+      router.push("/liquors");
+    }
+  }, [liquorId, router]);
+
+  useEffect(() => {
+    (async () => {
+      await getAuth();
+      await loadLiquorData();
+    })();
+  }, [getAuth, loadLiquorData]);
 
   const getAiNotes = async (liquorId: string) => {
     setHasAiNotes(false);
@@ -135,26 +139,6 @@ const TastingNotesNewPageComponent = () => {
     setHasAiNotes(true);
   };
 
-  // useEffect(() => {
-  //   const loadAiNotes = async () => {
-  //     if (!hasAiNotes) {
-  //       try {
-  //         const aiData = await fetchAiNotes(liquorId);
-  //         setRelatedNotes((prev) => [
-  //           new Set([...Array.from(prev[0]), ...aiData.noseNotes]),
-  //           new Set([...Array.from(prev[1]), ...aiData.palateNotes]),
-  //           new Set([...Array.from(prev[2]), ...aiData.finishNotes]),
-  //         ]);
-  //         setHasAiNotes(true);
-  //       } catch (error) {
-  //         console.error("Error fetching AI notes:", error);
-  //       }
-  //     }
-  //   };
-  //
-  //   loadAiNotes();
-  // }, [hasAiNotes]);
-
   useEffect(() => {
     const averageScore = calculateAverageScore(scores[0], scores[1], scores[2]);
     setTotalScore(averageScore ? averageScore.toString() : "");
@@ -165,7 +149,7 @@ const TastingNotesNewPageComponent = () => {
   };
   const updateSetRelatedNotes = (
     newRelatedNotes: string[],
-    currentTab: number
+    currentTab: number,
   ) => {
     setRelatedNotes((prev) => {
       const updatedRelatedNotes = [...prev];
@@ -228,13 +212,13 @@ const TastingNotesNewPageComponent = () => {
       overallNote: convertEmptyStringToNull(overallNote),
       mood: convertEmptyStringToNull(mood),
       noseNotes: convertEmptyStringToNull(
-        Array.from(selectedNotes[0]).join(", ")
+        Array.from(selectedNotes[0]).join(", "),
       ),
       palateNotes: convertEmptyStringToNull(
-        Array.from(selectedNotes[1]).join(", ")
+        Array.from(selectedNotes[1]).join(", "),
       ),
       finishNotes: convertEmptyStringToNull(
-        Array.from(selectedNotes[2]).join(", ")
+        Array.from(selectedNotes[2]).join(", "),
       ),
     };
 
@@ -257,9 +241,65 @@ const TastingNotesNewPageComponent = () => {
   };
 
   if (!liquorData) {
-    return <CircularProgress size={24} />;
-  }
+    return (
+      <Container sx={{ margin: "30px 0" }}>
+        {/* 주류 이미지 스켈레톤 */}
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={200}
+          sx={{ marginBottom: 2 }}
+        />
 
+        {/* 주류 이름 스켈레톤 */}
+        <Skeleton width="60%" height={40} sx={{ marginBottom: 2 }} />
+        <Skeleton width="30%" height={30} sx={{ marginBottom: 4 }} />
+
+        {/* 탭 스켈레톤 */}
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={48}
+          sx={{ marginBottom: 4 }}
+        />
+
+        {/* 탭 내용 스켈레톤 */}
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={120}
+          sx={{ marginBottom: 2 }}
+        />
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={120}
+          sx={{ marginBottom: 2 }}
+        />
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={120}
+          sx={{ marginBottom: 2 }}
+        />
+
+        {/* 총 점수와 메모 스켈레톤 */}
+        <Skeleton width="100%" height={60} sx={{ marginBottom: 4 }} />
+        <Skeleton width="100%" height={60} sx={{ marginBottom: 4 }} />
+
+        {/* 무드 선택 스켈레톤 */}
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={48}
+          sx={{ marginBottom: 4 }}
+        />
+
+        {/* 저장 버튼 스켈레톤 */}
+        <Skeleton variant="rectangular" width="100%" height={48} />
+      </Container>
+    );
+  }
   const tabContents = [
     {
       title: "향 (Nose)",
@@ -288,11 +328,11 @@ const TastingNotesNewPageComponent = () => {
         grapeVariety={liquorData.grapeVariety}
       />
 
-      <Tabs value={selectedTab} onChange={handleTabChange} centered>
-        <Tab label="Nose" />
-        <Tab label="Palate" />
-        <Tab label="Finish" />
-      </Tabs>
+      <StyledTabs value={selectedTab} onChange={handleTabChange} centered>
+        <StyledTab label="Nose" />
+        <StyledTab label="Palate" />
+        <StyledTab label="Finish" />
+      </StyledTabs>
 
       <TabContent>
         <TabContentComponent

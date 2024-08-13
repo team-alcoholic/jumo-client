@@ -71,6 +71,14 @@ const TabContentComponent: React.FC<TabContentComponentProps> = ({
 
   return (
     <ContentContainer>
+      <Typography
+        variant="subtitle2" // 글씨를 작게 설정
+        color="textSecondary" // 연한 색상 사용
+        sx={{ margin: "8px 0", fontSize: "12px", fontWeight: 400 }} // 크기를 더 작게 설정
+        margin={0}
+      >
+        느껴지는 테이스팅 노트를 클릭하세요. 인공지능이 계속 추천해줍니다.
+      </Typography>
       <Typography variant="h5" gutterBottom>
         {title}
       </Typography>
