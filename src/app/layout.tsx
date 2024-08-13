@@ -36,7 +36,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Provider>
-          <div className="container">
+          <div className="container" style={{ paddingBottom: "60px" }}>
             <HeaderComponent />
             {children}
             <NavigationComponent />
