@@ -128,3 +128,11 @@ interface KeyValueInfoProps {
   valueContent: string | null;
   keyMinWidth: number;
 }
+
+/** SingleTastingComponent 호출 시 사용되는 props type */
+interface SingleTastingProps {
+  keyContent: string | null;
+  valueContent: string | null;
+  detailContent: string | null;
+  keyMinWidth: number;
+}
