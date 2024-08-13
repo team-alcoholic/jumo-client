@@ -31,9 +31,9 @@ interface ReviewData {
   finishMemo: string | null;
   overallNote: string | null;
   mood: string | null;
-  noseNotes: string[] | null;
-  palateNotes: string[] | null;
-  finishNotes: string[] | null;
+  noseNotes: string | null;
+  palateNotes: string | null;
+  finishNotes: string | null;
   author: string | null;
   createdAt: string;
   liquor: LiquorData;
@@ -115,7 +115,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
           </Box>
         }
         score={noseScore}
-        notes={noseNotes}
+        notes={noseNotes ? noseNotes.split(",") : []}
         formattedDescription={noseMemo}
       />
       <NotesSection
@@ -129,7 +129,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
           </Box>
         }
         score={palateScore}
-        notes={palateNotes}
+        notes={palateNotes ? palateNotes.split(",") : []}
         formattedDescription={palateMemo}
       />
       <NotesSection
@@ -142,7 +142,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
             <HiOutlineLightBulb />
           </Box>
         }
-        notes={finishNotes}
+        notes={finishNotes ? finishNotes.split(",") : []}
         score={finishScore}
         formattedDescription={finishMemo}
       />

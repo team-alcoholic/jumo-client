@@ -35,7 +35,7 @@ export const fetchLiquorData = async (
 
 export const fetchAiNotes = async (liquorId: string): Promise<aiNotes> => {
   const response = await fetch(AI_LIQUOR_NOTES_URL + "/" + liquorId);
-  if (!response.ok) console.log("Failed to fetch AI notes");
+  if (!response.ok) return { noseNotes: [], palateNotes: [], finishNotes: [] };
   return await response.json();
 };
 
