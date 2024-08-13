@@ -7,6 +7,8 @@ import MoodSelectorComponent from "@/components/TastingNotesComponent/MoodSelect
 import {
   Container,
   SaveButton,
+  StyledTab,
+  StyledTabs,
   TabContent,
 } from "@/app/tasting-notes/new/StyledComponent";
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
@@ -326,11 +328,11 @@ const TastingNotesNewPageComponent = () => {
         grapeVariety={liquorData.grapeVariety}
       />
 
-      <Tabs value={selectedTab} onChange={handleTabChange} centered>
-        <Tab label="Nose" />
-        <Tab label="Palate" />
-        <Tab label="Finish" />
-      </Tabs>
+      <StyledTabs value={selectedTab} onChange={handleTabChange} centered>
+        <StyledTab label="Nose" />
+        <StyledTab label="Palate" />
+        <StyledTab label="Finish" />
+      </StyledTabs>
 
       <TabContent>
         <TabContentComponent

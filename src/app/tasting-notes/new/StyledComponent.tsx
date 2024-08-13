@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Box, Button, styled } from "@mui/material";
+import { Avatar, Box, Button, styled, Tab, Tabs } from "@mui/material";
 
 export const Header = styled(Box)(({ theme }) => ({
   position: "fixed",
@@ -41,7 +41,7 @@ export const WhiskeyImage = styled(Avatar)({
 });
 
 export const TabContent = styled(Box)({
-  marginTop: "20px",
+  marginTop: "0px",
   padding: "20px",
   backgroundColor: "#f9f9f9",
   borderRadius: "8px",
@@ -57,4 +57,38 @@ export const SaveButton = styled(Button)({
   "&:hover": {
     backgroundColor: "#303f9f",
   },
+});
+
+// 스타일 적용된 Tabs 컴포넌트
+export const StyledTabs = styled(Tabs)({
+  borderBottom: "1px solid #ddd",
+  marginBottom: "16px",
+  "& .MuiTabs-indicator": {
+    backgroundColor: "#00796b",
+    height: "3px",
+  },
+});
+
+// 스타일 적용된 Tab 컴포넌트
+export const StyledTab = styled(Tab)({
+  textTransform: "none",
+  fontWeight: 600,
+  fontSize: "16px",
+  color: "#555",
+  padding: "12px 16px",
+  "&.Mui-selected": {
+    color: "#00796b",
+  },
+  "&:hover": {
+    color: "#00796b",
+  },
+  "&.Mui-focusVisible": {
+    outline: "none",
+    backgroundColor: "transparent", // 클릭 시 배경색 변경 방지
+  },
+  "&:focus": {
+    outline: "none",
+    backgroundColor: "transparent", // 클릭 시 배경색 변경 방지
+  },
+  transition: "color 0.3s",
 });
