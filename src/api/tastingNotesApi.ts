@@ -47,7 +47,7 @@ export const fetchRelatedNotes = async (
     `${LIQUOR_NOTES_URL}?keyword=${encodeURIComponent(note)}&exclude=${encodeURIComponent(exclude)}&limit=5`,
   );
 
-  if (!response.ok) throw new Error("Failed to fetch related notes");
+  if (!response.ok) return [];
 
   return (await response.json())["tastingNotes"];
 };
@@ -62,13 +62,8 @@ export const saveReviewData = async (data: ReviewSavingData): Promise<void> => {
 
     body: JSON.stringify(data),
   });
-
   if (!response.ok) {
     throw await response.json();
-    // console.log("adsfasdfasdfadsfasd", await response.json());
-    // console.log(await response.json());
-    // throw new Error("Failed to save review data");
   }
-  // router.push("/tasting-notes");
   return await response.json();
 };
