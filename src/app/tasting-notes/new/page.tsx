@@ -21,6 +21,7 @@ import {
   saveReviewData,
 } from "@/api/tastingNotesApi";
 import { useRouter, useSearchParams } from "next/navigation";
+import TastingNotesSkeleton from "@/components/TastingNotesComponent/TastingNotesSkeleton";
 
 const TastingNotesNewPageComponent = () => {
   const params = useSearchParams();
@@ -195,125 +196,48 @@ const TastingNotesNewPageComponent = () => {
   if (!liquorId) {
     return null; // 또는 로딩 인디케이터나 에러 메시지를 표시할 수 있습니다.
   }
-
   const handleSave = async () => {
-    const convertEmptyStringToNull = (value: string | null) => {
-      return value === "" ? null : value;
-    };
-
     const ReviewSavingData: ReviewSavingData = {
-      liquorId: liquorId,
+      liquorId,
       noseScore: scores[0],
       palateScore: scores[1],
       finishScore: scores[2],
-      noseMemo: convertEmptyStringToNull(memos[0]),
-      palateMemo: convertEmptyStringToNull(memos[1]),
-      finishMemo: convertEmptyStringToNull(memos[2]),
-      overallNote: convertEmptyStringToNull(overallNote),
-      mood: convertEmptyStringToNull(mood),
-      noseNotes: convertEmptyStringToNull(
-        Array.from(selectedNotes[0]).join(", "),
-      ),
-      palateNotes: convertEmptyStringToNull(
-        Array.from(selectedNotes[1]).join(", "),
-      ),
-      finishNotes: convertEmptyStringToNull(
-        Array.from(selectedNotes[2]).join(", "),
-      ),
+      noseMemo: memos[0] || null,
+      palateMemo: memos[1] || null,
+      finishMemo: memos[2] || null,
+      overallNote: overallNote || null,
+      mood: mood || null,
+      noseNotes: selectedNotes[0].size
+        ? Array.from(selectedNotes[0]).join(", ")
+        : null,
+      palateNotes: selectedNotes[1].size
+        ? Array.from(selectedNotes[1]).join(", ")
+        : null,
+      finishNotes: selectedNotes[2].size
+        ? Array.from(selectedNotes[2]).join(", ")
+        : null,
     };
 
-    setSaving(true); // 로딩 상태 시작
+    setSaving(true);
 
     try {
       const tastingNotesId = await saveReviewData(ReviewSavingData);
       router.push(`/tasting-notes/${tastingNotesId}`);
-      console.log("Saved data:", ReviewSavingData);
       alert("저장 성공");
-    } catch (error: any) {
-      // 'error'를 'any' 타입으로 명시적으로 선언
-      let errorMessage = error.errors
-        .map((e: any) => e.field + e.message)
-        .join("\n");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "알 수 없는 오류가 발생했습니다.";
       alert(`저장 실패: ${errorMessage}`);
     } finally {
-      setSaving(false); // 로딩 상태 종료
+      setSaving(false);
     }
   };
 
   if (!liquorData) {
-    return (
-      <Container sx={{ margin: "30px 0" }}>
-        {/* 주류 이미지 스켈레톤 */}
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={200}
-          sx={{ marginBottom: 2 }}
-        />
-
-        {/* 주류 이름 스켈레톤 */}
-        <Skeleton width="60%" height={40} sx={{ marginBottom: 2 }} />
-        <Skeleton width="30%" height={30} sx={{ marginBottom: 4 }} />
-
-        {/* 탭 스켈레톤 */}
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={48}
-          sx={{ marginBottom: 4 }}
-        />
-
-        {/* 탭 내용 스켈레톤 */}
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={120}
-          sx={{ marginBottom: 2 }}
-        />
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={120}
-          sx={{ marginBottom: 2 }}
-        />
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={120}
-          sx={{ marginBottom: 2 }}
-        />
-
-        {/* 총 점수와 메모 스켈레톤 */}
-        <Skeleton width="100%" height={60} sx={{ marginBottom: 4 }} />
-        <Skeleton width="100%" height={60} sx={{ marginBottom: 4 }} />
-
-        {/* 무드 선택 스켈레톤 */}
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={48}
-          sx={{ marginBottom: 4 }}
-        />
-
-        {/* 저장 버튼 스켈레톤 */}
-        <Skeleton variant="rectangular" width="100%" height={48} />
-      </Container>
-    );
+    return <TastingNotesSkeleton />;
   }
-  const tabContents = [
-    {
-      title: "향 (Nose)",
-      description: "향 (Nose) 관련 내용을 여기에 입력하세요.",
-    },
-    {
-      title: "맛 (Palate)",
-      description: "맛 (Palate) 관련 내용을 여기에 입력하세요.",
-    },
-    {
-      title: "여운 (Finish)",
-      description: "여운 (Finish) 관련 내용을 여기에 입력하세요.",
-    },
-  ];
 
   return (
     <Container sx={{ margin: "30px 0" }}>
@@ -336,8 +260,7 @@ const TastingNotesNewPageComponent = () => {
 
       <TabContent>
         <TabContentComponent
-          title={tabContents[selectedTab].title}
-          description={tabContents[selectedTab].description}
+          selectedTab={selectedTab}
           relatedNotes={Array.from(relatedNotes[selectedTab])}
           selectedNotes={selectedNotes[selectedTab]}
           onNoteClick={handleNoteClick}

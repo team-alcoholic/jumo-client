@@ -16,8 +16,7 @@ const ContentContainer = styled("div")({
 });
 
 interface TabContentComponentProps {
-  title: string;
-  description: string;
+  selectedTab: number;
   relatedNotes: string[];
   selectedNotes: Set<string>;
   onNoteClick: (note: string) => void;
@@ -30,8 +29,7 @@ interface TabContentComponentProps {
 }
 
 const TabContentComponent: React.FC<TabContentComponentProps> = ({
-  title,
-  description,
+  selectedTab,
   relatedNotes,
   selectedNotes,
   onNoteClick,
@@ -69,6 +67,21 @@ const TabContentComponent: React.FC<TabContentComponentProps> = ({
     }
   };
 
+  const tabContents = [
+    {
+      title: "향 (Nose)",
+      description: "향 (Nose) 관련 내용을 여기에 입력하세요.",
+    },
+    {
+      title: "맛 (Palate)",
+      description: "맛 (Palate) 관련 내용을 여기에 입력하세요.",
+    },
+    {
+      title: "여운 (Finish)",
+      description: "여운 (Finish) 관련 내용을 여기에 입력하세요.",
+    },
+  ];
+
   return (
     <ContentContainer>
       <Typography
@@ -80,7 +93,7 @@ const TabContentComponent: React.FC<TabContentComponentProps> = ({
         느껴지는 테이스팅 노트를 클릭하세요. 인공지능이 계속 추천해줍니다.
       </Typography>
       <Typography variant="h5" gutterBottom>
-        {title}
+        {tabContents[selectedTab].title}
       </Typography>
       <Box
         display="flex"
@@ -142,7 +155,7 @@ const TabContentComponent: React.FC<TabContentComponentProps> = ({
         </Button>
       </Box>
 
-      <Typography>{description}</Typography>
+      <Typography>{tabContents[selectedTab].description}</Typography>
 
       <TextField
         type="number"
