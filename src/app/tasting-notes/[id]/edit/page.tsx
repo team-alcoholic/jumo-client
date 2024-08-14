@@ -26,6 +26,10 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import TastingNotesSkeleton from "@/components/TastingNotesComponent/TastingNotesSkeleton";
 import { revalidateReview } from "@/app/server-actions";
+import {
+  CustomSnackbar,
+  useCustomSnackbar,
+} from "@/components/Snackbar/CustomSnackbar";
 
 const REVIEW_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
 
@@ -36,7 +40,7 @@ interface TastingNotesEditPageComponentProps {
 const TastingNotesEditPageComponent = ({
   id,
 }: TastingNotesEditPageComponentProps) => {
-  console.log("asdfadsfasdf", id);
+  const { snackbar, showSnackbar, hideSnackbar } = useCustomSnackbar();
   const router = useRouter();
 
   const [selectedTab, setSelectedTab] = useState(0);
@@ -204,13 +208,13 @@ const TastingNotesEditPageComponent = ({
       const tastingNotesId = await updateReviewData(ReviewUpdateData);
       await revalidateReview(); // 데이터 업데이트 후 캐시 무효화
       router.push(`/tasting-notes/${tastingNotesId}`);
-      alert("저장 성공");
+      showSnackbar("저장에 성공했습니다.", "success");
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
           ? error.message
           : "알 수 없는 오류가 발생했습니다.";
-      alert(`저장 실패: ${errorMessage}`);
+      showSnackbar(`저장 실패: ${errorMessage}`, "error");
     } finally {
       setSaving(false);
     }
@@ -273,8 +277,14 @@ const TastingNotesEditPageComponent = ({
       />
       <MoodSelectorComponent mood={mood} setMood={setMood} />
       <SaveButton onClick={handleSave} variant="contained" disabled={saving}>
-        {saving ? <CircularProgress size={24} /> : "저장하기"}
+        {saving ? <CircularProgress size={24} /> : "수정 하기"}
       </SaveButton>
+      <CustomSnackbar
+        isOpen={snackbar.isOpen}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={hideSnackbar}
+      />
     </Container>
   );
 };

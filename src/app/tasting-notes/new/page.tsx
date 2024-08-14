@@ -1,6 +1,14 @@
 "use client";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
-import { CircularProgress, Skeleton, Tab, Tabs } from "@mui/material";
+import {
+  Alert,
+  AlertProps,
+  CircularProgress,
+  Skeleton,
+  Snackbar,
+  Tab,
+  Tabs,
+} from "@mui/material";
 import TabContentComponent from "@/components/TastingNotesComponent/TabContentComponent";
 import TotalScoreComponent from "@/components/TastingNotesComponent/TotalScoreComponent";
 import MoodSelectorComponent from "@/components/TastingNotesComponent/MoodSelectorComponent";
@@ -22,8 +30,15 @@ import {
 } from "@/api/tastingNotesApi";
 import { useRouter, useSearchParams } from "next/navigation";
 import TastingNotesSkeleton from "@/components/TastingNotesComponent/TastingNotesSkeleton";
+import { styled } from "@mui/material/styles";
+import {
+  CustomSnackbar,
+  useCustomSnackbar,
+} from "@/components/Snackbar/CustomSnackbar";
 
 const TastingNotesNewPageComponent = () => {
+  const { snackbar, showSnackbar, hideSnackbar } = useCustomSnackbar();
+
   const params = useSearchParams();
   const router = useRouter();
 
@@ -198,6 +213,7 @@ const TastingNotesNewPageComponent = () => {
   if (!liquorId) {
     return null; // 또는 로딩 인디케이터나 에러 메시지를 표시할 수 있습니다.
   }
+
   const handleSave = async () => {
     const ReviewSavingData: ReviewSavingData = {
       liquorId,
@@ -225,13 +241,13 @@ const TastingNotesNewPageComponent = () => {
     try {
       const tastingNotesId = await saveReviewData(ReviewSavingData);
       router.push(`/tasting-notes/${tastingNotesId}`);
-      alert("저장 성공");
+      showSnackbar("저장에 성공했습니다.", "success");
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
           ? error.message
           : "알 수 없는 오류가 발생했습니다.";
-      alert(`저장 실패: ${errorMessage}`);
+      showSnackbar(`저장 실패: ${errorMessage}`, "error");
     } finally {
       setSaving(false);
     }
@@ -296,6 +312,12 @@ const TastingNotesNewPageComponent = () => {
       <SaveButton onClick={handleSave} variant="contained" disabled={saving}>
         {saving ? <CircularProgress size={24} /> : "저장하기"}
       </SaveButton>
+      <CustomSnackbar
+        isOpen={snackbar.isOpen}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={hideSnackbar}
+      />
     </Container>
   );
 };
