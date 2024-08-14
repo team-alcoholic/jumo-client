@@ -100,3 +100,20 @@ export const updateReviewData = async (
   }
   return await response.json();
 };
+
+export const checkUserPermission = async (user: User) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+      {
+        method: "GET",
+        credentials: "include", // 세션 기반 인증에 필요한 경우 추가
+      },
+    );
+    const fetchedUser = await response.json();
+    return fetchedUser.userUuid === user.userUuid;
+  } catch (error) {
+    console.error("Error fetching auth data:", error);
+    return false;
+  }
+};

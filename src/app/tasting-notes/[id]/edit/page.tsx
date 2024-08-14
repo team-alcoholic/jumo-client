@@ -14,6 +14,7 @@ import {
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
 import { calculateAverageScore } from "@/utils/format";
 import {
+  checkUserPermission,
   fetchAiNotes,
   fetchLiquorData,
   fetchRelatedNotes,
@@ -61,29 +62,6 @@ const TastingNotesEditPageComponent = ({
   const [overallNote, setOverallNote] = useState<string>("");
   const [mood, setMood] = useState<string>("");
   const [liquorData, setLiquorData] = useState<LiquorData | null>(null);
-  const getAuth = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
-        {
-          method: "GET",
-          credentials: "include", // 세션 기반 인증에 필요한 경우 추가
-        },
-      );
-
-      if (response.status === 401) {
-        alert(
-          "리뷰 작성은 로그인이 필요합니다.(카카오로 1초 로그인 하러 가기)",
-        );
-        const redirectUrl = window.location.href;
-        router.push(`/login?redirectTo=${encodeURIComponent(redirectUrl)}`);
-      } else {
-        await response.json();
-      }
-    } catch (error) {
-      console.error("Error fetching auth data:", error);
-    }
-  }, [router]);
 
   const loadReviewData = useCallback(async () => {
     try {
@@ -106,6 +84,12 @@ const TastingNotesEditPageComponent = ({
         liquor,
       } = reviewData;
       const liquorData = reviewData.liquor;
+      const permission = await checkUserPermission(user);
+      if (!permission) {
+        alert("권한이 없습니다.");
+        router.back();
+        return;
+      }
       setLiquorData(liquorData);
 
       let tastingNotesAroma = noseNotes?.split(", ") || [];
@@ -133,10 +117,9 @@ const TastingNotesEditPageComponent = ({
 
   useEffect(() => {
     (async () => {
-      await getAuth();
       await loadReviewData();
     })();
-  }, [getAuth, loadReviewData]);
+  }, [loadReviewData]);
 
   useEffect(() => {
     const averageScore = calculateAverageScore(scores[0], scores[1], scores[2]);

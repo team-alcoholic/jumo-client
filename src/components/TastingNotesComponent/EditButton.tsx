@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { SaveButton } from "@/app/tasting-notes/new/StyledComponent";
 import { usePathname, useRouter } from "next/navigation";
-// import { useRouter } from "next/router";
+import { checkUserPermission } from "@/api/tastingNotesApi";
+
 interface EditButtonProps {
   user: User;
 }
+
 const EditButton: React.FC<EditButtonProps> = ({ user }) => {
   const [canEdit, setCanEdit] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -18,30 +20,16 @@ const EditButton: React.FC<EditButtonProps> = ({ user }) => {
   };
 
   useEffect(() => {
-    // 클라이언트 측에서만 실행
     setIsClient(true);
 
-    if (isClient) {
-      const checkUserPermission = async () => {
-        try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
-            {
-              method: "GET",
-              credentials: "include", // 세션 기반 인증에 필요한 경우 추가
-            },
-          );
-          const fetchedUser = await response.json();
-          if (fetchedUser.userUuid === user.userUuid) {
-            setCanEdit(true);
-          }
-        } catch (error) {
-          console.error("Error fetching auth data:", error);
-        }
-      };
+    const checkPermission = async () => {
+      if (isClient) {
+        const permission = await checkUserPermission(user);
+        setCanEdit(permission);
+      }
+    };
 
-      checkUserPermission();
-    }
+    checkPermission();
   }, [user, isClient]);
 
   if (!isClient || !canEdit) {
