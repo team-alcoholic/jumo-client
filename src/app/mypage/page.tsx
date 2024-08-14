@@ -1,6 +1,8 @@
 "use client";
 
-import { Button, Stack, Typography } from "@mui/material";
+import UserTastingComponent from "@/components/LiquorUserTastingComponent/UserTastingComponent";
+import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -8,6 +10,7 @@ import { useEffect, useState } from "react";
 export default function MyPage() {
   const [isLoggedIn, setIsLoggedIn] = useState<Boolean | null>(null);
   const [currentUrl, setCurrentUrl] = useState<string>("");
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -26,6 +29,8 @@ export default function MyPage() {
           // router.push('/login'); // 로그인되지 않았을 경우 로그인 페이지로 리다이렉트
         } else {
           setIsLoggedIn(true);
+          setUser(await response.json());
+          // console.log(await response.json());
         }
       } catch (error) {
         console.error("Error checking auth:", error);
@@ -37,9 +42,11 @@ export default function MyPage() {
     checkAuth();
   }, [router]);
 
-  if (isLoggedIn === null) {
-    return;
-  } else if (isLoggedIn === false) {
+  // 페이지: 로딩 중
+  if (isLoggedIn === null || (isLoggedIn === true && user === null)) return;
+
+  // 페이지: 로그인 되지 않은 경우
+  if (isLoggedIn === false) {
     return (
       <Stack
         sx={{
@@ -59,5 +66,49 @@ export default function MyPage() {
     );
   }
 
-  return <h1>you are logged in</h1>;
+  // 페이지: 로그인 되어 있는 경우
+  return (
+    <Stack sx={{ paddingTop: "10px" }}>
+      {/* 사용자 프로필 */}
+      <Box
+        sx={{
+          padding: "15px 16px",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: "25px",
+        }}
+      >
+        <Image
+          src={user?.profileThumbnailImage || "default"}
+          alt="profile image"
+          width={70}
+          height={70}
+          style={{ borderRadius: "15px" }}
+        />
+        <Stack sx={{ gap: "5px" }}>
+          <Typography sx={{ fontSize: "18px" }}>
+            {user?.profileNickname}
+          </Typography>
+          <Typography sx={{ fontSize: "15px", color: "gray" }}>지역</Typography>
+        </Stack>
+      </Box>
+
+      <Divider />
+
+      <Typography
+        sx={{
+          paddingTop: "20px",
+          fontSize: "15px",
+          color: "gray",
+          textAlign: "center",
+        }}
+      >
+        내가 작성한 테이스팅 노트
+      </Typography>
+
+      {/* 사용자 활동 정보 */}
+      <UserTastingComponent userId={`${user?.id}`} />
+    </Stack>
+  );
 }
