@@ -73,9 +73,7 @@ interface LiquorData {
 
 /** 사용자 type */
 interface User {
-  id: number;
-  provider: string | null;
-  providerId: string | null;
+  userUuid: string;
   profileNickname: string | null;
   profileImage: string | null;
   profileThumbnailImage: string | null;
