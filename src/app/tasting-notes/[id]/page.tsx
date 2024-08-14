@@ -12,6 +12,8 @@ import { notFound } from "next/navigation";
 import ShareButton from "@/components/Button/ShareButton";
 import { Metadata } from "next";
 import Link from "next/link";
+import HomeButton from "@/components/Button/tastingNotesButton";
+import TastingNotesButton from "@/components/Button/tastingNotesButton";
 
 const REVIEW_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
 const REVIEW_URL = process.env.NEXT_PUBLIC_BASE_URL + "/tasting-notes/";
@@ -159,6 +161,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
         text={shareData.text}
         url={shareData.url}
       />
+      <TastingNotesButton link={REVIEW_URL + "new?liquorId=" + liquor.id} />
 
       <Typography
         variant="body2"

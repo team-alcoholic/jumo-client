@@ -50,10 +50,13 @@ export const TabContent = styled(Box)({
 
 export const SaveButton = styled(Button)({
   marginTop: "20px",
-  width: "100%",
+  width: "50%",
   padding: "10px",
   backgroundColor: "#3f51b5",
   color: "#ffffff",
+  display: "block",
+  marginLeft: "auto",
+  marginRight: "auto",
   "&:hover": {
     backgroundColor: "#303f9f",
   },
