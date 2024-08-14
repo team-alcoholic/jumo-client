@@ -89,27 +89,14 @@ export default async function LiquorDetailPage({
 
       {/* 주류 리뷰 */}
       <Stack sx={{ marginTop: "40px" }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "row",
-            gap: "20px",
-            padding: "10px",
-          }}
-        >
+        <Stack sx={{ padding: "10px" }}>
           <Typography sx={{ fontSize: "22px", fontWeight: "600" }}>
             테이스팅 리뷰
           </Typography>
-          {/* <Link
-            href={`/tasting-notes/new?liquorId=${id}`}
-            style={{ color: "inherit", textDecoration: "none" }}
-          >
-            <Button variant="outlined" size="small" startIcon={<Edit />}>
-              작성하기
-            </Button>
-          </Link> */}
-        </Box>
+          <Typography sx={{ fontSize: "14px", color: "gray" }}>
+            다른 사용자들의 테이스팅 리뷰들을 확인해보세요.
+          </Typography>
+        </Stack>
         <Divider sx={{ margin: "5px 0" }} />
         <LiquorUserTastingComponent liquorId={id} />
       </Stack>
