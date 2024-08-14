@@ -13,7 +13,7 @@ import SingleTastingComponent from "../SingleTastingComponent/SingleTastingCompo
 /** 주류 유저 테이스팅 리뷰 목록 API 요청 함수 */
 const getLiquorTastingList = async (id: number) => {
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes/liquor/${id}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes/liquor/${id}`,
   );
   console.log(response.data);
   return response.data;
@@ -91,13 +91,19 @@ export default function LiquorUserTastingComponent({
                       alignItems: "center",
                     }}
                   >
-                    <Chip
-                      label={calculateAverageScore(
-                        tasting.noseScore,
-                        tasting.palateScore,
-                        tasting.finishScore
-                      )}
-                    />
+                    {calculateAverageScore(
+                      tasting.noseScore,
+                      tasting.palateScore,
+                      tasting.finishScore,
+                    ) && (
+                      <Chip
+                        label={calculateAverageScore(
+                          tasting.noseScore,
+                          tasting.palateScore,
+                          tasting.finishScore,
+                        )}
+                      />
+                    )}
                   </Box>
                 </Box>
 
