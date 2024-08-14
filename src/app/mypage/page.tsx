@@ -7,13 +7,26 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import LogoutIcon from "@mui/icons-material/Logout";
+import axios from "axios";
 
 export default function MyPage() {
   const [isLoggedIn, setIsLoggedIn] = useState<Boolean | null>(null);
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`,
+        {},
+        { withCredentials: true },
+      );
+      window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}`; // 로그아웃 후 메인 페이지로 이동
+    } catch (error) {
+      console.error("Error logging out", error);
+    }
+  };
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -22,7 +35,7 @@ export default function MyPage() {
           {
             method: "GET",
             credentials: "include", // 쿠키 포함
-          }
+          },
         );
 
         if (response.status === 401) {
@@ -111,6 +124,21 @@ export default function MyPage() {
           }}
         >
           회원 정보 수정
+        </Button>
+        <Button
+          variant="contained"
+          color="inherit"
+          size="small"
+          startIcon={<LogoutIcon fontSize="small" />}
+          onClick={handleLogout} // 클릭 시 handleLogout 실행
+          sx={{
+            margin: "5px 15px",
+            fontSize: "13px",
+            color: "gray",
+            backgroundColor: "#f5f5f5",
+          }}
+        >
+          로그아웃
         </Button>
 
         <Divider sx={{ padding: "5px 0" }} />
