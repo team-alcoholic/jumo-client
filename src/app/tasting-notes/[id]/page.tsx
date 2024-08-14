@@ -9,8 +9,11 @@ import { calculateAverageScore, formatDate } from "@/utils/format";
 import MoodSelectedComponent from "@/components/TastingNotesComponent/MoodSelectedComponent";
 import EditButton from "@/components/TastingNotesComponent/EditButton";
 import { notFound } from "next/navigation";
+import ShareButton from "@/components/Button/ShareButton";
+import { Metadata } from "next";
 
-const REVIEW_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
+const REVIEW_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
+const REVIEW_URL = process.env.NEXT_PUBLIC_BASE_URL + "/tasting-notes/";
 
 interface LiquorData {
   thumbnailImageUrl: string | null;
@@ -41,14 +44,11 @@ interface ReviewData {
   liquor: LiquorData;
 }
 
-// 데이터를 가져오는 함수
-// 1분마다 캐시를 업데이트
 async function fetchData(id: string): Promise<ReviewData> {
-  const res = await fetch(REVIEW_URL + id, {
+  const res = await fetch(REVIEW_API_URL + id, {
     next: { revalidate: 1, tags: ["review"] },
   });
 
-  console.log("res url", REVIEW_URL + id);
   if (!res.ok) {
     if (res.status === 404) {
       throw notFound();
@@ -58,13 +58,54 @@ async function fetchData(id: string): Promise<ReviewData> {
   return await res.json();
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const reviewData = await fetchData(params.id);
+  const { user, createdAt, liquor } = reviewData;
+
+  const title = `${liquor.koName} 테이스팅 노트`;
+  const description = `${user.profileNickname}님이 ${formatDate(createdAt)}에 작성한 ${liquor.koName} 리뷰`;
+  const url = `${REVIEW_URL}${params.id}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      images: [
+        {
+          url:
+            liquor.thumbnailImageUrl ||
+            "https://github.com/user-attachments/assets/36420b2d-e392-4b20-bcda-80d7944d9658",
+          width: 1200,
+          height: 630,
+          alt: liquor.koName,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [
+        liquor.thumbnailImageUrl ||
+          "https://github.com/user-attachments/assets/36420b2d-e392-4b20-bcda-80d7944d9658",
+      ],
+    },
+  };
+}
+
 interface PostPageProps {
   params: { id: string };
 }
+
 export default async function PostPage({ params: { id } }: PostPageProps) {
-  console.log("mId", id);
   const reviewData = await fetchData(id);
-  console.log("reviewData", reviewData);
 
   const {
     noseScore,
@@ -83,6 +124,14 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
     liquor,
   } = reviewData;
 
+  const text = `${user.profileNickname}님이 ${formatDate(createdAt)}에 작성한 ${liquor.koName} 리뷰`;
+
+  const shareData = {
+    title: `${liquor.koName} 테이스팅 노트`,
+    text,
+    url: `${REVIEW_URL}${id}`,
+  };
+
   return (
     <Container maxWidth="sm" sx={{ margin: "40px 0", padding: 0 }}>
       <LiquorTitle
@@ -95,11 +144,17 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
         region={liquor?.region || null}
         grapeVariety={liquor?.grapeVariety || null}
       />
+      <ShareButton
+        title={shareData.title}
+        text={shareData.text}
+        url={shareData.url}
+      />
+
       <Typography
         variant="body2"
         gutterBottom
         sx={{
-          paddingTop: "30px",
+          paddingTop: "5px",
           paddingBottom: "5px",
           textAlign: "right",
           color: "grey.600",
