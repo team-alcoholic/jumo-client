@@ -7,6 +7,8 @@ import NotesSection from "@/components/TastingNotesComponent/NotesSection";
 import { MdOutlineStickyNote2 } from "react-icons/md";
 import { calculateAverageScore, formatDate } from "@/utils/format";
 import MoodSelectedComponent from "@/components/TastingNotesComponent/MoodSelectedComponent";
+import EditButton from "@/components/TastingNotesComponent/EditButton";
+import { notFound } from "next/navigation";
 
 const REVIEW_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
 
@@ -34,7 +36,7 @@ interface ReviewData {
   noseNotes: string | null;
   palateNotes: string | null;
   finishNotes: string | null;
-  author: string | null;
+  user: User;
   createdAt: string;
   liquor: LiquorData;
 }
@@ -43,13 +45,13 @@ interface ReviewData {
 // 1분마다 캐시를 업데이트
 async function fetchData(id: string): Promise<ReviewData> {
   const res = await fetch(REVIEW_URL + id, {
-    next: { revalidate: 1 },
+    next: { revalidate: 1, tags: ["review"] },
   });
 
   console.log("res url", REVIEW_URL + id);
   if (!res.ok) {
     if (res.status === 404) {
-      throw new Error("404");
+      throw notFound();
     }
     throw new Error("Failed to fetch data");
   }
@@ -76,7 +78,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
     noseNotes,
     palateNotes,
     finishNotes,
-    author,
+    user,
     createdAt,
     liquor,
   } = reviewData;
@@ -104,7 +106,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
           fontStyle: "italic",
         }}
       >
-        {author}님이 {formatDate(createdAt)}에 작성함
+        {user.profileNickname}님이 {formatDate(createdAt)}에 작성함
       </Typography>
       <NotesSection
         title="향 (Nose)"
@@ -163,6 +165,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
         formattedDescription={overallNote}
       />
       {mood && <MoodSelectedComponent mood={mood} />}
+      <EditButton user={user} />
     </Container>
   );
 }

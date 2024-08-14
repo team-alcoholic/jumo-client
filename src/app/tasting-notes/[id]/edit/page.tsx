@@ -1,14 +1,6 @@
 "use client";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
-import {
-  Alert,
-  AlertProps,
-  CircularProgress,
-  Skeleton,
-  Snackbar,
-  Tab,
-  Tabs,
-} from "@mui/material";
+import { CircularProgress, Skeleton, Tab, Tabs } from "@mui/material";
 import TabContentComponent from "@/components/TastingNotesComponent/TabContentComponent";
 import TotalScoreComponent from "@/components/TastingNotesComponent/TotalScoreComponent";
 import MoodSelectorComponent from "@/components/TastingNotesComponent/MoodSelectorComponent";
@@ -22,27 +14,34 @@ import {
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
 import { calculateAverageScore } from "@/utils/format";
 import {
+  checkUserPermission,
   fetchAiNotes,
   fetchLiquorData,
   fetchRelatedNotes,
   ReviewSavingData,
+  ReviewUpdateData,
   saveReviewData,
+  updateReviewData,
 } from "@/api/tastingNotesApi";
 import { useRouter, useSearchParams } from "next/navigation";
 import TastingNotesSkeleton from "@/components/TastingNotesComponent/TastingNotesSkeleton";
-import { styled } from "@mui/material/styles";
+import { revalidateReview } from "@/app/server-actions";
 import {
   CustomSnackbar,
   useCustomSnackbar,
 } from "@/components/Snackbar/CustomSnackbar";
 
-const TastingNotesNewPageComponent = () => {
+const REVIEW_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
+
+interface TastingNotesEditPageComponentProps {
+  id: string;
+}
+
+const TastingNotesEditPageComponent = ({
+  id,
+}: TastingNotesEditPageComponentProps) => {
   const { snackbar, showSnackbar, hideSnackbar } = useCustomSnackbar();
-
-  const params = useSearchParams();
   const router = useRouter();
-
-  const liquorId = params.get("liquorId");
 
   const [selectedTab, setSelectedTab] = useState(0);
   const [relatedNotes, setRelatedNotes] = useState<Set<string>[]>([
@@ -56,7 +55,7 @@ const TastingNotesNewPageComponent = () => {
     new Set(),
   ]);
 
-  const [hasAiNotes, setHasAiNotes] = useState<boolean | null>(null);
+  const [hasAiNotes, setHasAiNotes] = useState<boolean | null>(true);
 
   const [scores, setScores] = useState<(number | null)[]>([null, null, null]);
   const [memos, setMemos] = useState<string[]>(["", "", ""]);
@@ -67,93 +66,64 @@ const TastingNotesNewPageComponent = () => {
   const [overallNote, setOverallNote] = useState<string>("");
   const [mood, setMood] = useState<string>("");
   const [liquorData, setLiquorData] = useState<LiquorData | null>(null);
-  const getAuth = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
-        {
-          method: "GET",
-          credentials: "include", // 세션 기반 인증에 필요한 경우 추가
-        },
-      );
 
-      if (response.status === 401) {
-        alert(
-          "리뷰 작성은 로그인이 필요합니다.(카카오로 1초 로그인 하러 가기)",
-        );
-        const redirectUrl = window.location.href;
-        router.push(`/login?redirectTo=${encodeURIComponent(redirectUrl)}`);
-      } else {
-        await response.json();
+  const loadReviewData = useCallback(async () => {
+    try {
+      const response = await fetch(`${REVIEW_URL}${id}`);
+      const reviewData: TastingNoteList = await response.json();
+      const {
+        noseScore,
+        palateScore,
+        finishScore,
+        noseMemo,
+        palateMemo,
+        finishMemo,
+        overallNote,
+        mood,
+        noseNotes,
+        palateNotes,
+        finishNotes,
+        user,
+        createdAt,
+        liquor,
+      } = reviewData;
+      const liquorData = reviewData.liquor;
+      const permission = await checkUserPermission(user);
+      if (!permission) {
+        alert("권한이 없습니다.");
+        router.back();
+        return;
       }
+      setLiquorData(liquorData);
+
+      let tastingNotesAroma = noseNotes?.split(", ") || [];
+      let tastingNotesTaste = palateNotes?.split(", ") || [];
+      let tastingNotesFinish = finishNotes?.split(", ") || [];
+
+      setRelatedNotes([
+        new Set(tastingNotesAroma),
+        new Set(tastingNotesTaste),
+        new Set(tastingNotesFinish),
+      ]);
+      setSelectedNotes([
+        new Set(tastingNotesAroma),
+        new Set(tastingNotesTaste),
+        new Set(tastingNotesFinish),
+      ]);
+      setMemos([noseMemo ?? "", palateMemo ?? "", finishMemo ?? ""]);
+      setOverallNote(overallNote ?? "");
+      setMood(mood ?? "");
+      setScores([noseScore, palateScore, finishScore]);
     } catch (error) {
-      console.error("Error fetching auth data:", error);
+      alert("주류 정보를 불러오는데 실패했습니다. 주류를 다시 선택해주세요.");
     }
   }, [router]);
 
-  const loadLiquorData = useCallback(async () => {
-    try {
-      if (!liquorId) {
-        alert("리뷰 작성을 위해서는 주류 검색이 필요합니다.");
-        router.push("/liquors");
-        return;
-      }
-      const data = await fetchLiquorData(liquorId);
-      setLiquorData(data);
-
-      let tastingNotesAroma = new Set(
-        data.tastingNotesAroma?.split(", ") || [],
-      );
-      let tastingNotesTaste = new Set(
-        data.tastingNotesTaste?.split(", ") || [],
-      );
-      let tastingNotesFinish = new Set(
-        data.tastingNotesFinish?.split(", ") || [],
-      );
-
-      if (data.aiNotes) {
-        setHasAiNotes(true);
-        data.aiNotes.tastingNotesAroma
-          .split(", ")
-          .forEach((note: string) => tastingNotesAroma.add(note));
-        data.aiNotes.tastingNotesTaste
-          .split(", ")
-          .forEach((note: string) => tastingNotesTaste.add(note));
-        data.aiNotes.tastingNotesFinish
-          .split(", ")
-          .forEach((note: string) => tastingNotesFinish.add(note));
-      } else {
-        getAiNotes(liquorId);
-      }
-
-      setRelatedNotes([
-        tastingNotesAroma,
-        tastingNotesTaste,
-        tastingNotesFinish,
-      ]);
-    } catch (error) {
-      alert("주류 정보를 불러오는데 실패했습니다. 주류를 다시 선택해주세요.");
-      router.push("/liquors");
-    }
-  }, [liquorId, router]);
-
   useEffect(() => {
     (async () => {
-      await getAuth();
-      await loadLiquorData();
+      await loadReviewData();
     })();
-  }, [getAuth, loadLiquorData]);
-
-  const getAiNotes = async (liquorId: string) => {
-    setHasAiNotes(false);
-    const aiData = await fetchAiNotes(liquorId);
-    setRelatedNotes((prev) => [
-      new Set([...Array.from(prev[0]), ...aiData.noseNotes]),
-      new Set([...Array.from(prev[1]), ...aiData.palateNotes]),
-      new Set([...Array.from(prev[2]), ...aiData.finishNotes]),
-    ]);
-    setHasAiNotes(true);
-  };
+  }, [loadReviewData]);
 
   useEffect(() => {
     const averageScore = calculateAverageScore(scores[0], scores[1], scores[2]);
@@ -210,13 +180,9 @@ const TastingNotesNewPageComponent = () => {
     });
   };
 
-  if (!liquorId) {
-    return null; // 또는 로딩 인디케이터나 에러 메시지를 표시할 수 있습니다.
-  }
-
   const handleSave = async () => {
-    const ReviewSavingData: ReviewSavingData = {
-      liquorId,
+    const ReviewUpdateData: ReviewUpdateData = {
+      id: id,
       noseScore: scores[0],
       palateScore: scores[1],
       finishScore: scores[2],
@@ -239,7 +205,8 @@ const TastingNotesNewPageComponent = () => {
     setSaving(true);
 
     try {
-      const tastingNotesId = await saveReviewData(ReviewSavingData);
+      const tastingNotesId = await updateReviewData(ReviewUpdateData);
+      await revalidateReview(); // 데이터 업데이트 후 캐시 무효화
       router.push(`/tasting-notes/${tastingNotesId}`);
       showSnackbar("저장에 성공했습니다.", "success");
     } catch (error: unknown) {
@@ -310,7 +277,7 @@ const TastingNotesNewPageComponent = () => {
       />
       <MoodSelectorComponent mood={mood} setMood={setMood} />
       <SaveButton onClick={handleSave} variant="contained" disabled={saving}>
-        {saving ? <CircularProgress size={24} /> : "저장하기"}
+        {saving ? <CircularProgress size={24} /> : "수정 하기"}
       </SaveButton>
       <CustomSnackbar
         isOpen={snackbar.isOpen}
@@ -322,10 +289,14 @@ const TastingNotesNewPageComponent = () => {
   );
 };
 
-export default function TastingNotesNewPage() {
+export default function TastingNotesEditPage({
+  params: { id },
+}: {
+  params: { id: string };
+}) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <TastingNotesNewPageComponent />
+      <TastingNotesEditPageComponent id={id} />
     </Suspense>
   );
 }
