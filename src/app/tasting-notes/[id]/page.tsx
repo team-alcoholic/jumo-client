@@ -8,6 +8,7 @@ import { MdOutlineStickyNote2 } from "react-icons/md";
 import { calculateAverageScore, formatDate } from "@/utils/format";
 import MoodSelectedComponent from "@/components/TastingNotesComponent/MoodSelectedComponent";
 import EditButton from "@/components/TastingNotesComponent/EditButton";
+import { notFound } from "next/navigation";
 
 const REVIEW_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
 
@@ -50,7 +51,7 @@ async function fetchData(id: string): Promise<ReviewData> {
   console.log("res url", REVIEW_URL + id);
   if (!res.ok) {
     if (res.status === 404) {
-      throw new Error("404");
+      throw notFound();
     }
     throw new Error("Failed to fetch data");
   }
