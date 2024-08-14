@@ -11,7 +11,7 @@ import Link from "next/link";
 import SingleTastingComponent from "../SingleTastingComponent/SingleTastingComponent";
 
 /** 유저 주류 테이스팅 리뷰 목록 API 요청 함수 */
-const getLiquorTastingList = async (id: number) => {
+const getLiquorTastingList = async (id: string) => {
   const response = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes/user/${id}`
   );
@@ -23,7 +23,7 @@ export default function UserTastingComponent({ userId }: { userId: string }) {
   // 주류 검색 api query
   const { data, status } = useQuery({
     queryKey: ["userTastingList", userId],
-    queryFn: () => getLiquorTastingList(+userId),
+    queryFn: () => getLiquorTastingList(userId),
   });
 
   return (

@@ -43,7 +43,7 @@ export default function MyPage() {
     checkAuth();
   }, [router]);
 
-  // 페이지: 로딩 중
+  // 페이지: 로그인 여부 로딩 중
   if (isLoggedIn === null || (isLoggedIn === true && user === null)) return;
 
   // 페이지: 로그인 되지 않은 경우
@@ -68,63 +68,67 @@ export default function MyPage() {
   }
 
   // 페이지: 로그인 되어 있는 경우
-  return (
-    <Stack sx={{ paddingTop: "10px" }}>
-      {/* 사용자 프로필 */}
-      <Box
-        sx={{
-          padding: "10px 15px",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: "25px",
-        }}
-      >
-        <Image
-          src={user?.profileThumbnailImage || "default"}
-          alt="profile image"
-          width={70}
-          height={70}
-          style={{ borderRadius: "15px" }}
-        />
-        <Stack sx={{ gap: "5px" }}>
-          <Typography sx={{ fontSize: "18px" }}>
-            {user?.profileNickname}
-          </Typography>
-          <Typography sx={{ fontSize: "15px", color: "gray" }}>지역</Typography>
-        </Stack>
-      </Box>
+  if (user) {
+    return (
+      <Stack sx={{ paddingTop: "10px" }}>
+        {/* 사용자 프로필 */}
+        <Box
+          sx={{
+            padding: "10px 15px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "25px",
+          }}
+        >
+          <Image
+            src={user?.profileThumbnailImage || "default"}
+            alt="profile image"
+            width={70}
+            height={70}
+            style={{ borderRadius: "15px" }}
+          />
+          <Stack sx={{ gap: "5px" }}>
+            <Typography sx={{ fontSize: "18px" }}>
+              {user?.profileNickname}
+            </Typography>
+            <Typography sx={{ fontSize: "15px", color: "gray" }}>
+              지역
+            </Typography>
+          </Stack>
+        </Box>
 
-      <Button
-        variant="contained"
-        color="inherit"
-        size="small"
-        startIcon={<Edit fontSize="small" />}
-        sx={{
-          margin: "5px 15px",
-          fontSize: "13px",
-          color: "gray",
-          backgroundColor: "#f5f5f5",
-        }}
-      >
-        회원 정보 수정
-      </Button>
+        <Button
+          variant="contained"
+          color="inherit"
+          size="small"
+          startIcon={<Edit fontSize="small" />}
+          sx={{
+            margin: "5px 15px",
+            fontSize: "13px",
+            color: "gray",
+            backgroundColor: "#f5f5f5",
+          }}
+        >
+          회원 정보 수정
+        </Button>
 
-      <Divider sx={{ padding: "5px 0" }} />
+        <Divider sx={{ padding: "5px 0" }} />
 
-      <Typography
-        sx={{
-          paddingTop: "20px",
-          fontSize: "15px",
-          color: "gray",
-          textAlign: "center",
-        }}
-      >
-        내가 작성한 테이스팅 노트
-      </Typography>
+        <Typography
+          sx={{
+            paddingTop: "50px",
+            fontSize: "15px",
+            color: "gray",
+            textAlign: "center",
+          }}
+        >
+          내가 작성한 테이스팅 노트
+        </Typography>
 
-      {/* 사용자 활동 정보 */}
-      <UserTastingComponent userId={`${user?.id}`} />
-    </Stack>
-  );
+        {/* 사용자 활동 정보 */}
+        <UserTastingComponent userId={user?.userUuid} />
+      </Stack>
+    );
+  }
 }
