@@ -19,6 +19,21 @@ export interface ReviewSavingData {
   finishNotes: string | null;
 }
 
+export interface ReviewUpdateData {
+  id: string;
+  noseScore: number | null;
+  palateScore: number | null;
+  finishScore: number | null;
+  noseMemo: string | null;
+  palateMemo: string | null;
+  finishMemo: string | null;
+  overallNote: string | null;
+  mood: string | null;
+  noseNotes: string | null;
+  palateNotes: string | null;
+  finishNotes: string | null;
+}
+
 const LIQUOR_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquors/`;
 const LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/similar-tasting-notes`;
 const AI_LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ai-similar-tasting-notes`;
@@ -55,6 +70,24 @@ export const fetchRelatedNotes = async (
 export const saveReviewData = async (data: ReviewSavingData): Promise<void> => {
   const response = await fetch(SAVE_REVIEW_URL, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include", // 쿠키를 포함하여 요청
+
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw await response.json();
+  }
+  return await response.json();
+};
+
+export const updateReviewData = async (
+  data: ReviewUpdateData,
+): Promise<void> => {
+  const response = await fetch(SAVE_REVIEW_URL + "/" + data.id, {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },

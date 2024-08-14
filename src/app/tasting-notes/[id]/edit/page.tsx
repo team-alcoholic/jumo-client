@@ -18,16 +18,25 @@ import {
   fetchLiquorData,
   fetchRelatedNotes,
   ReviewSavingData,
+  ReviewUpdateData,
   saveReviewData,
+  updateReviewData,
 } from "@/api/tastingNotesApi";
 import { useRouter, useSearchParams } from "next/navigation";
 import TastingNotesSkeleton from "@/components/TastingNotesComponent/TastingNotesSkeleton";
+import { revalidateReview } from "@/app/server-actions";
 
-const TastingNotesNewPageComponent = () => {
-  const params = useSearchParams();
+const REVIEW_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
+
+interface TastingNotesEditPageComponentProps {
+  id: string;
+}
+
+const TastingNotesEditPageComponent = ({
+  id,
+}: TastingNotesEditPageComponentProps) => {
+  console.log("asdfadsfasdf", id);
   const router = useRouter();
-
-  const liquorId = params.get("liquorId");
 
   const [selectedTab, setSelectedTab] = useState(0);
   const [relatedNotes, setRelatedNotes] = useState<Set<string>[]>([
@@ -41,7 +50,7 @@ const TastingNotesNewPageComponent = () => {
     new Set(),
   ]);
 
-  const [hasAiNotes, setHasAiNotes] = useState<boolean | null>(null);
+  const [hasAiNotes, setHasAiNotes] = useState<boolean | null>(true);
 
   const [scores, setScores] = useState<(number | null)[]>([null, null, null]);
   const [memos, setMemos] = useState<string[]>(["", "", ""]);
@@ -76,69 +85,58 @@ const TastingNotesNewPageComponent = () => {
     }
   }, [router]);
 
-  const loadLiquorData = useCallback(async () => {
+  const loadReviewData = useCallback(async () => {
     try {
-      if (!liquorId) {
-        alert("리뷰 작성을 위해서는 주류 검색이 필요합니다.");
-        router.push("/liquors");
-        return;
-      }
-      const data = await fetchLiquorData(liquorId);
-      setLiquorData(data);
+      const response = await fetch(`${REVIEW_URL}${id}`);
+      const reviewData: TastingNoteList = await response.json();
+      const {
+        noseScore,
+        palateScore,
+        finishScore,
+        noseMemo,
+        palateMemo,
+        finishMemo,
+        overallNote,
+        mood,
+        noseNotes,
+        palateNotes,
+        finishNotes,
+        user,
+        createdAt,
+        liquor,
+      } = reviewData;
+      const liquorData = reviewData.liquor;
+      setLiquorData(liquorData);
 
-      let tastingNotesAroma = new Set(
-        data.tastingNotesAroma?.split(", ") || [],
-      );
-      let tastingNotesTaste = new Set(
-        data.tastingNotesTaste?.split(", ") || [],
-      );
-      let tastingNotesFinish = new Set(
-        data.tastingNotesFinish?.split(", ") || [],
-      );
-
-      if (data.aiNotes) {
-        setHasAiNotes(true);
-        data.aiNotes.tastingNotesAroma
-          .split(", ")
-          .forEach((note: string) => tastingNotesAroma.add(note));
-        data.aiNotes.tastingNotesTaste
-          .split(", ")
-          .forEach((note: string) => tastingNotesTaste.add(note));
-        data.aiNotes.tastingNotesFinish
-          .split(", ")
-          .forEach((note: string) => tastingNotesFinish.add(note));
-      } else {
-        getAiNotes(liquorId);
-      }
+      let tastingNotesAroma = noseNotes?.split(", ") || [];
+      let tastingNotesTaste = palateNotes?.split(", ") || [];
+      let tastingNotesFinish = finishNotes?.split(", ") || [];
 
       setRelatedNotes([
-        tastingNotesAroma,
-        tastingNotesTaste,
-        tastingNotesFinish,
+        new Set(tastingNotesAroma),
+        new Set(tastingNotesTaste),
+        new Set(tastingNotesFinish),
       ]);
+      setSelectedNotes([
+        new Set(tastingNotesAroma),
+        new Set(tastingNotesTaste),
+        new Set(tastingNotesFinish),
+      ]);
+      setMemos([noseMemo ?? "", palateMemo ?? "", finishMemo ?? ""]);
+      setOverallNote(overallNote ?? "");
+      setMood(mood ?? "");
+      setScores([noseScore, palateScore, finishScore]);
     } catch (error) {
       alert("주류 정보를 불러오는데 실패했습니다. 주류를 다시 선택해주세요.");
-      router.push("/liquors");
     }
-  }, [liquorId, router]);
+  }, [router]);
 
   useEffect(() => {
     (async () => {
       await getAuth();
-      await loadLiquorData();
+      await loadReviewData();
     })();
-  }, [getAuth, loadLiquorData]);
-
-  const getAiNotes = async (liquorId: string) => {
-    setHasAiNotes(false);
-    const aiData = await fetchAiNotes(liquorId);
-    setRelatedNotes((prev) => [
-      new Set([...Array.from(prev[0]), ...aiData.noseNotes]),
-      new Set([...Array.from(prev[1]), ...aiData.palateNotes]),
-      new Set([...Array.from(prev[2]), ...aiData.finishNotes]),
-    ]);
-    setHasAiNotes(true);
-  };
+  }, [getAuth, loadReviewData]);
 
   useEffect(() => {
     const averageScore = calculateAverageScore(scores[0], scores[1], scores[2]);
@@ -195,12 +193,9 @@ const TastingNotesNewPageComponent = () => {
     });
   };
 
-  if (!liquorId) {
-    return null; // 또는 로딩 인디케이터나 에러 메시지를 표시할 수 있습니다.
-  }
   const handleSave = async () => {
-    const ReviewSavingData: ReviewSavingData = {
-      liquorId,
+    const ReviewUpdateData: ReviewUpdateData = {
+      id: id,
       noseScore: scores[0],
       palateScore: scores[1],
       finishScore: scores[2],
@@ -223,7 +218,8 @@ const TastingNotesNewPageComponent = () => {
     setSaving(true);
 
     try {
-      const tastingNotesId = await saveReviewData(ReviewSavingData);
+      const tastingNotesId = await updateReviewData(ReviewUpdateData);
+      await revalidateReview(); // 데이터 업데이트 후 캐시 무효화
       router.push(`/tasting-notes/${tastingNotesId}`);
       alert("저장 성공");
     } catch (error: unknown) {
@@ -300,10 +296,14 @@ const TastingNotesNewPageComponent = () => {
   );
 };
 
-export default function TastingNotesNewPage() {
+export default function TastingNotesEditPage({
+  params: { id },
+}: {
+  params: { id: string };
+}) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <TastingNotesNewPageComponent />
+      <TastingNotesEditPageComponent id={id} />
     </Suspense>
   );
 }
