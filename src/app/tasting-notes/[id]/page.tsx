@@ -7,6 +7,7 @@ import NotesSection from "@/components/TastingNotesComponent/NotesSection";
 import { MdOutlineStickyNote2 } from "react-icons/md";
 import { calculateAverageScore, formatDate } from "@/utils/format";
 import MoodSelectedComponent from "@/components/TastingNotesComponent/MoodSelectedComponent";
+import EditButton from "@/components/TastingNotesComponent/EditButton";
 
 const REVIEW_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
 
@@ -34,7 +35,7 @@ interface ReviewData {
   noseNotes: string | null;
   palateNotes: string | null;
   finishNotes: string | null;
-  author: string | null;
+  user: User;
   createdAt: string;
   liquor: LiquorData;
 }
@@ -76,7 +77,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
     noseNotes,
     palateNotes,
     finishNotes,
-    author,
+    user,
     createdAt,
     liquor,
   } = reviewData;
@@ -104,7 +105,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
           fontStyle: "italic",
         }}
       >
-        {author}님이 {formatDate(createdAt)}에 작성함
+        {user.profileNickname}님이 {formatDate(createdAt)}에 작성함
       </Typography>
       <NotesSection
         title="향 (Nose)"
@@ -163,6 +164,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
         formattedDescription={overallNote}
       />
       {mood && <MoodSelectedComponent mood={mood} />}
+      <EditButton user={user} />
     </Container>
   );
 }
