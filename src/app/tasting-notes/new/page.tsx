@@ -74,12 +74,12 @@ const TastingNotesNewPageComponent = () => {
         {
           method: "GET",
           credentials: "include", // 세션 기반 인증에 필요한 경우 추가
-        },
+        }
       );
 
       if (response.status === 401) {
         alert(
-          "리뷰 작성은 로그인이 필요합니다.(카카오로 1초 로그인 하러 가기)",
+          "리뷰 작성은 로그인이 필요합니다.(카카오로 1초 로그인 하러 가기)"
         );
         const redirectUrl = window.location.href;
         router.push(`/login?redirectTo=${encodeURIComponent(redirectUrl)}`);
@@ -102,13 +102,13 @@ const TastingNotesNewPageComponent = () => {
       setLiquorData(data);
 
       let tastingNotesAroma = new Set(
-        data.tastingNotesAroma?.split(", ") || [],
+        data.tastingNotesAroma?.split(", ") || []
       );
       let tastingNotesTaste = new Set(
-        data.tastingNotesTaste?.split(", ") || [],
+        data.tastingNotesTaste?.split(", ") || []
       );
       let tastingNotesFinish = new Set(
-        data.tastingNotesFinish?.split(", ") || [],
+        data.tastingNotesFinish?.split(", ") || []
       );
 
       if (data.aiNotes) {
@@ -165,7 +165,7 @@ const TastingNotesNewPageComponent = () => {
   };
   const updateSetRelatedNotes = (
     newRelatedNotes: string[],
-    currentTab: number,
+    currentTab: number
   ) => {
     setRelatedNotes((prev) => {
       const updatedRelatedNotes = [...prev];
@@ -220,20 +220,21 @@ const TastingNotesNewPageComponent = () => {
       noseScore: scores[0],
       palateScore: scores[1],
       finishScore: scores[2],
-      noseMemo: memos[0] || null,
-      palateMemo: memos[1] || null,
-      finishMemo: memos[2] || null,
-      overallNote: overallNote || null,
-      mood: mood || null,
-      noseNotes: selectedNotes[0].size
-        ? Array.from(selectedNotes[0]).join(", ")
-        : null,
-      palateNotes: selectedNotes[1].size
-        ? Array.from(selectedNotes[1]).join(", ")
-        : null,
-      finishNotes: selectedNotes[2].size
-        ? Array.from(selectedNotes[2]).join(", ")
-        : null,
+
+      noseMemo: convertEmptyStringToNull(memos[0]),
+      palateMemo: convertEmptyStringToNull(memos[1]),
+      finishMemo: convertEmptyStringToNull(memos[2]),
+      overallNote: convertEmptyStringToNull(overallNote),
+      mood: convertEmptyStringToNull(mood),
+      noseNotes: convertEmptyStringToNull(
+        Array.from(selectedNotes[0]).join(", ")
+      ),
+      palateNotes: convertEmptyStringToNull(
+        Array.from(selectedNotes[1]).join(", ")
+      ),
+      finishNotes: convertEmptyStringToNull(
+        Array.from(selectedNotes[2]).join(", ")
+      ),
     };
 
     setSaving(true);

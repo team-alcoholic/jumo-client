@@ -1,4 +1,4 @@
-// 지정된 주류에 해당하는 모든 유저들의 테이스팅 리뷰 목록 보여주는 컴포넌트
+// 지정된 유저가 작성한 모든 주류 테이스팅 리뷰 목록 보여주는 컴포넌트
 
 "use client";
 
@@ -10,24 +10,20 @@ import { useQuery } from "react-query";
 import Link from "next/link";
 import SingleTastingComponent from "../SingleTastingComponent/SingleTastingComponent";
 
-/** 주류 유저 테이스팅 리뷰 목록 API 요청 함수 */
-const getLiquorTastingList = async (id: number) => {
+/** 유저 주류 테이스팅 리뷰 목록 API 요청 함수 */
+const getLiquorTastingList = async (id: string) => {
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes/liquor/${id}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes/user/${id}`
   );
   console.log(response.data);
   return response.data;
 };
 
-export default function LiquorUserTastingComponent({
-  liquorId,
-}: {
-  liquorId: string;
-}) {
+export default function UserTastingComponent({ userId }: { userId: string }) {
   // 주류 검색 api query
   const { data, status } = useQuery({
-    queryKey: ["liquorTastingList", liquorId],
-    queryFn: () => getLiquorTastingList(+liquorId),
+    queryKey: ["userTastingList", userId],
+    queryFn: () => getLiquorTastingList(userId),
   });
 
   return (
@@ -44,7 +40,7 @@ export default function LiquorUserTastingComponent({
                 sx={{
                   border: "solid 1px #dddddd",
                   borderRadius: "5px 5px",
-                  padding: "15px 25px",
+                  padding: "15px 20px",
                   gap: "15px",
                 }}
               >
@@ -55,9 +51,10 @@ export default function LiquorUserTastingComponent({
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    gap: "5px",
                   }}
                 >
-                  {/* 작성자 정보 */}
+                  {/* 주류 및 작성 정보 */}
                   <Box
                     sx={{
                       display: "flex",
@@ -67,7 +64,7 @@ export default function LiquorUserTastingComponent({
                     }}
                   >
                     <Image
-                      src={tasting.user.profileThumbnailImage || "default"}
+                      src={tasting.liquor.thumbnailImageUrl || "default"}
                       width={40}
                       height={40}
                       alt="user profile image"
@@ -75,7 +72,7 @@ export default function LiquorUserTastingComponent({
                     />
                     <Stack sx={{ justifyContent: "center" }}>
                       <Typography sx={{ fontWeight: "500" }}>
-                        {tasting.user.profileNickname}
+                        {tasting.liquor.koName}
                       </Typography>
                       <Typography sx={{ color: "gray", fontSize: "13px" }}>
                         {formatDateTime(tasting.createdAt)}
