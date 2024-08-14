@@ -1,6 +1,7 @@
 "use client";
 
 import UserTastingComponent from "@/components/LiquorUserTastingComponent/UserTastingComponent";
+import { Edit } from "@mui/icons-material";
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
@@ -72,7 +73,7 @@ export default function MyPage() {
       {/* 사용자 프로필 */}
       <Box
         sx={{
-          padding: "15px 16px",
+          padding: "10px 15px",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
@@ -94,7 +95,22 @@ export default function MyPage() {
         </Stack>
       </Box>
 
-      <Divider />
+      <Button
+        variant="contained"
+        color="inherit"
+        size="small"
+        startIcon={<Edit fontSize="small" />}
+        sx={{
+          margin: "5px 15px",
+          fontSize: "13px",
+          color: "gray",
+          backgroundColor: "#f5f5f5",
+        }}
+      >
+        회원 정보 수정
+      </Button>
+
+      <Divider sx={{ padding: "5px 0" }} />
 
       <Typography
         sx={{
