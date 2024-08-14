@@ -58,12 +58,12 @@ const TastingNotesNewPageComponent = () => {
         {
           method: "GET",
           credentials: "include", // 세션 기반 인증에 필요한 경우 추가
-        },
+        }
       );
 
       if (response.status === 401) {
         alert(
-          "리뷰 작성은 로그인이 필요합니다.(카카오로 1초 로그인 하러 가기)",
+          "리뷰 작성은 로그인이 필요합니다.(카카오로 1초 로그인 하러 가기)"
         );
         const redirectUrl = window.location.href;
         router.push(`/login?redirectTo=${encodeURIComponent(redirectUrl)}`);
@@ -86,13 +86,13 @@ const TastingNotesNewPageComponent = () => {
       setLiquorData(data);
 
       let tastingNotesAroma = new Set(
-        data.tastingNotesAroma?.split(", ") || [],
+        data.tastingNotesAroma?.split(", ") || []
       );
       let tastingNotesTaste = new Set(
-        data.tastingNotesTaste?.split(", ") || [],
+        data.tastingNotesTaste?.split(", ") || []
       );
       let tastingNotesFinish = new Set(
-        data.tastingNotesFinish?.split(", ") || [],
+        data.tastingNotesFinish?.split(", ") || []
       );
 
       if (data.aiNotes) {
@@ -149,7 +149,7 @@ const TastingNotesNewPageComponent = () => {
   };
   const updateSetRelatedNotes = (
     newRelatedNotes: string[],
-    currentTab: number,
+    currentTab: number
   ) => {
     setRelatedNotes((prev) => {
       const updatedRelatedNotes = [...prev];
@@ -212,13 +212,13 @@ const TastingNotesNewPageComponent = () => {
       overallNote: convertEmptyStringToNull(overallNote),
       mood: convertEmptyStringToNull(mood),
       noseNotes: convertEmptyStringToNull(
-        Array.from(selectedNotes[0]).join(", "),
+        Array.from(selectedNotes[0]).join(", ")
       ),
       palateNotes: convertEmptyStringToNull(
-        Array.from(selectedNotes[1]).join(", "),
+        Array.from(selectedNotes[1]).join(", ")
       ),
       finishNotes: convertEmptyStringToNull(
-        Array.from(selectedNotes[2]).join(", "),
+        Array.from(selectedNotes[2]).join(", ")
       ),
     };
 

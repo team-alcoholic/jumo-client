@@ -23,7 +23,7 @@ function LoginComponent() {
   const handleKakaoLogin = () => {
     const redirectUrl = params.get("redirectTo");
     router.push(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao${redirectUrl ? `?redirectTo=${encodeURIComponent(redirectUrl)}` : ""}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao${redirectUrl ? `?redirectTo=${encodeURIComponent(redirectUrl)}` : ""}`
     );
   };
 
@@ -31,23 +31,23 @@ function LoginComponent() {
     <Container
       maxWidth="xs"
       sx={{
+        flex: 1,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
         textAlign: "center",
       }}
     >
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
+        <Typography variant="h5" component="h1" gutterBottom>
           주모에 오신 것을 환영합니다!
         </Typography>
-        <Typography variant="body1" color="textSecondary">
-          간단하게 로그인하고 다양한 서비스를 즐겨보세요.
+        <Typography color="textSecondary" sx={{ fontSize: "14px" }}>
+          간편하게 로그인하고 다양한 서비스를 즐겨보세요.
         </Typography>
         {info && (
-          <Typography variant="body1" color="textSecondary">
+          <Typography color="textSecondary" sx={{ fontSize: "14px" }}>
             {info}
           </Typography>
         )}
