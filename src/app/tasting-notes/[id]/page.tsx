@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Button, Container, Typography } from "@mui/material";
 import { GiNoseSide, GiTongue } from "react-icons/gi";
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
 import { HiOutlineLightBulb } from "react-icons/hi";
@@ -11,11 +11,14 @@ import EditButton from "@/components/TastingNotesComponent/EditButton";
 import { notFound } from "next/navigation";
 import ShareButton from "@/components/Button/ShareButton";
 import { Metadata } from "next";
+import Link from "next/link";
 
 const REVIEW_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/tasting-notes/";
 const REVIEW_URL = process.env.NEXT_PUBLIC_BASE_URL + "/tasting-notes/";
+const LIQUOR_URL = process.env.NEXT_PUBLIC_BASE_URL + "/liquors/";
 
 interface LiquorData {
+  id: number;
   thumbnailImageUrl: string | null;
   koName: string;
   type: string | null;
@@ -134,16 +137,23 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
 
   return (
     <Container maxWidth="sm" sx={{ margin: "40px 0", padding: 0 }}>
-      <LiquorTitle
-        thumbnailImageUrl={liquor?.thumbnailImageUrl || null}
-        koName={liquor.koName}
-        type={liquor?.type || null}
-        abv={liquor?.abv || null}
-        volume={liquor?.volume || null}
-        country={liquor?.country || null}
-        region={liquor?.region || null}
-        grapeVariety={liquor?.grapeVariety || null}
-      />
+      <Link
+        href={LIQUOR_URL + liquor.id}
+        passHref
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
+        <LiquorTitle
+          thumbnailImageUrl={liquor?.thumbnailImageUrl || null}
+          koName={liquor.koName}
+          type={liquor?.type || null}
+          abv={liquor?.abv || null}
+          volume={liquor?.volume || null}
+          country={liquor?.country || null}
+          region={liquor?.region || null}
+          grapeVariety={liquor?.grapeVariety || null}
+        />
+      </Link>
+
       <ShareButton
         title={shareData.title}
         text={shareData.text}
