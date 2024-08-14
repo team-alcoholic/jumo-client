@@ -44,7 +44,7 @@ interface ReviewData {
 // 1분마다 캐시를 업데이트
 async function fetchData(id: string): Promise<ReviewData> {
   const res = await fetch(REVIEW_URL + id, {
-    next: { revalidate: 1 },
+    next: { revalidate: 1, tags: ["review"] },
   });
 
   console.log("res url", REVIEW_URL + id);

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { SaveButton } from "@/app/tasting-notes/new/StyledComponent";
+import { usePathname, useRouter } from "next/navigation";
 // import { useRouter } from "next/router";
 interface EditButtonProps {
   user: User;
@@ -9,7 +10,12 @@ interface EditButtonProps {
 const EditButton: React.FC<EditButtonProps> = ({ user }) => {
   const [canEdit, setCanEdit] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  // const router = useRouter();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleEdit = () => {
+    router.push(`${pathname}/edit`);
+  };
 
   useEffect(() => {
     // 클라이언트 측에서만 실행
@@ -42,11 +48,7 @@ const EditButton: React.FC<EditButtonProps> = ({ user }) => {
     return null;
   }
 
-  return (
-    <SaveButton onClick={() => alert("수정하기 기능 구현 필요")}>
-      테이스팅 노트 수정하기
-    </SaveButton>
-  );
+  return <SaveButton onClick={handleEdit}>테이스팅 노트 수정하기</SaveButton>;
 };
 
 export default EditButton;
