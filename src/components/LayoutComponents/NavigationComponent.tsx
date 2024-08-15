@@ -139,9 +139,9 @@ export default function NavigationComponent() {
                 width: "100%",
                 height: "100%",
                 borderRadius: "5px 5px",
-                "&:hover": {
-                  backgroundColor: "#cccccc",
-                },
+                // "&:hover": {
+                //   backgroundColor: "#cccccc",
+                // },
               }}
             >
               {option.icon()}
