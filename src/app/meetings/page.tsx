@@ -19,9 +19,7 @@ import {
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "react-query";
-// import useLocalStorage from "use-local-storage";
 import MeetingCardSkeleton from "@/components/MeetingCard/MeetingCardSkeleton";
-import UserFeedbackCard from "@/components/UserFeedbackCard/UserFeedbackCard";
 
 // MeetingListResponse와 MeetingInfo 타입 정의 (필요한 경우 추가)
 interface pageParamType {
@@ -76,10 +74,10 @@ const getMeetingList = async ({
 
   response = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/meetings?${queryString}`,
-    { params }
+    { params },
   );
 
-  console.log(response.data);
+  // console.log(response.data);
   return response.data;
 };
 
@@ -135,12 +133,9 @@ export default function MeetingsPage() {
   // return
   return (
     <ContainerBox>
-      {/* 서비스 소개 및 유저 피드백 관련 컴포넌트 */}
-      <UserFeedbackCard />
-
       {/* 페이지 제목 */}
-      <Title>모임 목록</Title>
-      <Divider />
+      {/* <Title>모임 목록</Title> */}
+      {/* <Divider /> */}
 
       {/* 정렬 옵션 */}
       <ButtonGroup

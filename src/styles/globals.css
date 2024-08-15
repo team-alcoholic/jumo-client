@@ -4,7 +4,8 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -18,6 +19,19 @@ body::-webkit-scrollbar {
 
 .container {
   max-width: 600px; /* 원하는 최대 너비 설정 */
+  min-height: 100%;
   margin: 0 auto; /* 중앙 정렬 */
   padding: 0 16px; /* 양쪽 여백 추가 */
+  padding-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.main {
+  max-width: 600px; /* 원하는 최대 너비 설정 */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }

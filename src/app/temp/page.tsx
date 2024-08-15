@@ -42,7 +42,7 @@ export default function TempPage() {
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
           {
             withCredentials: true,
-          }
+          },
         );
         setProfile(response.data);
       } catch (error) {
@@ -59,7 +59,7 @@ export default function TempPage() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setProfile(null);
       window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}`; // 로그아웃 후 메인 페이지로 이동
@@ -71,8 +71,6 @@ export default function TempPage() {
   const handleLoginRedirect = () => {
     window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/login`; // 로그인 페이지로 이동
   };
-
-  console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users`);
 
   return (
     <Container maxWidth="lg">
