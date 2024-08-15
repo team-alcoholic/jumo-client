@@ -15,7 +15,7 @@ const getLiquorTastingList = async (id: string) => {
   const response = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes/user/${id}`,
   );
-  console.log(response.data);
+  // console.log(response.data);
   return response.data;
 };
 
@@ -132,13 +132,15 @@ export default function UserTastingComponent({ userId }: { userId: string }) {
                 <Stack>
                   <Typography
                     sx={{
-                      // overflow: "hidden",
-                      // whiteSpace: "nowrap",
-                      // textOverflow: "ellipsis",
+                      overflow: "hidden",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 5,
+                      WebkitBoxOrient: "vertical",
+                      textOverflow: "ellipsis",
                       fontSize: "15px",
                     }}
                   >
-                    &nbsp;{tasting.overallNote}
+                    {tasting.overallNote}
                   </Typography>
                 </Stack>
               </Stack>

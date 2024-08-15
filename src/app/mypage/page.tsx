@@ -40,7 +40,8 @@ export default function MyPage() {
 
         if (response.status === 401) {
           setIsLoggedIn(false);
-          // router.push('/login'); // 로그인되지 않았을 경우 로그인 페이지로 리다이렉트
+          const redirectUrl = window.location.href;
+          router.push(`/login?redirectTo=${encodeURIComponent(redirectUrl)}`);
         } else {
           setIsLoggedIn(true);
           setUser(await response.json());
@@ -49,7 +50,7 @@ export default function MyPage() {
       } catch (error) {
         console.error("Error checking auth:", error);
         setIsLoggedIn(false);
-        // router.push('/login');
+        router.push("/login");
       }
     };
     setCurrentUrl(window.location.href);
@@ -111,20 +112,20 @@ export default function MyPage() {
           </Stack>
         </Box>
 
-        <Button
-          variant="contained"
-          color="inherit"
-          size="small"
-          startIcon={<Edit fontSize="small" />}
-          sx={{
-            margin: "5px 15px",
-            fontSize: "13px",
-            color: "gray",
-            backgroundColor: "#f5f5f5",
-          }}
-        >
-          회원 정보 수정
-        </Button>
+        {/*<Button*/}
+        {/*  variant="contained"*/}
+        {/*  color="inherit"*/}
+        {/*  size="small"*/}
+        {/*  startIcon={<Edit fontSize="small" />}*/}
+        {/*  sx={{*/}
+        {/*    margin: "5px 15px",*/}
+        {/*    fontSize: "13px",*/}
+        {/*    color: "gray",*/}
+        {/*    backgroundColor: "#f5f5f5",*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  회원 정보 수정*/}
+        {/*</Button>*/}
         <Button
           variant="contained"
           color="inherit"

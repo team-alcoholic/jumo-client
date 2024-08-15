@@ -74,10 +74,10 @@ const getMeetingList = async ({
 
   response = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/meetings?${queryString}`,
-    { params }
+    { params },
   );
 
-  console.log(response.data);
+  // console.log(response.data);
   return response.data;
 };
 
