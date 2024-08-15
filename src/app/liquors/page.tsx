@@ -4,6 +4,7 @@ import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
 import { Search } from "@mui/icons-material";
 import {
   Box,
+  CircularProgress,
   InputAdornment,
   styled,
   TextField,
@@ -65,6 +66,13 @@ export default function LiquorsPage() {
           }}
         />
       </LiquorSearchBox>
+      {/* 로딩 UI */}
+      {status === "loading" && (
+        <SearchResultBox>
+          <CircularProgress />
+          <LoadingTypography>열심히 검색 중...</LoadingTypography>
+        </SearchResultBox>
+      )}
 
       {/* 검색 결과 */}
       {status == "success" &&
@@ -123,4 +131,10 @@ const SearchResultBox = styled(Box)({
 const SearchResultTypography = styled(Typography)({
   textAlign: "center",
   color: "gray",
+});
+
+const LoadingTypography = styled(Typography)({
+  textAlign: "center",
+  color: "gray",
+  marginTop: "16px",
 });
