@@ -132,13 +132,15 @@ export default function UserTastingComponent({ userId }: { userId: string }) {
                 <Stack>
                   <Typography
                     sx={{
-                      // overflow: "hidden",
-                      // whiteSpace: "nowrap",
-                      // textOverflow: "ellipsis",
+                      overflow: "hidden",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 5,
+                      WebkitBoxOrient: "vertical",
+                      textOverflow: "ellipsis",
                       fontSize: "15px",
                     }}
                   >
-                    &nbsp;{tasting.overallNote}
+                    {tasting.overallNote}
                   </Typography>
                 </Stack>
               </Stack>
