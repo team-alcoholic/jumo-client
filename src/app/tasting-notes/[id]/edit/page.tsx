@@ -100,16 +100,46 @@ const TastingNotesEditPageComponent = ({
       let tastingNotesTaste = palateNotes?.split(", ") || [];
       let tastingNotesFinish = finishNotes?.split(", ") || [];
 
-      setRelatedNotes([
-        new Set(tastingNotesAroma),
-        new Set(tastingNotesTaste),
-        new Set(tastingNotesFinish),
-      ]);
       setSelectedNotes([
         new Set(tastingNotesAroma),
         new Set(tastingNotesTaste),
         new Set(tastingNotesFinish),
       ]);
+      tastingNotesAroma = [
+        ...tastingNotesAroma,
+        ...(liquor.tastingNotesAroma
+          ? liquor.tastingNotesAroma.split(", ")
+          : []),
+        ...(liquor.aiNotes?.tastingNotesAroma
+          ? liquor.aiNotes.tastingNotesAroma.split(", ")
+          : []),
+      ];
+
+      tastingNotesTaste = [
+        ...tastingNotesTaste,
+        ...(liquor.tastingNotesTaste
+          ? liquor.tastingNotesTaste.split(", ")
+          : []),
+        ...(liquor.aiNotes?.tastingNotesTaste
+          ? liquor.aiNotes.tastingNotesTaste.split(", ")
+          : []),
+      ];
+
+      tastingNotesFinish = [
+        ...tastingNotesFinish,
+        ...(liquor.tastingNotesFinish
+          ? liquor.tastingNotesFinish.split(", ")
+          : []),
+        ...(liquor.aiNotes?.tastingNotesFinish
+          ? liquor.aiNotes.tastingNotesFinish.split(", ")
+          : []),
+      ];
+      setRelatedNotes([
+        new Set(tastingNotesAroma),
+        new Set(tastingNotesTaste),
+        new Set(tastingNotesFinish),
+      ]);
+
       setMemos([noseMemo ?? "", palateMemo ?? "", finishMemo ?? ""]);
       setOverallNote(overallNote ?? "");
       setMood(mood ?? "");
