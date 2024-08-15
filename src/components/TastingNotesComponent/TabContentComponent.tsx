@@ -123,7 +123,7 @@ const TabContentComponent: React.FC<TabContentComponentProps> = ({
       {!hasAiNotes && (
         <Box display="flex" alignItems="center" justifyContent="center" mt={2}>
           <Typography variant="subtitle1" color="textSecondary">
-            GPT-4 notes 불러오는 중...
+            인공지능이 노트를 분석중...
           </Typography>
           <Box ml={1}>
             <CircularProgress size={24} />
