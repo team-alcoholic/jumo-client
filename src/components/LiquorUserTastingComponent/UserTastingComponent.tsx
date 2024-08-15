@@ -15,7 +15,7 @@ const getLiquorTastingList = async (id: string) => {
   const response = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes/user/${id}`,
   );
-  console.log(response.data);
+  // console.log(response.data);
   return response.data;
 };
 
