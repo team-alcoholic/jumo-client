@@ -5,6 +5,7 @@ import {
   Diversity3,
   LocalBar,
   Warehouse,
+  EditNote,
 } from "@mui/icons-material";
 import { Box, Stack, Typography } from "@mui/material";
 import Link from "next/link";
@@ -13,6 +14,21 @@ import { usePathname } from "next/navigation";
 export default function NavigationComponent() {
   /** 현재 경로 */
   const pathName = usePathname();
+
+  // 네비게이션 바를 숨길 경로 패턴
+  const hideNavPaths = [
+    "/tasting-notes/new",
+    /^\/tasting-notes\/\d+\/edit$/, // 동적 ID를 포함한 edit 경로
+  ];
+
+  // 현재 경로가 숨길 경로 중 하나와 일치하면 네비게이션 바를 렌더링하지 않음
+  if (
+    hideNavPaths.some((path) =>
+      typeof path === "string" ? pathName === path : path.test(pathName),
+    )
+  ) {
+    return null;
+  }
 
   /** 네비게이션 바 옵션 객체 */
   const NAV_OPTIONS = [
@@ -23,7 +39,7 @@ export default function NavigationComponent() {
         return (
           <Warehouse
             sx={{
-              fontSize: "28px",
+              fontSize: "20px",
               color: pathName === this.link ? "black" : "gray",
             }}
           />
@@ -37,7 +53,7 @@ export default function NavigationComponent() {
         return (
           <Diversity3
             sx={{
-              fontSize: "28px",
+              fontSize: "20px",
               color: pathName.startsWith(this.link) ? "black" : "gray",
             }}
           />
@@ -45,13 +61,13 @@ export default function NavigationComponent() {
       },
     },
     {
-      title: "주류",
+      title: "테이스팅노트",
       link: "/liquors",
       icon: function () {
         return (
-          <LocalBar
+          <EditNote
             sx={{
-              fontSize: "28px",
+              fontSize: "20px",
               color: pathName.startsWith(this.link) ? "black" : "gray",
             }}
           />
@@ -65,7 +81,7 @@ export default function NavigationComponent() {
         return (
           <AccountCircle
             sx={{
-              fontSize: "28px",
+              fontSize: "20px",
               color: pathName.startsWith(this.link) ? "black" : "gray",
             }}
           />
@@ -82,7 +98,7 @@ export default function NavigationComponent() {
         left: "50%",
         transform: "translateX(-50%)",
         width: "100%",
-        height: 80,
+        height: 60,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",

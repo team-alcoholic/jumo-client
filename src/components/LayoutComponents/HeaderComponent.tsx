@@ -1,6 +1,7 @@
 "use client";
 import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function HeaderComponent() {
   const [isVisible, setIsVisible] = useState(true);
@@ -28,6 +29,23 @@ export default function HeaderComponent() {
     };
   }, [handleScroll, lastScrollY]);
 
+  const pathName = usePathname();
+
+  // 네비게이션 바를 숨길 경로 패턴
+  const hideNavPaths = [
+    "/tasting-notes/new",
+    /^\/tasting-notes\/\d+\/edit$/, // 동적 ID를 포함한 edit 경로
+  ];
+
+  // 현재 경로가 숨길 경로 중 하나와 일치하면 네비게이션 바를 렌더링하지 않음
+  if (
+    hideNavPaths.some((path) =>
+      typeof path === "string" ? pathName === path : path.test(pathName),
+    )
+  ) {
+    return null;
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <Box
@@ -37,7 +55,7 @@ export default function HeaderComponent() {
           left: "50%",
           transform: "translateX(-50%)",
           width: "100%",
-          height: 80,
+          height: 60,
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -49,7 +67,7 @@ export default function HeaderComponent() {
         }}
         style={{ backgroundColor: "white" }}
       >
-        <Typography variant="h4">JUMO</Typography>
+        <Typography variant="h5">JUMO</Typography>
       </Box>
       <div style={{ width: "100%", height: "80px" }}></div>
     </div>
