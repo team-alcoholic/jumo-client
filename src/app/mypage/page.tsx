@@ -112,20 +112,20 @@ export default function MyPage() {
           </Stack>
         </Box>
 
-        <Button
-          variant="contained"
-          color="inherit"
-          size="small"
-          startIcon={<Edit fontSize="small" />}
-          sx={{
-            margin: "5px 15px",
-            fontSize: "13px",
-            color: "gray",
-            backgroundColor: "#f5f5f5",
-          }}
-        >
-          회원 정보 수정
-        </Button>
+        {/*<Button*/}
+        {/*  variant="contained"*/}
+        {/*  color="inherit"*/}
+        {/*  size="small"*/}
+        {/*  startIcon={<Edit fontSize="small" />}*/}
+        {/*  sx={{*/}
+        {/*    margin: "5px 15px",*/}
+        {/*    fontSize: "13px",*/}
+        {/*    color: "gray",*/}
+        {/*    backgroundColor: "#f5f5f5",*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  회원 정보 수정*/}
+        {/*</Button>*/}
         <Button
           variant="contained"
           color="inherit"
