@@ -18,7 +18,7 @@ import { useQuery } from "react-query";
 const getLiquorList = async (keyword: string) => {
   if (!keyword) return null;
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`,
   );
   return response.data;
 };
@@ -85,9 +85,17 @@ export default function LiquorsPage() {
           ))
         ) : (
           <SearchResultBox>
-            <SearchResultTypography>
-              검색 결과가 없습니다.
-            </SearchResultTypography>
+            <Box>
+              <SearchResultTypography>
+                검색 결과가 없습니다.
+              </SearchResultTypography>
+              <SearchResultTypography>
+                테이스팅 노트 작성을 위해서는
+              </SearchResultTypography>
+              <SearchResultTypography>
+                주류를 선택해야 합니다.
+              </SearchResultTypography>
+            </Box>
           </SearchResultBox>
         ))}
     </Box>
