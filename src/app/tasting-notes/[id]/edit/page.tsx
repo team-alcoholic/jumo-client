@@ -1,6 +1,17 @@
 "use client";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
-import { CircularProgress, Skeleton, Tab, Tabs } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Skeleton,
+  Tab,
+  Tabs,
+} from "@mui/material";
 import TabContentComponent from "@/components/TastingNotesComponent/TabContentComponent";
 import TotalScoreComponent from "@/components/TastingNotesComponent/TotalScoreComponent";
 import MoodSelectorComponent from "@/components/TastingNotesComponent/MoodSelectorComponent";
@@ -42,6 +53,15 @@ const TastingNotesEditPageComponent = ({
 }: TastingNotesEditPageComponentProps) => {
   const { snackbar, showSnackbar, hideSnackbar } = useCustomSnackbar();
   const router = useRouter();
+
+  const [openCancelDialog, setopenCancelDialog] = useState(false);
+  const handleCancel = () => {
+    setopenCancelDialog(true);
+  };
+  const handleCancelRedirect = () => {
+    setopenCancelDialog(false);
+    router.push(`/tasting-notes/${id}`);
+  };
 
   const [selectedTab, setSelectedTab] = useState(0);
   const [relatedNotes, setRelatedNotes] = useState<Set<string>[]>([
@@ -309,12 +329,37 @@ const TastingNotesEditPageComponent = ({
       <SaveButton onClick={handleSave} variant="contained" disabled={saving}>
         {saving ? <CircularProgress size={24} /> : "수정 하기"}
       </SaveButton>
+      <SaveButton onClick={handleCancel} variant="contained" disabled={saving}>
+        취소하기
+      </SaveButton>
       <CustomSnackbar
         isOpen={snackbar.isOpen}
         message={snackbar.message}
         severity={snackbar.severity}
         onClose={hideSnackbar}
       />
+      <Dialog
+        open={openCancelDialog}
+        onClose={() => setopenCancelDialog(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"작성 중인 테이스팅 노트를 취소하시겠습니까?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            현재 작성 중인 테이스팅 노트의 내용이 저장되지 않습니다. 정말로
+            취소하시겠습니까?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setopenCancelDialog(false)}>취소</Button>
+          <Button onClick={handleCancelRedirect} autoFocus>
+            확인
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
