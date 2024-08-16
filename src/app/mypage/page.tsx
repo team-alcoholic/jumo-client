@@ -106,9 +106,9 @@ export default function MyPage() {
             <Typography sx={{ fontSize: "18px" }}>
               {user?.profileNickname}
             </Typography>
-            <Typography sx={{ fontSize: "15px", color: "gray" }}>
-              지역
-            </Typography>
+            {/*<Typography sx={{ fontSize: "15px", color: "gray" }}>*/}
+            {/*  지역*/}
+            {/*</Typography>*/}
           </Stack>
         </Box>
 
