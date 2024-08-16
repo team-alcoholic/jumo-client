@@ -20,6 +20,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import MeetingCardSkeleton from "@/components/MeetingCard/MeetingCardSkeleton";
+import { redirect } from "next/navigation";
 
 // MeetingListResponse와 MeetingInfo 타입 정의 (필요한 경우 추가)
 interface pageParamType {
@@ -74,7 +75,7 @@ const getMeetingList = async ({
 
   response = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/meetings?${queryString}`,
-    { params },
+    { params }
   );
 
   // console.log(response.data);
@@ -82,6 +83,9 @@ const getMeetingList = async ({
 };
 
 export default function MeetingsPage() {
+  // 임시 리다이렉션
+  redirect("/");
+
   // 스크롤 위치 유지
   // const [scrollY] = useLocalStorage("meeting-list-scroll", 0);
   // useEffect(() => {
