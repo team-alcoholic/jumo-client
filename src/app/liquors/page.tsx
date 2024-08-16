@@ -4,8 +4,11 @@ import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
 import { Search } from "@mui/icons-material";
 import {
   Box,
+  Button,
   CircularProgress,
   InputAdornment,
+  Paper,
+  Stack,
   styled,
   TextField,
   Typography,
@@ -14,6 +17,7 @@ import axios from "axios";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useQuery } from "react-query";
+import AddIcon from "@mui/icons-material/Add";
 
 /** 주류 검색 API 요청 함수 */
 const getLiquorList = async (keyword: string) => {
@@ -103,6 +107,19 @@ export default function LiquorsPage() {
               <SearchResultTypography>
                 주류를 선택해야 합니다.
               </SearchResultTypography>
+              <TipPaper elevation={1}>
+                <TipTypography>💡 Tip: 찾는 주류가 없으신가요?</TipTypography>
+                <Link href="/liquors/new" passHref>
+                  <Button
+                    variant="outlined"
+                    startIcon={<AddIcon />}
+                    fullWidth
+                    size="small"
+                  >
+                    주류 직접 추가하기
+                  </Button>
+                </Link>
+              </TipPaper>
             </Box>
           </SearchResultBox>
         ))}
@@ -138,3 +155,18 @@ const LoadingTypography = styled(Typography)({
   color: "gray",
   marginTop: "16px",
 });
+
+const TipPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2),
+  marginTop: theme.spacing(4),
+  backgroundColor: theme.palette.background.default,
+  borderLeft: `4px solid ${theme.palette.primary.main}`,
+  maxWidth: "300px",
+  width: "100%",
+}));
+
+const TipTypography = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  marginBottom: theme.spacing(1),
+  fontSize: "0.9rem",
+}));
