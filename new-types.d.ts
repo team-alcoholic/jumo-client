@@ -69,6 +69,7 @@ interface LiquorData {
   region: string | null;
   grapeVariety: string | null;
   aiNotes: aiNotes | null;
+  user: User;
 }
 
 /** 사용자 type */
