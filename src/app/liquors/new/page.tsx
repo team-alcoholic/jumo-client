@@ -19,6 +19,7 @@ import {
   DialogActions,
   DialogContentText,
   Dialog,
+  CircularProgress,
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { styled } from "@mui/system";
@@ -112,29 +113,24 @@ const LiquorForm: React.FC = () => {
   const { control, handleSubmit, setValue } = useForm<LiquorFormData>();
   const router = useRouter();
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
+    const checkLocalStorage = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/me`,
-          {
-            withCredentials: true,
-          },
-        );
-        setIsLoggedIn(true);
         const savedData = localStorage.getItem("liquorFormData");
         if (savedData) {
           const parsedData = JSON.parse(savedData);
-          onSubmit(parsedData);
+          setIsLoading(true);
+          await onSubmit(parsedData);
+          setIsLoading(false);
         }
       } catch (error) {
-        setIsLoggedIn(false);
+        console.error("로그인 상태 체크 중 에러 발생:", error);
       }
     };
 
-    checkLoginStatus();
+    checkLocalStorage();
   }, []);
 
   useEffect(() => {
@@ -181,6 +177,23 @@ const LiquorForm: React.FC = () => {
     const redirectUrl = window.location.href;
     router.push(`/login?redirectTo=${encodeURIComponent(redirectUrl)}`);
   };
+
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress />
+        <Typography variant="h6" style={{ marginLeft: "20px" }}>
+          서버로 전송 중...
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <Container maxWidth={false} disableGutters>
