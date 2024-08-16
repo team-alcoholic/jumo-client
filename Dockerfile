@@ -22,14 +22,8 @@ FROM node:18-slim
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 빌드 단계에서 생성된 빌드 결과물만 복사
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/public ./public
-COPY --from=build /app/package.json ./
-COPY --from=build /app/package-lock.json ./
-
-# next.config.js 파일 복사
-COPY --from=build /app/next.config.mjs ./
+# 빌드 단계에서 생성된 모든 파일을 복사
+COPY --from=build /app ./
 
 # 프로덕션 의존성 설치
 RUN npm install --only=production
