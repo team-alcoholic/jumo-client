@@ -24,7 +24,7 @@ export default function NavigationComponent() {
   // 현재 경로가 숨길 경로 중 하나와 일치하면 네비게이션 바를 렌더링하지 않음
   if (
     hideNavPaths.some((path) =>
-      typeof path === "string" ? pathName === path : path.test(pathName),
+      typeof path === "string" ? pathName === path : path.test(pathName)
     )
   ) {
     return null;
@@ -46,20 +46,20 @@ export default function NavigationComponent() {
         );
       },
     },
-    {
-      title: "모임",
-      link: "/meetings",
-      icon: function () {
-        return (
-          <Diversity3
-            sx={{
-              fontSize: "20px",
-              color: pathName.startsWith(this.link) ? "black" : "gray",
-            }}
-          />
-        );
-      },
-    },
+    // {
+    //   title: "모임",
+    //   link: "/meetings",
+    //   icon: function () {
+    //     return (
+    //       <Diversity3
+    //         sx={{
+    //           fontSize: "20px",
+    //           color: pathName.startsWith(this.link) ? "black" : "gray",
+    //         }}
+    //       />
+    //     );
+    //   },
+    // },
     {
       title: "테이스팅노트",
       link: "/liquors",

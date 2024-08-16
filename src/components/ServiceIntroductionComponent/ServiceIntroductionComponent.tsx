@@ -4,21 +4,13 @@ import {
   CardActions,
   CardContent,
   Chip,
+  Stack,
   Typography,
 } from "@mui/material";
 import Link from "next/link";
 
 const GOOGLE_FORM_URL = "https://forms.gle/cuoJy7uJF4r2ewMg9";
 const KAKAO_OPENCHAT_URL = "https://open.kakao.com/o/sSDeVvGg";
-
-// const onClickGoogle = () => {
-//   const url = "https://forms.gle/cuoJy7uJF4r2ewMg9";
-//   window.open(url, "_blank");
-// };
-// const onClickKakao = () => {
-//   const url = "https://open.kakao.com/o/sSDeVvGg";
-//   window.open(url, "_blank");
-// };
 
 export default function ServiceIntroductionComponent() {
   return (
@@ -42,17 +34,44 @@ export default function ServiceIntroductionComponent() {
           gap: "15px",
         }}
       >
+        {/* 제목 */}
+        <Stack sx={{ paddingBottom: "10px" }}>
+          <Typography variant="h5">JUMO 업데이트 소개</Typography>
+          <Typography sx={{ fontSize: "12px", color: "gray" }}>
+            v2.0.0
+          </Typography>
+        </Stack>
+
+        {/* 본문 */}
         <Typography sx={{ fontSize: "15px" }}>
-          JUMO(주모)는 원하는 주류 모임을 쉽게 찾기 위한 서비스로, 각종
-          커뮤니티에서 만들어지고 있는 주류 모임들을 한눈에 찾아볼 수 있습니다.
+          주류 검색 및 테이스팅 노트 작성 기능, 카카오 로그인 기능이
+          추가되었습니다.
         </Typography>
+        {/* 본문 */}
         <Typography sx={{ fontSize: "15px" }}>
-          서비스 사용 중에 불편하셨던 부분들을 하단 링크의 Google Form을 통해
-          알려주시면 반영하여 개선해가도록 하겠습니다. 또한 카카오톡
-          오픈채팅방을 통해서 저희 팀과 지속적으로 소통하실 수 있으니 많은 의견
-          부탁드립니다!
+          <strong>주류 검색 기능</strong>
+          <br />
+          원하는 주류를 검색해 정보를 확인하고, 다른 사용자의 테이스팅 리뷰를
+          조회할 수 있습니다.
+        </Typography>
+        {/* 본문 */}
+        <Typography sx={{ fontSize: "15px" }}>
+          <strong>테이스팅 노트 작성 기능</strong>
+          <br />
+          카카오 로그인을 완료하면, 직접 테이스팅 노트를 작성할 수 있습니다! AI
+          기반의 테이스팅 노트 추천 기능을 활용해 노트를 작성해보세요. 작성한
+          노트는 주류 페이지와 마이 페이지에서 확인하실 수 있습니다.
+        </Typography>
+        {/* 본문 3 */}
+        <Typography sx={{ fontSize: "15px" }}>
+          서비스 사용 중에 불편하셨던 부분, 원하시는 기능 등을 하단 링크의
+          Google Form을 통해 알려주시면 반영하여 개선해가도록 하겠습니다. 또한
+          카카오톡 오픈채팅방을 통해서 저희 팀과 지속적으로 소통하실 수 있으니
+          많은 의견 부탁드립니다!
         </Typography>
       </CardContent>
+
+      {/* 링크 버튼 */}
       <CardActions
         sx={{
           padding: "5px 10px",
@@ -79,35 +98,3 @@ export default function ServiceIntroductionComponent() {
     </Card>
   );
 }
-
-// const CardContainer = styled(Card)({
-//   margin: "20px 0",
-//   padding: "15px 15px",
-//   minHeight: "100px",
-//   display: "flex",
-//   flexDirection: "column",
-//   justifyContent: "center",
-//   alignItems: "center",
-//   gap: "5px",
-// });
-
-// const UserFeedbackCardContent = styled(CardContent)({
-//   display: "flex",
-//   flexDirection: "column",
-//   gap: "15px",
-// });
-
-// const UserFeedbackCardActions = styled(CardActions)({
-//   padding: "5px 10px",
-//   display: "flex",
-//   flexDirection: "row",
-//   gap: "10px",
-// });
-
-// const IntroductionText = styled(Typography)({
-//   fontSize: "15px",
-// });
-
-// const LinkChip = styled(Chip)({
-//   fontSize: "12px",
-// });
