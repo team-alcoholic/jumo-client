@@ -83,141 +83,138 @@ const getMeetingList = async ({
 };
 
 export default function MeetingsPage() {
-  // 임시 리다이렉션
-  redirect("/");
-
   // 스크롤 위치 유지
   // const [scrollY] = useLocalStorage("meeting-list-scroll", 0);
   // useEffect(() => {
   //   if (+scrollY !== 0) window.scrollTo(0, +scrollY);
   // }, [scrollY]);
 
-  // // 정렬 옵션 상태 관리
-  // const [sortOption, setSortOption] = useState("created-at");
-  // // 필터 상태 관리
-  // const [liquorsFilter, setLiquorsFilter] = useState<string[]>([]);
+  // 정렬 옵션 상태 관리
+  const [sortOption, setSortOption] = useState("created-at");
+  // 필터 상태 관리
+  const [liquorsFilter, setLiquorsFilter] = useState<string[]>([]);
 
-  // // useInfiniteQuery 설정
-  // const { data, fetchNextPage, isFetchingNextPage, status } = useInfiniteQuery({
-  //   // 정렬 및 필터 정보를 queryKey에 포함
-  //   queryKey: ["meetingList", sortOption, liquorsFilter],
-  //   queryFn: ({ pageParam }) =>
-  //     getMeetingList({
-  //       pageParam,
-  //       options: {
-  //         sort: sortOption,
-  //         liquors: liquorsFilter.join(","),
-  //       },
-  //     }),
-  //   getNextPageParam: (lastPage: MeetingListResponse) =>
-  //     lastPage.eof
-  //       ? undefined
-  //       : { id: lastPage.cursorId, date: lastPage.cursorDate },
-  // });
+  // useInfiniteQuery 설정
+  const { data, fetchNextPage, isFetchingNextPage, status } = useInfiniteQuery({
+    // 정렬 및 필터 정보를 queryKey에 포함
+    queryKey: ["meetingList", sortOption, liquorsFilter],
+    queryFn: ({ pageParam }) =>
+      getMeetingList({
+        pageParam,
+        options: {
+          sort: sortOption,
+          liquors: liquorsFilter.join(","),
+        },
+      }),
+    getNextPageParam: (lastPage: MeetingListResponse) =>
+      lastPage.eof
+        ? undefined
+        : { id: lastPage.cursorId, date: lastPage.cursorDate },
+  });
 
-  // // IntersectionObserver API 설정: 페이지 마지막 요소 도달 시 다음 페이지 호출
-  // const target = useRef(null);
-  // const onIntersect = ([entry]: IntersectionObserverEntry[]) => {
-  //   return entry.isIntersecting && fetchNextPage();
-  // };
-  // useObserver({ target, onIntersect });
+  // IntersectionObserver API 설정: 페이지 마지막 요소 도달 시 다음 페이지 호출
+  const target = useRef(null);
+  const onIntersect = ([entry]: IntersectionObserverEntry[]) => {
+    return entry.isIntersecting && fetchNextPage();
+  };
+  useObserver({ target, onIntersect });
 
-  // /** 정렬 옵션 변경 함수 */
-  // const handleSortChange = (newSort: string) => setSortOption(newSort);
+  /** 정렬 옵션 변경 함수 */
+  const handleSortChange = (newSort: string) => setSortOption(newSort);
 
-  // /** 주류 필터 옵션 변경 함수 */
-  // const handleLiquorsFilterChange = (option: string) => {
-  //   setLiquorsFilter((prevFilter) => {
-  //     if (prevFilter.includes(option))
-  //       return prevFilter.filter((item) => item !== option);
-  //     else return [...prevFilter, option];
-  //   });
-  // };
+  /** 주류 필터 옵션 변경 함수 */
+  const handleLiquorsFilterChange = (option: string) => {
+    setLiquorsFilter((prevFilter) => {
+      if (prevFilter.includes(option))
+        return prevFilter.filter((item) => item !== option);
+      else return [...prevFilter, option];
+    });
+  };
 
-  // // return
-  // return (
-  //   <ContainerBox>
-  //     {/* 페이지 제목 */}
-  //     {/* <Title>모임 목록</Title> */}
-  //     {/* <Divider /> */}
+  // return
+  return (
+    <ContainerBox>
+      {/* 페이지 제목 */}
+      {/* <Title>모임 목록</Title> */}
+      {/* <Divider /> */}
 
-  //     {/* 정렬 옵션 */}
-  //     <ButtonGroup
-  //       style={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         marginTop: "30px",
-  //         marginBottom: "10px",
-  //       }}
-  //     >
-  //       {SORT_OPTIONS.map(({ option, label }) => (
-  //         <Button
-  //           key={option}
-  //           onClick={() => handleSortChange(option)}
-  //           variant={sortOption === option ? "contained" : "outlined"}
-  //         >
-  //           {label}
-  //         </Button>
-  //       ))}
-  //     </ButtonGroup>
+      {/* 정렬 옵션 */}
+      <ButtonGroup
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "30px",
+          marginBottom: "10px",
+        }}
+      >
+        {SORT_OPTIONS.map(({ option, label }) => (
+          <Button
+            key={option}
+            onClick={() => handleSortChange(option)}
+            variant={sortOption === option ? "contained" : "outlined"}
+          >
+            {label}
+          </Button>
+        ))}
+      </ButtonGroup>
 
-  //     {/* 필터 */}
-  //     <FilterBox>
-  //       <FilterFormGroup>
-  //         {LIQUORS_FILTER_OPTIONS.map(({ option, label }) => (
-  //           <FilterFormControlLabel
-  //             key={option}
-  //             control={
-  //               <BpCheckbox
-  //                 onClick={() => handleLiquorsFilterChange(option)}
-  //                 checked={liquorsFilter.includes(option)}
-  //               />
-  //             }
-  //             label={label}
-  //           />
-  //         ))}
-  //       </FilterFormGroup>
-  //     </FilterBox>
+      {/* 필터 */}
+      <FilterBox>
+        <FilterFormGroup>
+          {LIQUORS_FILTER_OPTIONS.map(({ option, label }) => (
+            <FilterFormControlLabel
+              key={option}
+              control={
+                <BpCheckbox
+                  onClick={() => handleLiquorsFilterChange(option)}
+                  checked={liquorsFilter.includes(option)}
+                />
+              }
+              label={label}
+            />
+          ))}
+        </FilterFormGroup>
+      </FilterBox>
 
-  //     {/* 모임 목록 */}
-  //     {(() => {
-  //       switch (status) {
-  //         case "error":
-  //           return "error";
-  //         case "loading":
-  //           return (
-  //             <List>
-  //               {Array.from({ length: 30 }).map((_, i) => (
-  //                 <MeetingCardSkeleton key={i} />
-  //               ))}
-  //             </List>
-  //           );
-  //         case "success":
-  //           return (
-  //             <List>
-  //               {data.pages.map((page: MeetingListResponse, i) => (
-  //                 <div key={i}>
-  //                   {page.meetings.map((info: MeetingInfo) => (
-  //                     <MeetingCard key={info.id} meeting={info} />
-  //                   ))}
-  //                 </div>
-  //               ))}
-  //             </List>
-  //           );
-  //         default:
-  //           return null;
-  //       }
-  //     })()}
-  //     <div ref={target} />
-  //     {isFetchingNextPage && (
-  //       <div>
-  //         {Array.from({ length: 30 }).map((_, i) => (
-  //           <MeetingCardSkeleton key={i} />
-  //         ))}
-  //       </div>
-  //     )}
-  //   </ContainerBox>
-  // );
+      {/* 모임 목록 */}
+      {(() => {
+        switch (status) {
+          case "error":
+            return "error";
+          case "loading":
+            return (
+              <List>
+                {Array.from({ length: 30 }).map((_, i) => (
+                  <MeetingCardSkeleton key={i} />
+                ))}
+              </List>
+            );
+          case "success":
+            return (
+              <List>
+                {data.pages.map((page: MeetingListResponse, i) => (
+                  <div key={i}>
+                    {page.meetings.map((info: MeetingInfo) => (
+                      <MeetingCard key={info.id} meeting={info} />
+                    ))}
+                  </div>
+                ))}
+              </List>
+            );
+          default:
+            return null;
+        }
+      })()}
+      <div ref={target} />
+      {isFetchingNextPage && (
+        <div>
+          {Array.from({ length: 30 }).map((_, i) => (
+            <MeetingCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
+    </ContainerBox>
+  );
 }
 
 const ContainerBox = styled(Box)({

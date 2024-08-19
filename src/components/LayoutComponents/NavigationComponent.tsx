@@ -46,20 +46,20 @@ export default function NavigationComponent() {
         );
       },
     },
-    // {
-    //   title: "모임",
-    //   link: "/meetings",
-    //   icon: function () {
-    //     return (
-    //       <Diversity3
-    //         sx={{
-    //           fontSize: "20px",
-    //           color: pathName.startsWith(this.link) ? "black" : "gray",
-    //         }}
-    //       />
-    //     );
-    //   },
-    // },
+    {
+      title: "모임",
+      link: "/meetings",
+      icon: function () {
+        return (
+          <Diversity3
+            sx={{
+              fontSize: "20px",
+              color: pathName.startsWith(this.link) ? "black" : "gray",
+            }}
+          />
+        );
+      },
+    },
     {
       title: "테이스팅노트",
       link: "/liquors",
