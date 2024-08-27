@@ -40,6 +40,7 @@ interface LiquorInfo {
   id: number;
   en_name: string;
   ko_name: string;
+  ko_name_origin: string;
   price: string;
   thumbnail_image_url: string;
   tasting_notes_Aroma: string;
