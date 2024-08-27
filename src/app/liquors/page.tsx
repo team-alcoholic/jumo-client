@@ -181,6 +181,7 @@ const SearchResultBox = styled(Box)({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  gap: "10px",
 });
 
 const SearchResultTypography = styled(Typography)({
@@ -191,7 +192,6 @@ const SearchResultTypography = styled(Typography)({
 const LoadingTypography = styled(Typography)({
   textAlign: "center",
   color: "gray",
-  marginTop: "16px",
 });
 
 const TipPaper = styled(Paper)(({ theme }) => ({
