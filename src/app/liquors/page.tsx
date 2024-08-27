@@ -15,15 +15,16 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useQuery } from "react-query";
 import AddIcon from "@mui/icons-material/Add";
+import debounce from "lodash.debounce";
 
 /** 주류 검색 API 요청 함수 */
 const getLiquorList = async (keyword: string) => {
   if (!keyword) return null;
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`
   );
   return response.data;
 };
@@ -31,16 +32,25 @@ const getLiquorList = async (keyword: string) => {
 export default function LiquorsPage() {
   // 검색 키워드 state
   const [keyword, setKeyword] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState(keyword);
+
+  // 주류 검색 api query
+  const { data, status, isFetching } = useQuery({
+    queryKey: ["liquorList", debouncedKeyword],
+    queryFn: () => getLiquorList(debouncedKeyword),
+    enabled: !!debouncedKeyword,
+  });
+
+  // debounce function
+  const debounceKeywordChange = useCallback(
+    debounce((nextValue: string) => setDebouncedKeyword(nextValue), 200),
+    []
+  );
 
   const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeyword(e.target.value);
+    debounceKeywordChange(e.target.value);
   };
-
-  // 주류 검색 api query
-  const { data, status } = useQuery({
-    queryKey: ["liquorList", keyword],
-    queryFn: () => getLiquorList(keyword),
-  });
 
   return (
     <Box>
@@ -71,7 +81,7 @@ export default function LiquorsPage() {
         />
       </LiquorSearchBox>
       {/* 로딩 UI */}
-      {status === "loading" && (
+      {isFetching && (
         <SearchResultBox>
           <CircularProgress />
           <LoadingTypography>열심히 검색 중...</LoadingTypography>
