@@ -43,7 +43,7 @@ export default function LiquorsPage() {
 
   // debounce function
   const debounceKeywordChange = useCallback(
-    debounce((nextValue: string) => setDebouncedKeyword(nextValue), 200),
+    debounce((nextValue: string) => setDebouncedKeyword(nextValue), 300),
     []
   );
 
@@ -123,7 +123,7 @@ export default function LiquorsPage() {
             <LiquorCardLink key={liquor.id} href={`/liquors/${liquor.id}`}>
               <LiquorTitle
                 thumbnailImageUrl={liquor.thumbnail_image_url}
-                koName={liquor.ko_name}
+                koName={liquor.ko_name_origin}
                 type={liquor.type}
                 abv={liquor.abv}
                 volume={liquor.volume}
