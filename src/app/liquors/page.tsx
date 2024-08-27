@@ -80,6 +80,34 @@ export default function LiquorsPage() {
           }}
         />
       </LiquorSearchBox>
+
+      {/* 초기 화면 */}
+      {status == "idle" && (
+        <SearchResultBox>
+          <Box>
+            <SearchResultTypography>
+              테이스팅 노트 작성을 위해서는
+            </SearchResultTypography>
+            <SearchResultTypography>
+              주류를 선택해야 합니다.
+            </SearchResultTypography>
+            <TipPaper elevation={1}>
+              <TipTypography>💡 Tip: 찾는 주류가 없으신가요?</TipTypography>
+              <Link href="/liquors/new" passHref>
+                <Button
+                  variant="outlined"
+                  startIcon={<AddIcon />}
+                  fullWidth
+                  size="small"
+                >
+                  주류 직접 추가하기
+                </Button>
+              </Link>
+            </TipPaper>
+          </Box>
+        </SearchResultBox>
+      )}
+
       {/* 로딩 UI */}
       {isFetching && (
         <SearchResultBox>
