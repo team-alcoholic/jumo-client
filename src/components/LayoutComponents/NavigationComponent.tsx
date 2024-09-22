@@ -6,6 +6,7 @@ import {
   LocalBar,
   Warehouse,
   EditNote,
+  Search,
 } from "@mui/icons-material";
 import { Box, Stack, Typography } from "@mui/material";
 import Link from "next/link";
@@ -33,7 +34,7 @@ export default function NavigationComponent() {
   /** 네비게이션 바 옵션 객체 */
   const NAV_OPTIONS = [
     {
-      title: "홈",
+      title: "JUMO",
       link: "/",
       icon: function () {
         return (
@@ -47,25 +48,11 @@ export default function NavigationComponent() {
       },
     },
     {
-      title: "모임",
-      link: "/meetings",
-      icon: function () {
-        return (
-          <Diversity3
-            sx={{
-              fontSize: "20px",
-              color: pathName.startsWith(this.link) ? "black" : "gray",
-            }}
-          />
-        );
-      },
-    },
-    {
-      title: "테이스팅노트",
+      title: "주류 검색",
       link: "/liquors",
       icon: function () {
         return (
-          <EditNote
+          <Search
             sx={{
               fontSize: "20px",
               color: pathName.startsWith(this.link) ? "black" : "gray",
@@ -75,11 +62,25 @@ export default function NavigationComponent() {
       },
     },
     {
-      title: "마이페이지",
+      title: "주류 생활",
       link: "/mypage",
       icon: function () {
         return (
           <AccountCircle
+            sx={{
+              fontSize: "20px",
+              color: pathName.startsWith(this.link) ? "black" : "gray",
+            }}
+          />
+        );
+      },
+    },
+    {
+      title: "주모 레포트",
+      link: "/report",
+      icon: function () {
+        return (
+          <EditNote
             sx={{
               fontSize: "20px",
               color: pathName.startsWith(this.link) ? "black" : "gray",
