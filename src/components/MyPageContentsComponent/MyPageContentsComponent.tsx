@@ -10,7 +10,22 @@ const getLiquorTastingList = async (id: string) => {
   const response = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes/user/${id}`
   );
-  return response.data;
+  const list: TastingNoteList[] = response.data;
+
+  // 그룹화 로직
+  const groupMap = new Map<string, UserNoteGroup>();
+  list.forEach((note) => {
+    const liquorId = note.liquor.id.toString(); // liquor의 고유 식별자로 가정
+    if (groupMap.has(liquorId)) {
+      groupMap.get(liquorId)!.notesCount++;
+    } else {
+      groupMap.set(liquorId, { liquor: note.liquor, notesCount: 1 });
+    }
+  });
+
+  const group: UserNoteGroup[] = Array.from(groupMap.values());
+
+  return { list, group };
 };
 
 /** 로그아웃 API 요청 함수 */
@@ -111,8 +126,8 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
 
       {/* 사용자 활동 정보 */}
       {status == "success" &&
-        (data && data.length ? (
-          <UserTastingComponent data={data} />
+        (data && data.list.length ? (
+          <UserTastingComponent data={data.list} />
         ) : (
           <Stack sx={{ padding: "30px 0", gap: "5px" }}>
             <Typography sx={{ color: "gray", textAlign: "center" }}>

@@ -57,6 +57,7 @@ interface LiquorInfo {
 
 /** 주류 type: DB 버전 */
 interface LiquorData {
+  id: number;
   thumbnailImageUrl: string | null;
   koName: string | null;
   enName: string | null;
@@ -100,6 +101,18 @@ interface TastingNoteList {
   updatedAt: string | null;
   createdBy: string | null;
   user: User;
+}
+
+/** 사용자 작성 노트 type: 주류별 작성 노트 그룹 정보 */
+interface UserNoteGroup {
+  liquor: LiquorData;
+  notesCount: number;
+}
+
+/** 사용자 작성 노트 목록 type */
+interface UserNoteData {
+  list: TastingNoteList[];
+  group: UserNoteGroup[];
 }
 
 interface aiNotes {

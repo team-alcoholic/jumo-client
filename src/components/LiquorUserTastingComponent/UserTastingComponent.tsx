@@ -19,7 +19,11 @@ import SingleTastingComponent from "../SingleTastingComponent/SingleTastingCompo
 //   return response.data;
 // };
 
-export default function UserTastingComponent({ data }: { data }) {
+export default function UserTastingComponent({
+  data,
+}: {
+  data: TastingNoteList[];
+}) {
   // // 주류 검색 api query
   // const { data, status } = useQuery({
   //   queryKey: ["userTastingList", userId],
