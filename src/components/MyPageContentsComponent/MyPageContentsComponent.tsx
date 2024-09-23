@@ -1,9 +1,22 @@
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+"use client";
+
+import {
+  Box,
+  Button,
+  Divider,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import Image from "next/image";
 import { useQuery } from "react-query";
 import UserTastingComponent from "../LiquorUserTastingComponent/UserTastingComponent";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { useState } from "react";
+import { Edit } from "@mui/icons-material";
+import UserNoteGroupComponent from "../LiquorUserTastingComponent/UserNoteGroupComponent";
 
 /** 유저 주류 테이스팅 리뷰 목록 API 요청 함수 */
 const getLiquorTastingList = async (id: string) => {
@@ -43,6 +56,15 @@ const handleLogout = async () => {
 };
 
 export default function MyPageContentsComponent({ user }: { user: User }) {
+  // 사용자 작성 노트 탭 state
+  const [noteTabOption, setNoteTabOption] = useState("group");
+  const handleNoteTabOptionChange = (
+    e: React.SyntheticEvent,
+    value: string
+  ) => {
+    setNoteTabOption(value);
+  };
+
   // 주류 검색 api query
   const { data, status } = useQuery({
     queryKey: ["userTastingList", user.userUuid],
@@ -81,60 +103,93 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
         </Stack>
       </Box>
 
-      {/*<Button*/}
-      {/*  variant="contained"*/}
-      {/*  color="inherit"*/}
-      {/*  size="small"*/}
-      {/*  startIcon={<Edit fontSize="small" />}*/}
-      {/*  sx={{*/}
-      {/*    margin: "5px 15px",*/}
-      {/*    fontSize: "13px",*/}
-      {/*    color: "gray",*/}
-      {/*    backgroundColor: "#f5f5f5",*/}
-      {/*  }}*/}
-      {/*>*/}
-      {/*  회원 정보 수정*/}
-      {/*</Button>*/}
-      <Button
-        variant="contained"
-        color="inherit"
-        size="small"
-        startIcon={<LogoutIcon fontSize="small" />}
-        onClick={handleLogout} // 클릭 시 handleLogout 실행
+      <Box
         sx={{
-          margin: "5px 15px",
-          fontSize: "13px",
-          color: "gray",
-          backgroundColor: "#f5f5f5",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          // gap: "2px",
         }}
       >
-        로그아웃
-      </Button>
+        <Button
+          variant="contained"
+          color="inherit"
+          size="small"
+          startIcon={<Edit fontSize="small" />}
+          sx={{
+            margin: "5px 10px",
+            width: "100%",
+            fontSize: "12px",
+            color: "gray",
+            backgroundColor: "#f5f5f5",
+          }}
+        >
+          회원 정보 수정
+        </Button>
+        <Button
+          variant="contained"
+          color="inherit"
+          size="small"
+          startIcon={<LogoutIcon fontSize="small" />}
+          onClick={handleLogout} // 클릭 시 handleLogout 실행
+          sx={{
+            margin: "5px 10px",
+            width: "100%",
+            fontSize: "12px",
+            color: "gray",
+            backgroundColor: "#f5f5f5",
+          }}
+        >
+          로그아웃
+        </Button>
+      </Box>
 
-      <Divider sx={{ padding: "15px 0" }} />
-
-      <Typography
+      {/* 사용자 작성 노트 보기 옵션 탭 */}
+      <Box
         sx={{
-          paddingTop: "50px",
+          borderBottom: 1,
+          paddingTop: "20px",
+          borderColor: "divider",
+        }}
+      >
+        <Tabs
+          value={noteTabOption}
+          onChange={handleNoteTabOptionChange}
+          variant="fullWidth"
+          // centered
+        >
+          <Tab value="group" label="주류" />
+          <Tab value="list" label="피드" />
+        </Tabs>
+      </Box>
+
+      {/* <Typography
+        sx={{
+          paddingTop: "20px",
           fontSize: "12px",
           color: "gray",
           textAlign: "center",
         }}
       >
         내가 작성한 테이스팅 노트
-      </Typography>
+      </Typography> */}
 
       {/* 사용자 활동 정보 */}
       {status == "success" &&
-        (data && data.list.length ? (
-          <UserTastingComponent data={data.list} />
+        (data.list.length && data.group.length ? (
+          <>
+            {noteTabOption === "group" && <UserNoteGroupComponent />}
+            {noteTabOption === "list" && (
+              <UserTastingComponent data={data.list} />
+            )}
+          </>
         ) : (
           <Stack sx={{ padding: "30px 0", gap: "5px" }}>
             <Typography sx={{ color: "gray", textAlign: "center" }}>
-              아직 작성된 테이스팅 리뷰가 없습니다.
+              아직 작성된 테이스팅 노트가 없습니다.
             </Typography>
             <Typography sx={{ color: "gray", textAlign: "center" }}>
-              가장 먼저 테이스팅 리뷰를 등록해보세요!
+              먼저 테이스팅 노트를 작성해보세요!
             </Typography>
           </Stack>
         ))}

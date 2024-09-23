@@ -32,6 +32,18 @@ export default function UserTastingComponent({
 
   return (
     <Stack sx={{ marginBottom: "10px", padding: "20px 0", gap: "15px" }}>
+      {/* 소제목 */}
+      <Typography
+        sx={{
+          fontSize: "12px",
+          color: "gray",
+          textAlign: "center",
+        }}
+      >
+        내가 작성한 테이스팅 노트
+      </Typography>
+
+      {/* 테이스팅 노트 목록 */}
       {data.map((tasting: TastingNoteList) => (
         <Link
           key={tasting.id}
