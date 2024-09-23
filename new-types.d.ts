@@ -125,7 +125,7 @@ interface aiNotes {
 
 /** LiquorTitle 컴포넌트 호출 시 사용되는 props type */
 interface LiquorTitleProps {
-  thumbnailImageUrl: string | null;
+  thumbnailImageUrl: string | undefined;
   koName: string | null;
   type: string | null;
   abv: string | null;
