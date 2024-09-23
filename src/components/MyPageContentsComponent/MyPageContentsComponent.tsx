@@ -97,7 +97,8 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
           <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Typography sx={{ fontSize: "12px" }}>작성한 노트 수</Typography>
             <Typography sx={{ fontSize: "12px", color: "gray" }}>
-              {10}
+              {data &&
+                data.group.reduce((acc, item) => acc + item.notesCount, 0)}
             </Typography>
           </Box>
         </Stack>
@@ -119,7 +120,7 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
           sx={{
             margin: "5px 10px",
             width: "100%",
-            fontSize: "12px",
+            fontSize: "10px",
             color: "gray",
             backgroundColor: "#f5f5f5",
           }}
@@ -135,7 +136,7 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
           sx={{
             margin: "5px 10px",
             width: "100%",
-            fontSize: "12px",
+            fontSize: "10px",
             color: "gray",
             backgroundColor: "#f5f5f5",
           }}
@@ -163,22 +164,13 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
         </Tabs>
       </Box>
 
-      {/* <Typography
-        sx={{
-          paddingTop: "20px",
-          fontSize: "12px",
-          color: "gray",
-          textAlign: "center",
-        }}
-      >
-        내가 작성한 테이스팅 노트
-      </Typography> */}
-
       {/* 사용자 활동 정보 */}
       {status == "success" &&
         (data.list.length && data.group.length ? (
           <>
-            {noteTabOption === "group" && <UserNoteGroupComponent />}
+            {noteTabOption === "group" && (
+              <UserNoteGroupComponent data={data.group} />
+            )}
             {noteTabOption === "list" && (
               <UserTastingComponent data={data.list} />
             )}

@@ -1,13 +1,9 @@
 "use client";
 
-import UserTastingComponent from "@/components/LiquorUserTastingComponent/UserTastingComponent";
-import { Edit } from "@mui/icons-material";
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
-import Image from "next/image";
+import { Button, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import MyPageContentsComponent from "@/components/MyPageContentsComponent/MyPageContentsComponent";
 
 export default function MyPage() {

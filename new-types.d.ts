@@ -58,7 +58,7 @@ interface LiquorInfo {
 /** 주류 type: DB 버전 */
 interface LiquorData {
   id: number;
-  thumbnailImageUrl: string | null;
+  thumbnailImageUrl: string | undefined;
   koName: string | null;
   enName: string | null;
   type: string | null;
