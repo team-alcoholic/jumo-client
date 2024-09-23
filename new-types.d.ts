@@ -57,7 +57,8 @@ interface LiquorInfo {
 
 /** 주류 type: DB 버전 */
 interface LiquorData {
-  thumbnailImageUrl: string | null;
+  id: number;
+  thumbnailImageUrl: string | undefined;
   koName: string | null;
   enName: string | null;
   type: string | null;
@@ -102,6 +103,18 @@ interface TastingNoteList {
   user: User;
 }
 
+/** 사용자 작성 노트 type: 주류별 작성 노트 그룹 정보 */
+interface UserNoteGroup {
+  liquor: LiquorData;
+  notesCount: number;
+}
+
+/** 사용자 작성 노트 목록 type */
+interface UserNoteData {
+  list: TastingNoteList[];
+  group: UserNoteGroup[];
+}
+
 interface aiNotes {
   tastingNotesAroma: string;
   tastingNotesTaste: string;
@@ -112,7 +125,7 @@ interface aiNotes {
 
 /** LiquorTitle 컴포넌트 호출 시 사용되는 props type */
 interface LiquorTitleProps {
-  thumbnailImageUrl: string | null;
+  thumbnailImageUrl: string | undefined;
   koName: string | null;
   type: string | null;
   abv: string | null;

@@ -21,7 +21,7 @@ const LIQUOR_URL = process.env.NEXT_PUBLIC_BASE_URL + "/liquors/";
 
 interface LiquorData {
   id: number;
-  thumbnailImageUrl: string | null;
+  thumbnailImageUrl: string | undefined;
   koName: string;
   type: string | null;
   abv: string | null;
@@ -145,7 +145,7 @@ export default async function PostPage({ params: { id } }: PostPageProps) {
         style={{ textDecoration: "none", color: "inherit" }}
       >
         <LiquorTitle
-          thumbnailImageUrl={liquor?.thumbnailImageUrl || null}
+          thumbnailImageUrl={liquor?.thumbnailImageUrl}
           koName={liquor.koName}
           type={liquor?.type || null}
           abv={liquor?.abv || null}
