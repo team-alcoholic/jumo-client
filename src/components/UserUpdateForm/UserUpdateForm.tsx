@@ -95,10 +95,6 @@ export default function UserUpdateForm() {
     setNickname(e.target.value);
   };
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setProfileImage(e.target.value);
-  };
-
   return (
     user && (
       <Stack
