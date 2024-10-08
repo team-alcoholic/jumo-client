@@ -3,10 +3,11 @@
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import axios, { AxiosError } from "axios";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 
 export default function UserUpdateForm() {
+  const pathName = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<User>(); // 응답받은 user 객체 관리
   const [nickname, setNickname] = useState(""); // 이름
@@ -34,15 +35,33 @@ export default function UserUpdateForm() {
       user.profileNickname = nickname;
       user.profileImage = profileImage;
       user.profileThumbnailImage = profileImage;
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
-        user,
-        { withCredentials: true }
-      );
 
-      console.log(response.data);
-      const redirectUrl = response.data;
-      router.push(redirectUrl);
+      // 호출 경로에 따라 동작 구분 (회원가입 시 정보 입력 or 회원 정보 수정)
+      try {
+        switch (pathName) {
+          // 회원 가입 정보 입력 시
+          case "/join":
+            const response = await axios.post(
+              `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+              user,
+              { withCredentials: true }
+            );
+            const redirectUrl = response.data;
+            router.push(redirectUrl);
+          // 회원 정보 수정 시
+          case "/mypage/edit":
+            await axios.put(
+              `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+              user,
+              { withCredentials: true }
+            );
+            router.push("/mypage");
+        }
+      } catch (err) {
+        if (axios.isAxiosError(err) && err.code === "ERR_BAD_REQUEST") {
+          router.push("/login");
+        } else console.error(err);
+      }
     }
   };
 

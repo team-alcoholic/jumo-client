@@ -124,6 +124,7 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
             color: "gray",
             backgroundColor: "#f5f5f5",
           }}
+          href="/mypage/edit"
         >
           회원 정보 수정
         </Button>
