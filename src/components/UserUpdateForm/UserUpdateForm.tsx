@@ -17,7 +17,7 @@ export default function UserUpdateForm() {
   const getUserInfo = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users`,
         { withCredentials: true }
       );
       setUser(response.data);
@@ -33,7 +33,6 @@ export default function UserUpdateForm() {
   const updateUserInfo = async () => {
     if (user) {
       user.profileNickname = nickname;
-      user.profileImage = profileImage;
       user.profileThumbnailImage = profileImage;
 
       // 호출 경로에 따라 동작 구분 (회원가입 시 정보 입력 or 회원 정보 수정)
@@ -42,16 +41,17 @@ export default function UserUpdateForm() {
           // 회원 가입 정보 입력 시
           case "/join":
             const response = await axios.post(
-              `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+              `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users`,
               user,
               { withCredentials: true }
             );
             const redirectUrl = response.data;
             router.push(redirectUrl);
+
           // 회원 정보 수정 시
           case "/mypage/edit":
             await axios.put(
-              `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+              `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users`,
               user,
               { withCredentials: true }
             );
@@ -68,7 +68,7 @@ export default function UserUpdateForm() {
   /** 랜덤 프로필 이미지 요청 api */
   const getRandomImage = async () => {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/random-image`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users/random-image`
     );
     setProfileImage(response.data);
   };
@@ -76,7 +76,7 @@ export default function UserUpdateForm() {
   /** 랜덤 사용자 이름 요청 api */
   const getRandomNickname = async () => {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/random-name`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users/random-name`
     );
     setNickname(response.data);
   };
@@ -111,7 +111,6 @@ export default function UserUpdateForm() {
           alt="profile image"
           width={255}
           height={255}
-          // onChange={handleImageChange}
         />
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Typography>이름</Typography>

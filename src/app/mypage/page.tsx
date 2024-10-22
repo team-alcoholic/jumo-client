@@ -16,7 +16,7 @@ export default function MyPage() {
     const checkAuth = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users`,
           {
             method: "GET",
             credentials: "include", // 쿠키 포함
@@ -30,7 +30,6 @@ export default function MyPage() {
         } else {
           setIsLoggedIn(true);
           setUser(await response.json());
-          // console.log(await response.json());
         }
       } catch (error) {
         console.error("Error checking auth:", error);

@@ -77,9 +77,8 @@ interface LiquorData {
 /** 사용자 type */
 interface User {
   userUuid: string;
-  profileNickname: string | null;
-  profileImage: string | null;
-  profileThumbnailImage: string | null;
+  profileNickname: string;
+  profileThumbnailImage: string;
 }
 
 /** 테이스팅노트 type: 주류 상세정보 페이지에서 보이는 유저 테이스팅 리뷰 목록 API 응답 객체 타입 */
