@@ -4,6 +4,9 @@ import { JSDOM } from "jsdom";
 import { translateWhiskyNameToJapenese } from "@/utils/translateWhiskyNameToJapenese";
 import fetch from "node-fetch";
 
+// 캐시를 저장할 객체 (In-Memory)
+let cache = {};
+
 async function translateText(text: string): Promise<string> {
   if (!text) return "";
 
@@ -57,6 +60,19 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // 캐싱된 결과가 있는지 확인
+  const cacheKey = `${params.query}-${params.store}`;
+  const cachedResult = cache[cacheKey];
+
+  if (
+    cachedResult &&
+    Date.now() - cachedResult.timestamp < 24 * 60 * 60 * 1000
+  ) {
+    // 캐싱된 데이터를 반환
+    return NextResponse.json(cachedResult.data);
+  }
+
+  // 무카와인 경우 위스키 이름을 일본어로 번역
   if (params.store === "mukawa") {
     params.query = translateWhiskyNameToJapenese(params.query).japanese;
   }
@@ -84,6 +100,12 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // 캐싱 저장
+    cache[cacheKey] = {
+      data: searchResult,
+      timestamp: Date.now(),
+    };
+
     return NextResponse.json(searchResult);
   } catch (error) {
     console.error("검색 처리 중 오류 발생:", error);
@@ -93,7 +115,6 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
 // 상품명만 번역하는 새로운 함수
 async function translateProductNames(results) {
   const translatedResults = [];
