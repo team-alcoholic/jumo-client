@@ -9,12 +9,9 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import Image from "next/image";
-import Link from "next/link";
 import FloatingButton from "@/components/FloatingButton/FloatingButton";
-import { Edit } from "@mui/icons-material";
-
+import PriceInfo from "@/components/PriceInfo/PriceInfo";
 /** 주류 상세정보 API 요청 함수 */
 const getLiquorInfo = async (id: string) => {
   const res = await fetch(
@@ -88,6 +85,9 @@ export default async function LiquorDetailPage({
 
         {/* 정보 */}
         <LiquorInfoCardComponent liquor={liquor} />
+
+        <PriceInfo liquorName={liquor.koName} store="dailyshot" />
+        <PriceInfo liquorName={liquor.koName} store="traders" />
       </Stack>
 
       {/* 주류 리뷰 */}
