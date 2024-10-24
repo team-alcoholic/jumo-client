@@ -1,4 +1,7 @@
 "use client";
+
+// 임시 비활성화
+
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import {
   Button,
@@ -185,7 +188,7 @@ const TastingNotesEditPageComponent = ({
   };
   const updateSetRelatedNotes = (
     newRelatedNotes: string[],
-    currentTab: number,
+    currentTab: number
   ) => {
     setRelatedNotes((prev) => {
       const updatedRelatedNotes = [...prev];
@@ -369,9 +372,17 @@ export default function TastingNotesEditPage({
 }: {
   params: { id: string };
 }) {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <TastingNotesEditPageComponent id={id} />
-    </Suspense>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    alert("주모 공사중입니다.");
+    router.back();
+  });
+
+  return null;
+  // return (
+  //   <Suspense fallback={<div>Loading...</div>}>
+  //     <TastingNotesEditPageComponent id={id} />
+  //   </Suspense>
+  // );
 }

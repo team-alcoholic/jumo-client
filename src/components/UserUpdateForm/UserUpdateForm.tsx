@@ -32,8 +32,9 @@ export default function UserUpdateForm() {
   /** 사용자 정보 수정 요청 api -> 이전 경로로 리다이렉트 */
   const updateUserInfo = async () => {
     if (user) {
-      user.profileNickname = nickname;
-      user.profileThumbnailImage = profileImage;
+      const formData = new FormData();
+      formData.append("userUuid", user.userUuid);
+      formData.append("profileNickname", nickname);
 
       // 호출 경로에 따라 동작 구분 (회원가입 시 정보 입력 or 회원 정보 수정)
       try {
@@ -42,18 +43,25 @@ export default function UserUpdateForm() {
           case "/join":
             const response = await axios.post(
               `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users`,
-              user,
-              { withCredentials: true }
+              formData,
+              {
+                headers: { "Content-Type": "multipart/form-data" },
+                withCredentials: true,
+              }
             );
             const redirectUrl = response.data;
             router.push(redirectUrl);
 
           // 회원 정보 수정 시
           case "/mypage/edit":
+            console.log(user);
             await axios.put(
               `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users`,
-              user,
-              { withCredentials: true }
+              formData,
+              {
+                headers: { "Content-Type": "multipart/form-data" },
+                withCredentials: true,
+              }
             );
             router.push("/mypage");
         }
@@ -83,9 +91,12 @@ export default function UserUpdateForm() {
 
   useEffect(() => {
     const init = async () => {
-      const user = await getUserInfo();
+      const user: User = await getUserInfo();
       if (user) setNickname(user.profileNickname ? user.profileNickname : "");
-      if (user) setProfileImage(user.profileImage ? user.profileImage : "");
+      if (user)
+        setProfileImage(
+          user.profileThumbnailImage ? user.profileThumbnailImage : ""
+        );
     };
 
     init();

@@ -18,7 +18,7 @@ import { Edit } from "@mui/icons-material";
 /** 주류 상세정보 API 요청 함수 */
 const getLiquorInfo = async (id: string) => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquors/${id}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/liquors/${id}`
   );
   if (!res.ok) {
     if (res.status === 404) {
