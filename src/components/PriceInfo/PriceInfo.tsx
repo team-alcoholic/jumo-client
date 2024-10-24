@@ -26,18 +26,24 @@ interface TradersItem {
   sell_price: number;
 }
 
+interface MukawaItem {
+  name: string;
+  price: number;
+  url: string;
+}
+
 interface PriceInfoProps {
   liquorName: string;
-  store?: "dailyshot" | "traders";
+  store?: "dailyshot" | "traders" | "mukawa";
 }
 
 const PriceInfo: React.FC<PriceInfoProps> = ({
   liquorName,
   store = "dailyshot",
 }) => {
-  const [priceInfo, setPriceInfo] = useState<DailyshotItem[] | TradersItem[]>(
-    []
-  );
+  const [priceInfo, setPriceInfo] = useState<
+    DailyshotItem[] | TradersItem[] | MukawaItem[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -64,6 +70,8 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
 
         if (store === "traders") {
           setPriceInfo(data.data);
+        } else if (store === "mukawa") {
+          setPriceInfo(data);
         } else {
           setPriceInfo(data.results);
         }
@@ -96,9 +104,14 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
   return (
     <Box sx={{ mt: 4 }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
-        {store === "dailyshot" ? "데일리샷" : "트레이더스"} 가격 정보
+        {store === "dailyshot"
+          ? "데일리샷"
+          : store === "traders"
+            ? "트레이더스"
+            : "무카와"}{" "}
+        가격 정보
       </Typography>
-      {store === "dailyshot" && (
+      {(store === "dailyshot" || store === "mukawa") && (
         <Typography variant="body2" sx={{ mb: 1, color: "text.secondary" }}>
           클릭시 상세 페이지로 이동합니다.
         </Typography>
@@ -117,34 +130,43 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
             ) : priceInfo.length > 0 ? (
               priceInfo.map((item) => {
                 const isDailyshot = store === "dailyshot";
+                const isMukawa = store === "mukawa";
                 const itemId = isDailyshot
                   ? (item as DailyshotItem).id
-                  : (item as TradersItem).sku_code;
+                  : isMukawa
+                    ? (item as MukawaItem).url
+                    : (item as TradersItem).sku_code;
                 const itemName = isDailyshot
                   ? (item as DailyshotItem).name
-                  : (item as TradersItem).sku_nm;
+                  : isMukawa
+                    ? (item as MukawaItem).name
+                    : (item as TradersItem).sku_nm;
                 const itemPrice = isDailyshot
-                  ? (item as DailyshotItem).price.toLocaleString()
-                  : (item as TradersItem).sell_price.toLocaleString();
+                  ? `${(item as DailyshotItem).price.toLocaleString()} 원`
+                  : isMukawa
+                    ? `${(item as MukawaItem).price.toLocaleString()} 엔`
+                    : `${(item as TradersItem).sell_price.toLocaleString()} 원`;
                 const itemUrl = isDailyshot
                   ? (item as DailyshotItem).web_url
-                  : undefined;
+                  : isMukawa
+                    ? (item as MukawaItem).url
+                    : undefined;
 
                 return (
                   <TableRow
                     key={itemId}
-                    hover={isDailyshot}
+                    hover={isDailyshot || isMukawa}
                     onClick={() => {
-                      if (isDailyshot && itemUrl) {
+                      if ((isDailyshot || isMukawa) && itemUrl) {
                         window.open(itemUrl, "_blank");
                       }
                     }}
-                    sx={isDailyshot ? { cursor: "pointer" } : {}}
+                    sx={isDailyshot || isMukawa ? { cursor: "pointer" } : {}}
                   >
                     <TableCell component="th" scope="row">
                       {itemName}
                     </TableCell>
-                    <TableCell align="right">{itemPrice} 원</TableCell>
+                    <TableCell align="right">{itemPrice}</TableCell>
                   </TableRow>
                 );
               })

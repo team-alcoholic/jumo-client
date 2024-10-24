@@ -12,6 +12,7 @@ import {
 import Image from "next/image";
 import FloatingButton from "@/components/FloatingButton/FloatingButton";
 import PriceInfo from "@/components/PriceInfo/PriceInfo";
+import { translateWhiskyNameToJapenese } from "@/utils/translateWhiskyNameToJapenese";
 /** 주류 상세정보 API 요청 함수 */
 const getLiquorInfo = async (id: string) => {
   const res = await fetch(
@@ -88,6 +89,7 @@ export default async function LiquorDetailPage({
 
         <PriceInfo liquorName={liquor.koName} store="traders" />
         <PriceInfo liquorName={liquor.koName} store="dailyshot" />
+        <PriceInfo liquorName={liquor.koName} store="mukawa" />
       </Stack>
 
       {/* 주류 리뷰 */}
