@@ -98,6 +98,11 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
       <Typography variant="h6" sx={{ mb: 2 }}>
         {store === "dailyshot" ? "데일리샷" : "트레이더스"} 가격 정보
       </Typography>
+      {store === "dailyshot" && (
+        <Typography variant="body2" sx={{ mb: 1, color: "text.secondary" }}>
+          클릭시 상세 페이지로 이동합니다.
+        </Typography>
+      )}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -109,28 +114,46 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
           <TableBody>
             {isLoading ? (
               <LoadingSkeleton />
+            ) : priceInfo.length > 0 ? (
+              priceInfo.map((item) => {
+                const isDailyshot = store === "dailyshot";
+                const itemId = isDailyshot
+                  ? (item as DailyshotItem).id
+                  : (item as TradersItem).sku_code;
+                const itemName = isDailyshot
+                  ? (item as DailyshotItem).name
+                  : (item as TradersItem).sku_nm;
+                const itemPrice = isDailyshot
+                  ? (item as DailyshotItem).price.toLocaleString()
+                  : (item as TradersItem).sell_price.toLocaleString();
+                const itemUrl = isDailyshot
+                  ? (item as DailyshotItem).web_url
+                  : undefined;
+
+                return (
+                  <TableRow
+                    key={itemId}
+                    hover={isDailyshot}
+                    onClick={() => {
+                      if (isDailyshot && itemUrl) {
+                        window.open(itemUrl, "_blank");
+                      }
+                    }}
+                    sx={isDailyshot ? { cursor: "pointer" } : {}}
+                  >
+                    <TableCell component="th" scope="row">
+                      {itemName}
+                    </TableCell>
+                    <TableCell align="right">{itemPrice} 원</TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
-              priceInfo.map((item) => (
-                <TableRow
-                  key={
-                    store === "dailyshot"
-                      ? (item as DailyshotItem).id
-                      : (item as TradersItem).sku_code
-                  }
-                >
-                  <TableCell component="th" scope="row">
-                    {store === "dailyshot"
-                      ? (item as DailyshotItem).name
-                      : (item as TradersItem).sku_nm}
-                  </TableCell>
-                  <TableCell align="right">
-                    {store === "dailyshot"
-                      ? (item as DailyshotItem).price.toLocaleString()
-                      : (item as TradersItem).sell_price.toLocaleString()}
-                    원
-                  </TableCell>
-                </TableRow>
-              ))
+              <TableRow>
+                <TableCell colSpan={2} align="center">
+                  가격 정보가 없습니다.
+                </TableCell>
+              </TableRow>
             )}
           </TableBody>
         </Table>
