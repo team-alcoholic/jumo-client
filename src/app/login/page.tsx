@@ -24,7 +24,7 @@ function LoginComponent() {
   const handleKakaoLogin = () => {
     const redirectUrl = params.get("redirectTo");
     router.push(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao${redirectUrl ? `?redirectTo=${encodeURIComponent(redirectUrl)}` : ""}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/oauth2/authorization/kakao${redirectUrl ? `?redirectTo=${encodeURIComponent(redirectUrl)}` : ""}`
     );
   };
 

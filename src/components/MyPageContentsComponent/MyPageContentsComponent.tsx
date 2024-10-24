@@ -19,20 +19,27 @@ import { Edit } from "@mui/icons-material";
 import UserNoteGroupComponent from "../LiquorUserTastingComponent/UserNoteGroupComponent";
 
 /** 유저 주류 테이스팅 리뷰 목록 API 요청 함수 */
-const getLiquorTastingList = async (id: string) => {
+const getUserNoteList = async (id: string) => {
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes/user/${id}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/notes/user/${id}`
   );
-  const list: TastingNoteList[] = response.data;
+  const list: Note[] = response.data;
 
   // 그룹화 로직
-  const groupMap = new Map<string, UserNoteGroup>();
+  const groupMap = new Map<number, UserNoteGroup>();
   list.forEach((note) => {
-    const liquorId = note.liquor.id.toString(); // liquor의 고유 식별자로 가정
-    if (groupMap.has(liquorId)) {
-      groupMap.get(liquorId)!.notesCount++;
-    } else {
-      groupMap.set(liquorId, { liquor: note.liquor, notesCount: 1 });
+    let liquor = null;
+    if (note.type == "PURCHASE" && note.purchaseNote)
+      liquor = note.purchaseNote.liquor;
+    else if (note.type == "TASTING" && note.tastingNote)
+      liquor = note.tastingNote.liquor;
+
+    if (liquor) {
+      if (groupMap.has(liquor.id)) {
+        groupMap.get(liquor.id)!.notesCount++;
+      } else {
+        groupMap.set(liquor.id, { liquor, notesCount: 1 });
+      }
     }
   });
 
@@ -45,7 +52,7 @@ const getLiquorTastingList = async (id: string) => {
 const handleLogout = async () => {
   try {
     await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/logout`,
       {},
       { withCredentials: true }
     );
@@ -65,10 +72,10 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
     setNoteTabOption(value);
   };
 
-  // 주류 검색 api query
+  // 노트 목록 api query
   const { data, status } = useQuery({
-    queryKey: ["userTastingList", user.userUuid],
-    queryFn: () => getLiquorTastingList(user.userUuid),
+    queryKey: ["userNoteList", user.userUuid],
+    queryFn: () => getUserNoteList(user.userUuid),
   });
 
   return (
@@ -109,7 +116,6 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          // gap: "2px",
         }}
       >
         <Button

@@ -77,9 +77,57 @@ interface LiquorData {
 /** 사용자 type */
 interface User {
   userUuid: string;
-  profileNickname: string | null;
-  profileImage: string | null;
-  profileThumbnailImage: string | null;
+  profileNickname: string;
+  profileThumbnailImage: string;
+}
+
+/** 노트 type */
+interface Note {
+  type: string;
+  purchaseNote: PurchaseNote;
+  tastingNote: TastingNote;
+}
+
+/** 노트 이미지 type */
+interface NoteImage {
+  id: number;
+  fileName: string;
+  fileUrl: string;
+}
+
+/** 구매 노트 type */
+interface PurchaseNote {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
+  liquor: LiquorData;
+  noteImages: NoteImage[];
+  purchaseAt: string;
+  place: string;
+  price: number;
+  volume: number;
+  content: string;
+}
+
+/** 감상 노트 type */
+interface TastingNote {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
+  liquor: LiquorData;
+  noteImages: NoteImage[];
+  tastingAt: string;
+  method: string;
+  place: string;
+  noteAromas: Aroma[];
+  score: number;
+  isDetail: boolean;
+  content: string;
+  nose?: string;
+  palate?: string;
+  finish?: string;
 }
 
 /** 테이스팅노트 type: 주류 상세정보 페이지에서 보이는 유저 테이스팅 리뷰 목록 API 응답 객체 타입 */
@@ -101,6 +149,12 @@ interface TastingNoteList {
   updatedAt: string | null;
   createdBy: string | null;
   user: User;
+}
+
+/** 아로마 type */
+interface Aroma {
+  id: number;
+  name: string;
 }
 
 /** 사용자 작성 노트 type: 주류별 작성 노트 그룹 정보 */
@@ -148,4 +202,9 @@ interface SingleTastingProps {
   valueContent: string | null;
   detailContent: string | null;
   keyMinWidth: number;
+}
+
+/** PostPage(테이스팅 노트 상세 페이지) 호출 시 사용되는 props type */
+interface PostPageProps {
+  params: { id: string };
 }

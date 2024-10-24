@@ -24,7 +24,7 @@ import debounce from "lodash.debounce";
 const getLiquorList = async (keyword: string) => {
   if (!keyword) return null;
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/liquorsearch?keyword=${keyword}`
   );
   return response.data;
 };

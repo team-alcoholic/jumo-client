@@ -146,17 +146,15 @@ const LiquorForm: React.FC = () => {
     console.log("폼 제출 시작", data);
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquors`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/liquors`,
         data,
         {
           headers: {
             "Content-Type": "application/json",
           },
           withCredentials: true,
-        },
+        }
       );
-
-      console.log("서버 응답:", response.data);
       localStorage.removeItem("liquorFormData");
       const liquorId = response.data;
       router.push(`/tasting-notes/new?liquorId=${liquorId}`);

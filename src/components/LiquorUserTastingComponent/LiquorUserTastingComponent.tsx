@@ -13,9 +13,8 @@ import SingleTastingComponent from "../SingleTastingComponent/SingleTastingCompo
 /** 주류 유저 테이스팅 리뷰 목록 API 요청 함수 */
 const getLiquorTastingList = async (id: number) => {
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes/liquor/${id}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/notes/liquor/${id}`
   );
-  // console.log(response.data);
   return response.data;
 };
 
@@ -25,7 +24,7 @@ export default function LiquorUserTastingComponent({
   liquorId: string;
 }) {
   // 주류 검색 api query
-  const { data, status } = useQuery({
+  const { data, status } = useQuery<Note[]>({
     queryKey: ["liquorTastingList", liquorId],
     queryFn: () => getLiquorTastingList(+liquorId),
   });
@@ -34,119 +33,111 @@ export default function LiquorUserTastingComponent({
     <Stack sx={{ marginBottom: "10px", padding: "20px 0", gap: "15px" }}>
       {status == "success" &&
         (data && data.length ? (
-          data.map((tasting: TastingNoteList) => (
-            <Link
-              key={tasting.id}
-              href={`/tasting-notes/${tasting.id}`}
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              <Stack
-                sx={{
-                  border: "solid 1px #dddddd",
-                  borderRadius: "5px 5px",
-                  padding: "15px 25px",
-                  gap: "15px",
-                }}
+          data.map(({ type, tastingNote }) =>
+            type == "TASTING" ? (
+              <Link
+                key={tastingNote.id}
+                href={`/tasting-notes/${tastingNote.id}`}
+                style={{ textDecoration: "none", color: "inherit" }}
               >
-                {/* 카드 헤더 */}
-                <Box
+                <Stack
                   sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    border: "solid 1px #dddddd",
+                    borderRadius: "5px 5px",
+                    padding: "15px 25px",
+                    gap: "15px",
                   }}
                 >
-                  {/* 작성자 정보 */}
+                  {/* 카드 헤더 */}
                   <Box
                     sx={{
                       display: "flex",
                       flexDirection: "row",
-                      alignItems: "center",
-                      gap: "20px",
-                    }}
-                  >
-                    <Image
-                      src={tasting.user.profileThumbnailImage || "default"}
-                      width={40}
-                      height={40}
-                      alt="user profile image"
-                      style={{ borderRadius: "15px" }}
-                    />
-                    <Stack sx={{ justifyContent: "center" }}>
-                      <Typography sx={{ fontWeight: "500" }}>
-                        {tasting.user.profileNickname}
-                      </Typography>
-                      <Typography sx={{ color: "gray", fontSize: "13px" }}>
-                        {formatDateTime(tasting.createdAt)}
-                      </Typography>
-                    </Stack>
-                  </Box>
-                  {/* 작성자 총점 */}
-                  <Box
-                    sx={{
-                      paddingRight: "5px",
-                      display: "flex",
-                      justifyContent: "center",
+                      justifyContent: "space-between",
                       alignItems: "center",
                     }}
                   >
-                    {calculateAverageScore(
-                      tasting.noseScore,
-                      tasting.palateScore,
-                      tasting.finishScore,
-                    ) && (
-                      <Chip
-                        label={calculateAverageScore(
-                          tasting.noseScore,
-                          tasting.palateScore,
-                          tasting.finishScore,
-                        )}
+                    {/* 작성자 정보 */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: "20px",
+                      }}
+                    >
+                      <Image
+                        src={
+                          tastingNote.user.profileThumbnailImage || "default"
+                        }
+                        width={40}
+                        height={40}
+                        alt="user profile image"
+                        style={{ borderRadius: "15px" }}
                       />
-                    )}
+                      <Stack sx={{ justifyContent: "center" }}>
+                        <Typography sx={{ fontWeight: "500" }}>
+                          {tastingNote.user.profileNickname}
+                        </Typography>
+                        <Typography sx={{ color: "gray", fontSize: "13px" }}>
+                          {formatDateTime(tastingNote.createdAt)}
+                        </Typography>
+                      </Stack>
+                    </Box>
+                    {/* 작성자 총점 */}
+                    <Box
+                      sx={{
+                        paddingRight: "5px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {tastingNote.score && <Chip label={tastingNote.score} />}
+                    </Box>
                   </Box>
-                </Box>
 
-                <Divider />
+                  <Divider />
 
-                {/* 테이스팅 리뷰 내용: 상세 */}
-                <Stack sx={{ gap: "5px" }}>
-                  <SingleTastingComponent
-                    keyContent="Nose"
-                    valueContent={tasting.noseNotes}
-                    detailContent={tasting.noseMemo}
-                    keyMinWidth={50}
-                  />
-                  <SingleTastingComponent
-                    keyContent="Palate"
-                    valueContent={tasting.palateNotes}
-                    detailContent={tasting.palateMemo}
-                    keyMinWidth={50}
-                  />
-                  <SingleTastingComponent
-                    keyContent="Finish"
-                    valueContent={tasting.finishNotes}
-                    detailContent={tasting.finishMemo}
-                    keyMinWidth={50}
-                  />
+                  {/* 테이스팅 리뷰 내용: 상세 */}
+                  <Stack sx={{ gap: "5px" }}>
+                    <SingleTastingComponent
+                      keyContent="Nose"
+                      valueContent="테이스팅 노트입니다."
+                      detailContent={tastingNote.nose ? tastingNote.nose : ""}
+                      keyMinWidth={50}
+                    />
+                    <SingleTastingComponent
+                      keyContent="Palate"
+                      valueContent="테이스팅 노트입니다."
+                      detailContent={tastingNote.nose ? tastingNote.nose : ""}
+                      keyMinWidth={50}
+                    />
+                    <SingleTastingComponent
+                      keyContent="Finish"
+                      valueContent="테이스팅 노트입니다."
+                      detailContent={tastingNote.nose ? tastingNote.nose : ""}
+                      keyMinWidth={50}
+                    />
+                  </Stack>
+
+                  {/* 테이스팅 리뷰 내용: 총평 */}
+                  <Stack>
+                    <Typography
+                      sx={{
+                        // overflow: "hidden",
+                        // whiteSpace: "nowrap",
+                        // textOverflow: "ellipsis",
+                        fontSize: "15px",
+                      }}
+                    >
+                      &nbsp;{tastingNote.content}
+                    </Typography>
+                  </Stack>
                 </Stack>
-
-                {/* 테이스팅 리뷰 내용: 총평 */}
-                <Stack>
-                  <Typography
-                    sx={{
-                      // overflow: "hidden",
-                      // whiteSpace: "nowrap",
-                      // textOverflow: "ellipsis",
-                      fontSize: "15px",
-                    }}
-                  >
-                    &nbsp;{tasting.overallNote}
-                  </Typography>
-                </Stack>
-              </Stack>
-            </Link>
-          ))
+              </Link>
+            ) : null
+          )
         ) : (
           <Stack sx={{ padding: "30px 0", gap: "5px" }}>
             <Typography sx={{ color: "gray", textAlign: "center" }}>
