@@ -14,24 +14,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
-interface DailyshotItem {
-  id: number;
-  name: string;
-  price: number;
-}
-
-interface TradersItem {
-  sku_code: string;
-  sku_nm: string;
-  sell_price: number;
-}
-
-interface MukawaItem {
-  name: string;
-  price: number;
-  url: string;
-}
-
 interface PriceInfoProps {
   liquorName: string;
   store?: "dailyshot" | "traders" | "mukawa";
@@ -42,7 +24,7 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
   store = "dailyshot",
 }) => {
   const [priceInfo, setPriceInfo] = useState<
-    DailyshotItem[] | TradersItem[] | MukawaItem[]
+    { name: string; price: number; url?: string }[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -68,13 +50,8 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
         const data = response.data;
         console.log("가져온 데이터:", data);
 
-        if (store === "traders") {
-          setPriceInfo(data.data);
-        } else if (store === "mukawa") {
-          setPriceInfo(data);
-        } else {
-          setPriceInfo(data.results);
-        }
+        // 통일된 형식으로 설정
+        setPriceInfo(data || []);
       } catch (error) {
         console.error(`${store} 가격 정보를 가져오는 데 실패했습니다:`, error);
         setPriceInfo([]);
@@ -128,48 +105,27 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
             {isLoading ? (
               <LoadingSkeleton />
             ) : priceInfo.length > 0 ? (
-              priceInfo.map((item) => {
-                const isDailyshot = store === "dailyshot";
-                const isMukawa = store === "mukawa";
-                const itemId = isDailyshot
-                  ? (item as DailyshotItem).id
-                  : isMukawa
-                    ? (item as MukawaItem).url
-                    : (item as TradersItem).sku_code;
-                const itemName = isDailyshot
-                  ? (item as DailyshotItem).name
-                  : isMukawa
-                    ? (item as MukawaItem).name
-                    : (item as TradersItem).sku_nm;
-                const itemPrice = isDailyshot
-                  ? `${(item as DailyshotItem).price.toLocaleString()} 원`
-                  : isMukawa
-                    ? `${(item as MukawaItem).price.toLocaleString()} 엔`
-                    : `${(item as TradersItem).sell_price.toLocaleString()} 원`;
-                const itemUrl = isDailyshot
-                  ? (item as DailyshotItem).web_url
-                  : isMukawa
-                    ? (item as MukawaItem).url
-                    : undefined;
-
-                return (
-                  <TableRow
-                    key={itemId}
-                    hover={isDailyshot || isMukawa}
-                    onClick={() => {
-                      if ((isDailyshot || isMukawa) && itemUrl) {
-                        window.open(itemUrl, "_blank");
-                      }
-                    }}
-                    sx={isDailyshot || isMukawa ? { cursor: "pointer" } : {}}
-                  >
-                    <TableCell component="th" scope="row">
-                      {itemName}
-                    </TableCell>
-                    <TableCell align="right">{itemPrice}</TableCell>
-                  </TableRow>
-                );
-              })
+              priceInfo.map((item) => (
+                <TableRow
+                  key={item.name}
+                  hover={!!item.url}
+                  onClick={() => {
+                    if (item.url) {
+                      window.open(item.url, "_blank");
+                    }
+                  }}
+                  sx={item.url ? { cursor: "pointer" } : {}}
+                >
+                  <TableCell component="th" scope="row">
+                    {item.name}
+                  </TableCell>
+                  <TableCell align="right">
+                    {store === "mukawa"
+                      ? `${item.price.toLocaleString()} 엔`
+                      : `${item.price.toLocaleString()} 원`}
+                  </TableCell>
+                </TableRow>
+              ))
             ) : (
               <TableRow>
                 <TableCell colSpan={2} align="center">

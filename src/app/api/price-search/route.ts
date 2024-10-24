@@ -148,13 +148,28 @@ async function performSearch({ store, query, page, pageSize }) {
     throw new Error(`API 요청 실패: ${response.status}`);
   }
 
+  let results;
   if (store === "mukawa") {
     const buffer = await response.arrayBuffer();
     const decodedHtml = iconv.decode(Buffer.from(buffer), "euc-jp");
-    return parseMukawaHtml(decodedHtml);
+    results = parseMukawaHtml(decodedHtml);
+  } else {
+    const data = await response.json();
+    if (store === "dailyshot") {
+      results = data.results || []; // dailyshot의 경우
+    } else if (store === "traders") {
+      results = data.data || []; // traders의 경우
+    } else {
+      results = []; // 기본값
+    }
   }
 
-  return response.json();
+  // 통일된 형식으로 변환
+  return results.map((item) => ({
+    name: item.name || item.sku_nm,
+    price: item.price || item.sell_price,
+    url: item.url || item.web_url || undefined,
+  }));
 }
 
 function getSearchUrl(store, query, page, pageSize) {
