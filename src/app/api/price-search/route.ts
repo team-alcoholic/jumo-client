@@ -4,8 +4,14 @@ import { JSDOM } from "jsdom";
 import { translateWhiskyNameToJapenese } from "@/utils/translateWhiskyNameToJapenese";
 import fetch from "node-fetch";
 
+// 캐시 타입 정의
+interface CacheItem {
+  data: any;
+  timestamp: number;
+}
+
 // 캐시를 저장할 객체 (In-Memory)
-let cache = {};
+let cache: Record<string, CacheItem> = {};
 
 async function translateText(text: string): Promise<string> {
   if (!text) return "";
