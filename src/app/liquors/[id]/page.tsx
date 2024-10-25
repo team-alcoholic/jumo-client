@@ -9,12 +9,10 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import Image from "next/image";
-import Link from "next/link";
 import FloatingButton from "@/components/FloatingButton/FloatingButton";
-import { Edit } from "@mui/icons-material";
-
+import PriceInfo from "@/components/PriceInfo/PriceInfo";
+import { translateWhiskyNameToJapenese } from "@/utils/translateWhiskyNameToJapenese";
 /** 주류 상세정보 API 요청 함수 */
 const getLiquorInfo = async (id: string) => {
   const res = await fetch(
@@ -88,6 +86,11 @@ export default async function LiquorDetailPage({
 
         {/* 정보 */}
         <LiquorInfoCardComponent liquor={liquor} />
+        {/* 주류 가격 정보 */}
+        <PriceInfo liquorName={liquor.koName || ""} store="traders" />
+        <PriceInfo liquorName={liquor.koName || ""} store="dailyshot" />
+        <PriceInfo liquorName={liquor.koName || ""} store="mukawa" />
+        <PriceInfo liquorName={liquor.koName || ""} store="cu" />
       </Stack>
 
       {/* 주류 리뷰 */}
