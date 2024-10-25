@@ -53,8 +53,12 @@ function toEUCJPEncoding(query: string) {
 
 export async function GET(request: NextRequest) {
   const params = {
-    query: request.nextUrl.searchParams.get("q"),
-    store: request.nextUrl.searchParams.get("store") || "dailyshot",
+    query: request.nextUrl.searchParams.get("q") || "",
+    store: (request.nextUrl.searchParams.get("store") || "dailyshot") as
+      | "dailyshot"
+      | "mukawa"
+      | "cu"
+      | "traders",
     page: parseInt(request.nextUrl.searchParams.get("page") || "1"),
     pageSize: parseInt(request.nextUrl.searchParams.get("pageSize") || "12"),
   };
@@ -79,8 +83,9 @@ export async function GET(request: NextRequest) {
   }
 
   // 무카와인 경우 위스키 이름을 일본어로 번역
-  if (params.store === "mukawa") {
-    params.query = translateWhiskyNameToJapenese(params.query).japanese;
+  if (params.store === "mukawa" && params.query) {
+    const translatedQuery = translateWhiskyNameToJapenese(params.query);
+    params.query = translatedQuery.japanese || params.query;
   }
 
   try {
@@ -93,7 +98,7 @@ export async function GET(request: NextRequest) {
 
     if (!searchResult?.length) {
       const firstValidWord = params.query
-        .split(" ")
+        ?.split(" ")
         .find((word) => word.length >= 2);
       if (firstValidWord) {
         searchResult = await performSearch({
@@ -121,9 +126,23 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+// 검색 결과 아이템의 인터페이스 정의
+interface SearchResultItem {
+  name: string;
+  price: number;
+  url?: string;
+  description?: string;
+  original?: {
+    name: string;
+  };
+}
+
 // 상품명만 번역하는 새로운 함수
-async function translateProductNames(results) {
-  const translatedResults = [];
+async function translateProductNames(
+  results: SearchResultItem[]
+): Promise<SearchResultItem[]> {
+  const translatedResults: SearchResultItem[] = [];
 
   for (const item of results) {
     // Rate limiting 방지를 위한 딜레이
@@ -143,7 +162,43 @@ async function translateProductNames(results) {
   return translatedResults;
 }
 
-async function performSearch({ store, query, page, pageSize }) {
+// CU API 응답의 타입을 정의합니다.
+interface CUApiResponse {
+  data: {
+    cubarResult: {
+      result: {
+        rows: Array<{
+          fields: {
+            item_nm: string;
+            hyun_maega: string;
+            link_url: string;
+          };
+        }>;
+      };
+    };
+  };
+}
+
+// CU 아이템의 타입을 정의합니다.
+interface CUItem {
+  fields: {
+    item_nm: string;
+    hyun_maega: string;
+    link_url: string;
+  };
+}
+
+async function performSearch({
+  store,
+  query,
+  page,
+  pageSize,
+}: {
+  store: "dailyshot" | "mukawa" | "cu" | "traders";
+  query: string;
+  page: number;
+  pageSize: number;
+}): Promise<SearchResultItem[]> {
   const url = getSearchUrl(store, query, page, pageSize);
   if (!url) {
     throw new Error("지원하지 않는 스토어입니다.");
@@ -173,8 +228,8 @@ async function performSearch({ store, query, page, pageSize }) {
       throw new Error(`CU API 요청 실패: ${response.status}`);
     }
 
-    const data = await response.json();
-    results = data.data.cubarResult.result.rows.map((item) => {
+    const data = (await response.json()) as CUApiResponse;
+    results = data.data.cubarResult.result.rows.map((item: CUItem) => {
       const fields = item.fields;
       return {
         name: fields.item_nm,
@@ -210,23 +265,32 @@ async function performSearch({ store, query, page, pageSize }) {
   }
 
   // 통일된 형식으로 변환
-  return results.map((item) => ({
+  return results.map((item: SearchItem) => ({
     name: item.name || item.sku_nm,
     price: item.price || item.sell_price,
     url: item.url || item.web_url || undefined,
+    description: item.description,
+    original: {
+      name: item.name,
+    },
   }));
 }
 
-function getSearchUrl(store, query, page, pageSize) {
+function getSearchUrl(
+  store: "dailyshot" | "mukawa" | "cu" | "traders",
+  query: string,
+  page: number,
+  pageSize: number
+) {
   const urls = {
-    cu: () => `https://www.pocketcu.co.kr/api/search/rest/total/cubar`, // CU는 POST 방식 사용
-    dailyshot: (q, p, ps) =>
+    cu: () => `https://www.pocketcu.co.kr/api/search/rest/total/cubar`,
+    dailyshot: (q: string, p: number, ps: number) =>
       `https://api.dailyshot.co/items/search?q=${q}&page=${p}&page_size=${ps}`,
-    traders: (q, p, ps) =>
+    traders: (q: string, p: number, ps: number) =>
       `https://hbsinvtje8.execute-api.ap-northeast-2.amazonaws.com/ps/search/products?offset=${
         (p - 1) * ps
       }&limit=${ps}&store_id=2006&biztp=1200&search_term=${q}&sort_type=recommend`,
-    mukawa: (q) =>
+    mukawa: (q: string) =>
       `https://mukawa-spirit.com/?mode=srh&cid=&keyword=${toEUCJPEncoding(q)}`,
   };
 
@@ -240,22 +304,33 @@ function parseMukawaHtml(html: string) {
   const productItems = document.querySelectorAll(".list-product-item");
 
   const results = Array.from(productItems).map((item) => {
-    const name = item
+    const element = item as Element;
+    const name = element
       .querySelector(".list-product-item__ttl")
       ?.textContent?.trim();
-    const priceText = item
+    const priceText = element
       .querySelector(".list-product-item__price")
       ?.textContent?.trim();
     const price = priceText ? parseInt(priceText.replace(/[^0-9]/g, "")) : 0;
-    const description = item
+    const description = element
       .querySelector(".list-product-item__memo")
       ?.textContent?.trim();
     const url =
       "https://mukawa-spirit.com" +
-      item.querySelector("a")?.getAttribute("href");
+      element.querySelector("a")?.getAttribute("href");
 
     return { name, price, description, url };
   });
 
   return results;
+}
+
+interface SearchItem {
+  name?: string;
+  sku_nm?: string;
+  price?: number;
+  sell_price?: number;
+  url?: string;
+  web_url?: string;
+  description?: string;
 }
