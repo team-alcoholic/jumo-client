@@ -86,10 +86,12 @@ export default async function LiquorDetailPage({
 
         {/* 정보 */}
         <LiquorInfoCardComponent liquor={liquor} />
+        {/* 주류 가격 정보 */}
 
         <PriceInfo liquorName={liquor.koName} store="traders" />
         <PriceInfo liquorName={liquor.koName} store="dailyshot" />
         <PriceInfo liquorName={liquor.koName} store="mukawa" />
+        <PriceInfo liquorName={liquor.koName} store="cu" />
       </Stack>
 
       {/* 주류 리뷰 */}

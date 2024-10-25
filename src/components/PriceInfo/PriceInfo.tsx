@@ -16,8 +16,15 @@ import axios from "axios";
 
 interface PriceInfoProps {
   liquorName: string;
-  store?: "dailyshot" | "traders" | "mukawa";
+  store?: "dailyshot" | "traders" | "mukawa" | "cu";
 }
+
+const storeDisplayName = {
+  dailyshot: "데일리샷",
+  traders: "트레이더스",
+  mukawa: "무카와",
+  cu: "CU",
+};
 
 const PriceInfo: React.FC<PriceInfoProps> = ({
   liquorName,
@@ -50,7 +57,6 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
         const data = response.data;
         console.log("가져온 데이터:", data);
 
-        // 통일된 형식으로 설정
         setPriceInfo(data || []);
       } catch (error) {
         console.error(`${store} 가격 정보를 가져오는 데 실패했습니다:`, error);
@@ -81,14 +87,9 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
   return (
     <Box sx={{ mt: 4 }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
-        {store === "dailyshot"
-          ? "데일리샷"
-          : store === "traders"
-            ? "트레이더스"
-            : "무카와"}{" "}
-        가격 정보
+        {storeDisplayName[store]} 가격 정보
       </Typography>
-      {(store === "dailyshot" || store === "mukawa") && (
+      {store !== "traders" && (
         <Typography variant="body2" sx={{ mb: 1, color: "text.secondary" }}>
           클릭시 상세 페이지로 이동합니다.
         </Typography>

@@ -143,24 +143,63 @@ async function performSearch({ store, query, page, pageSize }) {
     throw new Error("지원하지 않는 스토어입니다.");
   }
 
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`API 요청 실패: ${response.status}`);
-  }
-
+  let response;
   let results;
-  if (store === "mukawa") {
+
+  if (store === "cu") {
+    // CU는 POST 방식 사용
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        searchWord: query,
+        prevSearchWord: query.split(" ")[0], // 첫 단어를 prevSearchWord로 사용
+        spellModifyUseYn: "Y",
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
+        searchSort: "recom",
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`CU API 요청 실패: ${response.status}`);
+    }
+
+    const data = await response.json();
+    results = data.data.cubarResult.result.rows.map((item) => {
+      const fields = item.fields;
+      return {
+        name: fields.item_nm,
+        price: parseInt(fields.hyun_maega, 10),
+        url: `https://www.pocketcu.co.kr${fields.link_url}`,
+      };
+    });
+  } else if (store === "mukawa") {
+    // 무카와는 HTML 파싱을 사용
+    response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`무카와 API 요청 실패: ${response.status}`);
+    }
+
     const buffer = await response.arrayBuffer();
     const decodedHtml = iconv.decode(Buffer.from(buffer), "euc-jp");
     results = parseMukawaHtml(decodedHtml);
   } else {
+    // dailyshot, traders는 기존 방식 유지
+    response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`API 요청 실패: ${response.status}`);
+    }
+
     const data = await response.json();
     if (store === "dailyshot") {
-      results = data.results || []; // dailyshot의 경우
+      results = data.results || [];
     } else if (store === "traders") {
-      results = data.data || []; // traders의 경우
+      results = data.data || [];
     } else {
-      results = []; // 기본값
+      results = [];
     }
   }
 
@@ -174,6 +213,7 @@ async function performSearch({ store, query, page, pageSize }) {
 
 function getSearchUrl(store, query, page, pageSize) {
   const urls = {
+    cu: () => `https://www.pocketcu.co.kr/api/search/rest/total/cubar`, // CU는 POST 방식 사용
     dailyshot: (q, p, ps) =>
       `https://api.dailyshot.co/items/search?q=${q}&page=${p}&page_size=${ps}`,
     traders: (q, p, ps) =>
