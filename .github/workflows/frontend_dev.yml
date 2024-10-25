@@ -22,6 +22,7 @@ jobs:
           echo "NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID }}" >> .env
           echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> .env
           echo "NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}" >> .env
+          echo "DEEPL_API_KEY=${{ secrets.DEEPL_API_KEY }}" >> .env
 
 
       - name: Configure AWS credentials
