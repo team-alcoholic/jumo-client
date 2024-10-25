@@ -7,6 +7,7 @@ import {
   Warehouse,
   EditNote,
   Search,
+  Forum,
 } from "@mui/icons-material";
 import { Box, Stack, Typography } from "@mui/material";
 import Link from "next/link";
@@ -48,6 +49,20 @@ export default function NavigationComponent() {
       },
     },
     {
+      title: "주모 피드",
+      link: "/notes-feed",
+      icon: function () {
+        return (
+          <Forum
+            sx={{
+              fontSize: "20px",
+              color: pathName.startsWith(this.link) ? "black" : "gray",
+            }}
+          />
+        );
+      },
+    },
+    {
       title: "주류 검색",
       link: "/liquors",
       icon: function () {
@@ -62,25 +77,11 @@ export default function NavigationComponent() {
       },
     },
     {
-      title: "주류 생활",
+      title: "나의 주모",
       link: "/mypage",
       icon: function () {
         return (
           <AccountCircle
-            sx={{
-              fontSize: "20px",
-              color: pathName.startsWith(this.link) ? "black" : "gray",
-            }}
-          />
-        );
-      },
-    },
-    {
-      title: "주모 레포트",
-      link: "/report",
-      icon: function () {
-        return (
-          <EditNote
             sx={{
               fontSize: "20px",
               color: pathName.startsWith(this.link) ? "black" : "gray",

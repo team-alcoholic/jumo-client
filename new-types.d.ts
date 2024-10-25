@@ -81,6 +81,13 @@ interface User {
   profileThumbnailImage: string;
 }
 
+/** 노트 페이지네이션 type */
+interface NoteList {
+  cursor: number;
+  eof: boolean;
+  notes: Note[];
+}
+
 /** 노트 type */
 interface Note {
   type: string;
