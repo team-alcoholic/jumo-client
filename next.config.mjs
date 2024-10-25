@@ -17,29 +17,29 @@ const nextConfig = {
       },
     ],
   },
-  // 검색 API를 위한 rewrites 추가
-  async rewrites() {
-    const isDevelopment = process.env.NODE_ENV === "development";
+  // // 검색 API를 위한 rewrites 추가
+  // async rewrites() {
+  //   const isDevelopment = process.env.NODE_ENV === "development";
 
-    console.log("isDevelopment:", isDevelopment); // 개발 환경인지 확인
+  //   console.log("isDevelopment:", isDevelopment); // 개발 환경인지 확인
 
-    if (isDevelopment) {
-      console.log("Rewriting API paths for development...");
-      return [
-        {
-          source: "/api/v1/liquorsearch",
-          destination: "https://dev.jumo.im/api/v1/liquorsearch",
-        },
-        {
-          source: "/search",
-          destination: "https://api.dailyshot.co/items/search",
-        },
-      ];
-    }
+  //   if (isDevelopment) {
+  //     console.log("Rewriting API paths for development...");
+  //     return [
+  //       {
+  //         source: "/api/v1/liquorsearch",
+  //         destination: "https://dev.jumo.im/api/v1/liquorsearch",
+  //       },
+  //       {
+  //         source: "/search",
+  //         destination: "https://api.dailyshot.co/items/search",
+  //       },
+  //     ];
+  //   }
 
-    console.log("No rewrites applied.");
-    return [];
-  },
+  //   console.log("No rewrites applied.");
+  //   return [];
+  // },
 };
 
 export default withSentryConfig(nextConfig, {

@@ -20,9 +20,12 @@ import { useQuery } from "react-query";
 import AddIcon from "@mui/icons-material/Add";
 import debounce from "lodash.debounce";
 
+/** 주류 검색 API 요청 함수 */
 const getLiquorList = async (keyword: string) => {
   if (!keyword) return null;
-  const response = await axios.get(`/api/v1/liquorsearch?keyword=${keyword}`);
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/liquorsearch?keyword=${keyword}`
+  );
   return response.data;
 };
 
