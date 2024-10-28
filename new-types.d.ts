@@ -38,40 +38,40 @@ interface MeetingDetailInfo extends MeetingInfo {
 /** 주류 type: ES 버전 */
 interface LiquorInfo {
   id: number;
-  en_name: string;
   ko_name: string;
   ko_name_origin: string;
-  price: string;
+  en_name: string;
+  type: string;
+  abv: string;
+  volume: string;
+  country: string;
   thumbnail_image_url: string;
   tasting_notes_Aroma: string;
   tasting_notes_Taste: string;
   tasting_notes_Finish: string;
-  type: string;
-  volume: string;
-  abv: string;
-  country: string;
   region: string;
   grape_variety: string;
   notes_count: number;
+  price: string;
 }
 
 /** 주류 type: DB 버전 */
 interface LiquorData {
   id: number;
-  thumbnailImageUrl: string | undefined;
   koName: string | null;
   enName: string | null;
   type: string | null;
   abv: string | null;
   volume: string | null;
   country: string | null;
+  thumbnailImageUrl: string | undefined;
   tastingNotesAroma: string | null;
   tastingNotesTaste: string | null;
   tastingNotesFinish: string | null;
   region: string | null;
   grapeVariety: string | null;
   aiNotes: aiNotes | null;
-  user: User;
+  user: User | null;
 }
 
 /** 사용자 type */

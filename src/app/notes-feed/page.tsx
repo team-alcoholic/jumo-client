@@ -1,7 +1,17 @@
 "use client";
 
 import useObserver from "@/hooks/useObserver";
-import { List, styled, Box, Tabs, Tab } from "@mui/material";
+import {
+  List,
+  styled,
+  Box,
+  Tabs,
+  Tab,
+  Backdrop,
+  SpeedDial,
+  SpeedDialIcon,
+  SpeedDialAction,
+} from "@mui/material";
 
 import axios from "axios";
 import { SyntheticEvent, useRef, useState } from "react";
@@ -9,6 +19,8 @@ import { useInfiniteQuery } from "react-query";
 import MeetingCardSkeleton from "@/components/MeetingCard/MeetingCardSkeleton";
 import PurchaseNoteCard from "@/components/NoteCard/PurchaseNoteCard";
 import TastingNoteCard from "@/components/NoteCard/TastingNoteCard";
+import { ShoppingCartOutlined, WineBarOutlined } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
 
 /** MeetingListResponse와 MeetingInfo 타입 정의 (필요한 경우 추가) */
 interface pageParamType {
@@ -80,8 +92,12 @@ const getNotesList = async ({
 };
 
 export default function NotesFeedPage() {
+  const router = useRouter();
+
   // 노트 유형 옵션 상태 관리
   const [typeOption, setTypeOption] = useState("ALL");
+  // 노트 작성 다이얼 옵션
+  const [dialOpen, setDialOpen] = useState(false);
 
   // useInfiniteQuery 설정
   const { data, fetchNextPage, isFetchingNextPage, status } = useInfiniteQuery({
@@ -109,6 +125,32 @@ export default function NotesFeedPage() {
     _event: SyntheticEvent,
     newTypeOption: string
   ) => setTypeOption(newTypeOption);
+
+  /** 노트 작성 다이얼 옵션 */
+  const dialAction = [
+    {
+      icon: <WineBarOutlined />,
+      name: "마셨어요",
+      onClick: () => {
+        router.push("/tasting-notes/new");
+      },
+    },
+    {
+      icon: <ShoppingCartOutlined />,
+      name: "구매했어요",
+      onClick: () => {
+        router.push("/purchase-notes/new");
+      },
+    },
+  ];
+
+  /** 다이얼 상태 변경 함수 */
+  const handleDialOpen = () => {
+    setDialOpen(true);
+  };
+  const handleDialClose = () => {
+    setDialOpen(false);
+  };
 
   // return
   return (
@@ -161,6 +203,8 @@ export default function NotesFeedPage() {
         }
       })()}
       <div ref={target} />
+
+      {/* 로딩 시 보여질 스켈레톤 */}
       {isFetchingNextPage && (
         <div>
           {Array.from({ length: 30 }).map((_, i) => (
@@ -168,6 +212,36 @@ export default function NotesFeedPage() {
           ))}
         </div>
       )}
+
+      {/* 노트 작성 다이얼 */}
+      <Backdrop open={dialOpen} />
+      <SpeedDial
+        sx={{
+          position: "fixed",
+          bottom: 72,
+          right: 12,
+          "& .MuiSpeedDial-fab": {
+            // 메인 버튼 설정
+            width: 45,
+            height: 45,
+          },
+        }}
+        icon={<SpeedDialIcon />}
+        onClose={handleDialClose}
+        onOpen={handleDialOpen}
+        open={dialOpen}
+        ariaLabel="dial"
+      >
+        {dialAction.map((action) => (
+          <SpeedDialAction
+            key={action.name}
+            icon={action.icon}
+            tooltipTitle={action.name}
+            tooltipOpen
+            onClick={action.onClick}
+          />
+        ))}
+      </SpeedDial>
     </ContainerBox>
   );
 }

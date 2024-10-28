@@ -19,6 +19,7 @@ export default function NavigationComponent() {
 
   // 네비게이션 바를 숨길 경로 패턴
   const hideNavPaths = [
+    "/purchase-notes/new",
     "/tasting-notes/new",
     /^\/tasting-notes\/\d+\/edit$/, // 동적 ID를 포함한 edit 경로
   ];
@@ -93,67 +94,70 @@ export default function NavigationComponent() {
   ];
 
   return (
-    <Box
-      sx={{
-        position: "fixed",
-        bottom: 0,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "100%",
-        height: 60,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "white",
-        borderTop: "solid 1px #D9D9D9",
-        zIndex: 1000,
-      }}
-    >
+    <Stack>
       <Box
         sx={{
-          padding: "10px",
-          width: 600,
-          height: "100%",
+          position: "fixed",
+          bottom: 0,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "100%",
+          height: 60,
           display: "flex",
-          justifyContent: "space-around",
+          justifyContent: "center",
           alignItems: "center",
+          backgroundColor: "white",
+          borderTop: "solid 1px #D9D9D9",
+          zIndex: 1000,
         }}
       >
-        {NAV_OPTIONS.map((option, index) => (
-          <Link
-            key={index}
-            href={option.link}
-            style={{
-              color: "inherit",
-              textDecoration: "none",
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Stack
-              sx={{
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "5px",
+        <Box
+          sx={{
+            padding: "10px",
+            width: 600,
+            height: "100%",
+            display: "flex",
+            justifyContent: "space-around",
+            alignItems: "center",
+          }}
+        >
+          {NAV_OPTIONS.map((option, index) => (
+            <Link
+              key={index}
+              href={option.link}
+              style={{
+                color: "inherit",
+                textDecoration: "none",
                 width: "100%",
                 height: "100%",
-                borderRadius: "5px 5px",
-                // "&:hover": {
-                //   backgroundColor: "#cccccc",
-                // },
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              {option.icon()}
-              <Typography sx={{ fontSize: "12px", color: "gray" }}>
-                {option.title}
-              </Typography>
-            </Stack>
-          </Link>
-        ))}
+              <Stack
+                sx={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "5px",
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "5px 5px",
+                  // "&:hover": {
+                  //   backgroundColor: "#cccccc",
+                  // },
+                }}
+              >
+                {option.icon()}
+                <Typography sx={{ fontSize: "12px", color: "gray" }}>
+                  {option.title}
+                </Typography>
+              </Stack>
+            </Link>
+          ))}
+        </Box>
       </Box>
-    </Box>
+      <div style={{ width: "100%", height: "60px" }}></div>
+    </Stack>
   );
 }

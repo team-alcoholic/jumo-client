@@ -33,6 +33,7 @@ export default function HeaderComponent() {
 
   // 네비게이션 바를 숨길 경로 패턴
   const hideNavPaths = [
+    "/purchase-notes/new",
     "/tasting-notes/new",
     /^\/tasting-notes\/\d+\/edit$/, // 동적 ID를 포함한 edit 경로
   ];
@@ -40,7 +41,7 @@ export default function HeaderComponent() {
   // 현재 경로가 숨길 경로 중 하나와 일치하면 네비게이션 바를 렌더링하지 않음
   if (
     hideNavPaths.some((path) =>
-      typeof path === "string" ? pathName === path : path.test(pathName),
+      typeof path === "string" ? pathName === path : path.test(pathName)
     )
   ) {
     return null;
