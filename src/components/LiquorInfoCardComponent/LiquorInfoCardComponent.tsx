@@ -4,7 +4,7 @@ import KeyValueInfoComponent from "../KeyValueInfoComponent/KeyValueInfoComponen
 export default function LiquorInfoCardComponent({
   liquor,
 }: {
-  liquor: LiquorData;
+  liquor: Liquor;
 }) {
   /** 주류 기본 정보 */
   const LIQUOR_INFO_FIELDS = [

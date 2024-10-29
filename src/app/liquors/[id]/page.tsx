@@ -18,7 +18,7 @@ import { Edit } from "@mui/icons-material";
 /** 주류 상세정보 API 요청 함수 */
 const getLiquorInfo = async (id: string) => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/liquors/${id}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/liquors/${id}`
   );
   if (!res.ok) {
     if (res.status === 404) {
@@ -26,7 +26,7 @@ const getLiquorInfo = async (id: string) => {
     }
     throw new Error("Failed to fetch data");
   }
-  const data: LiquorData = await res.json();
+  const data: Liquor = await res.json();
   return data;
 };
 
@@ -39,7 +39,7 @@ export default async function LiquorDetailPage({
 }) {
   // 주류 데이터
   const liquor = await getLiquorInfo(id);
-  const userProfileNickname = liquor.user.profileNickname || "";
+  const userProfileNickname = liquor.user ? liquor.user.profileNickname : "";
 
   return (
     <Stack

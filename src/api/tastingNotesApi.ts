@@ -34,14 +34,12 @@ export interface ReviewUpdateData {
   finishNotes: string | null;
 }
 
-const LIQUOR_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquors/`;
+const LIQUOR_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/liquors/`;
 const LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/similar-tasting-notes`;
 const AI_LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ai-similar-tasting-notes`;
 const SAVE_REVIEW_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes`;
 
-export const fetchLiquorData = async (
-  liquorId: string
-): Promise<LiquorData> => {
+export const fetchLiquorData = async (liquorId: string): Promise<Liquor> => {
   const response = await fetch(LIQUOR_URL + liquorId);
   if (!response.ok) throw new Error("Failed to fetch data");
 

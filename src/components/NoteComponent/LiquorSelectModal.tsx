@@ -18,8 +18,8 @@ import { LiquorList } from "./LiquorList";
 /** LiquorSelectModal 컴포넌트 props 타입 */
 interface LiquorSelectModalProps {
   open: boolean;
-  value: LiquorData | null;
-  onClose: (value: LiquorData | null) => void;
+  value: Liquor | null;
+  onClose: (value: Liquor | null) => void;
 }
 
 /** 주류 검색 API 요청 함수 */
@@ -63,7 +63,7 @@ export default function LiquorSelectModal(props: LiquorSelectModalProps) {
   };
   /** 주류 선택할 경우 처리 */
   const handleLiquorListClick = (newValue: LiquorInfo) => {
-    const result: LiquorData = {
+    const result: Liquor = {
       id: newValue.id,
       koName: newValue.ko_name_origin,
       enName: newValue.en_name,
@@ -77,7 +77,8 @@ export default function LiquorSelectModal(props: LiquorSelectModalProps) {
       tastingNotesFinish: newValue.tasting_notes_Finish,
       region: newValue.region,
       grapeVariety: newValue.grape_variety,
-      aiNotes: null,
+      category: null,
+      liquorAromas: [],
       user: null,
     };
     onClose(result);

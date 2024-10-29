@@ -26,22 +26,31 @@ const LiquorTitle: React.FC<LiquorTitleProps> = ({
       />
       <div>
         <Typography
-          variant="h6"
-          style={{ fontWeight: "bold", color: "#424242" }}
+          sx={{
+            fontWeight: "bold",
+            color: "#424242",
+            fontSize: { xs: "18px", md: "20px" },
+          }}
         >
           {koName}
         </Typography>
-        <Typography variant="subtitle1" style={{ color: "#757575" }}>
+        <Typography
+          sx={{ color: "#757575", fontSize: { xs: "15px", md: "18px" } }}
+        >
           {type && `${type}`}
           {type && abv && ", "}
           {abv && `도수 ${abv}`}
         </Typography>
-        <Typography variant="subtitle2" style={{ color: "#757575" }}>
+        <Typography
+          sx={{ color: "#757575", fontSize: { xs: "12px", md: "15px" } }}
+        >
           {volume && `${volume}`}
           {volume && country && ", "}
           {country && `${country}`}
         </Typography>
-        <Typography variant="subtitle2" style={{ color: "#757575" }}>
+        <Typography
+          sx={{ color: "#757575", fontSize: { xs: "12px", md: "15px" } }}
+        >
           {region && `${region}`}
           {region && grapeVariety && ", "}
           {grapeVariety && `${grapeVariety}`}

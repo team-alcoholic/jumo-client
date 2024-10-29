@@ -35,6 +35,13 @@ interface MeetingDetailInfo extends MeetingInfo {
   images: string[];
 }
 
+/** 주종 type */
+interface LiquorCategory {
+  id: number;
+  name: string;
+  image: string;
+}
+
 /** 주류 type: ES 버전 */
 interface LiquorInfo {
   id: number;
@@ -56,7 +63,7 @@ interface LiquorInfo {
 }
 
 /** 주류 type: DB 버전 */
-interface LiquorData {
+interface Liquor {
   id: number;
   koName: string | null;
   enName: string | null;
@@ -70,7 +77,9 @@ interface LiquorData {
   tastingNotesFinish: string | null;
   region: string | null;
   grapeVariety: string | null;
-  aiNotes: aiNotes | null;
+  // aiNotes: aiNotes | null;
+  category: LiquorCategory | null;
+  liquorAromas: Aroma[];
   user: User | null;
 }
 
@@ -108,7 +117,7 @@ interface PurchaseNote {
   createdAt: string;
   updatedAt: string;
   user: User;
-  liquor: LiquorData;
+  liquor: Liquor;
   noteImages: NoteImage[];
   purchaseAt: string;
   place: string;
@@ -123,7 +132,7 @@ interface TastingNote {
   createdAt: string;
   updatedAt: string;
   user: User;
-  liquor: LiquorData;
+  liquor: Liquor;
   noteImages: NoteImage[];
   tastingAt: string;
   method: string;
@@ -140,7 +149,7 @@ interface TastingNote {
 /** 테이스팅노트 type: 주류 상세정보 페이지에서 보이는 유저 테이스팅 리뷰 목록 API 응답 객체 타입 */
 interface TastingNoteList {
   id: number;
-  liquor: LiquorData;
+  liquor: Liquor;
   noseScore: number | null;
   palateScore: number | null;
   finishScore: number | null;
@@ -166,7 +175,7 @@ interface Aroma {
 
 /** 사용자 작성 노트 type: 주류별 작성 노트 그룹 정보 */
 interface UserNoteGroup {
-  liquor: LiquorData;
+  liquor: Liquor;
   notesCount: number;
 }
 

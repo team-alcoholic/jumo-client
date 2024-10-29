@@ -126,7 +126,7 @@ export default function NewPurchaseNotePage() {
     fileInputRef.current?.click();
   };
 
-  const [liquorData, setLiquorData] = useState<LiquorData | null>(null);
+  const [liquorData, setLiquorData] = useState<Liquor | null>(null);
   const handleClearLiquorData = () => {
     setLiquorData(null);
   };
@@ -136,7 +136,7 @@ export default function NewPurchaseNotePage() {
   const handleOpenLiquorDialog = () => {
     setOpenLiquorDialog(true);
   };
-  const handleCloseLiquorDialog = (value: LiquorData | null) => {
+  const handleCloseLiquorDialog = (value: Liquor | null) => {
     setOpenLiquorDialog(false);
     setLiquorData(value);
   };
@@ -175,27 +175,11 @@ export default function NewPurchaseNotePage() {
     }
   }, [router]);
 
-  const loadLiquorData = useCallback(async () => {
-    try {
-      if (!liquorId) {
-        alert("리뷰 작성을 위해서는 주류 검색이 필요합니다.");
-        router.push("/liquors");
-        return;
-      }
-      const data = await fetchLiquorData(liquorId);
-      setLiquorData(data);
-    } catch (error) {
-      alert("주류 정보를 불러오는데 실패했습니다. 주류를 다시 선택해주세요.");
-      router.push("/liquors");
-    }
-  }, [liquorId, router]);
-
   useEffect(() => {
     (async () => {
       await getAuth();
-      // await loadLiquorData();
     })();
-  }, [getAuth, loadLiquorData]);
+  }, [getAuth]);
 
   // 컴포넌트 언마운트 시 모든 미리보기 URL 정리
   useEffect(() => {
@@ -242,7 +226,7 @@ export default function NewPurchaseNotePage() {
       <PageTitleComponent title="구매 노트 작성하기" />
       <Stack sx={{ margin: "30px 0", gap: "30px" }}>
         {/* 주류 선택 */}
-        <Stack>
+        <Stack sx={{ gap: "5px" }}>
           <Box
             sx={{
               display: "flex",

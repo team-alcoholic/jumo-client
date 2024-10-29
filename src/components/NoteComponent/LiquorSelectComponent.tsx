@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from "react";
 export default function LiquorSelectComponent({
   setLiquorData,
 }: {
-  setLiquorData: Dispatch<SetStateAction<LiquorData | null>>;
+  setLiquorData: Dispatch<SetStateAction<Liquor | null>>;
 }) {
   return;
 }
