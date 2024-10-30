@@ -23,7 +23,7 @@ import AddIcon from "@mui/icons-material/Add";
 const getLiquorList = async (keyword: string) => {
   if (!keyword) return null;
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`
   );
   return response.data;
 };
@@ -101,25 +101,24 @@ export default function LiquorsPage() {
               <SearchResultTypography>
                 검색 결과가 없습니다.
               </SearchResultTypography>
+              <SearchResultTypography>가격 통합 비교 및</SearchResultTypography>
               <SearchResultTypography>
                 테이스팅 노트 작성을 위해서는
               </SearchResultTypography>
               <SearchResultTypography>
                 주류를 선택해야 합니다.
               </SearchResultTypography>
-              <TipPaper elevation={1}>
-                <TipTypography>💡 Tip: 찾는 주류가 없으신가요?</TipTypography>
-                <Link href="/liquors/new" passHref>
-                  <Button
-                    variant="outlined"
-                    startIcon={<AddIcon />}
-                    fullWidth
-                    size="small"
-                  >
-                    주류 직접 추가하기
-                  </Button>
-                </Link>
-              </TipPaper>
+
+              <MarketInfoBox>
+                <MarketInfoTitle>
+                  🏪 현재 가격 비교 지원 중인 마켓
+                </MarketInfoTitle>
+                <MarketChipsContainer>
+                  {["트레이더스", "데일리샷", "무카와", "CU"].map((market) => (
+                    <MarketChip key={market}>{market}</MarketChip>
+                  ))}
+                </MarketChipsContainer>
+              </MarketInfoBox>
             </Box>
           </SearchResultBox>
         ))}
@@ -169,4 +168,38 @@ const TipTypography = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
   marginBottom: theme.spacing(1),
   fontSize: "0.9rem",
+}));
+
+const MarketInfoBox = styled(Box)(({ theme }) => ({
+  marginTop: theme.spacing(4),
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${theme.palette.divider}`,
+  maxWidth: "300px",
+  margin: "32px auto 0",
+}));
+
+const MarketInfoTitle = styled(Typography)(({ theme }) => ({
+  fontSize: "0.9rem",
+  color: theme.palette.text.secondary,
+  marginBottom: theme.spacing(1.5),
+  textAlign: "center",
+  fontWeight: 500,
+}));
+
+const MarketChipsContainer = styled(Box)({
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "8px",
+  justifyContent: "center",
+});
+
+const MarketChip = styled(Box)(({ theme }) => ({
+  padding: "4px 12px",
+  borderRadius: "16px",
+  fontSize: "0.85rem",
+  backgroundColor: theme.palette.primary.main + "15",
+  color: theme.palette.primary.main,
+  border: `1px solid ${theme.palette.primary.main}30`,
 }));
