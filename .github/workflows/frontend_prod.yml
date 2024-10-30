@@ -22,6 +22,8 @@ jobs:
           echo "NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID_PROD }}" >> .env
           echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> .env
           echo "NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}" >> .env
+          echo "DEEPL_API_KEY=${{ secrets.DEEPL_API_KEY }}" >> .env
+
 
 
       - name: Configure AWS credentials
@@ -58,7 +60,10 @@ jobs:
 
       - name: Run new Docker container
         run: |
-          docker run --rm -it -d -p 80:3000 --name jumo_front_prod ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jumo_front_prod:latest
+          docker run --rm -it -d -p 80:3000 \          
+          -e SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
+          -e DEEPL_API_KEY=${{ secrets.DEEPL_API_KEY }} \
+          --name jumo_front_prod ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jumo_front_prod:latest
 
       - name: Clean up unused Docker images after deployment
         run: |
@@ -83,7 +88,10 @@ jobs:
 
       - name: Run new Docker container
         run: |
-          docker run --rm -it -d -p 80:3000 --name jumo_front_prod ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jumo_front_prod:latest
+          docker run --rm -it -d -p 80:3000 \          
+          -e SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
+          -e DEEPL_API_KEY=${{ secrets.DEEPL_API_KEY }} \
+          --name jumo_front_prod ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jumo_front_prod:latest
 
       - name: Clean up unused Docker images after deployment
         run: |
