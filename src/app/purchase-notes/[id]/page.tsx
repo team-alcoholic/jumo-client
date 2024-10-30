@@ -92,10 +92,10 @@ export default async function PurchaseNotePage({
 
   const { content, user, createdAt, liquor } = note.purchaseNote;
 
-  const text = `${user.profileNickname}님이 ${formatDate(createdAt)}에 작성한 ${liquor.koName} 리뷰`;
+  const text = `${user.profileNickname}님이 ${formatFullDate(createdAt)}에 작성한 ${liquor.koName} 구매 노트`;
 
   const shareData = {
-    title: `${liquor.koName} 테이스팅 노트`,
+    title: `${liquor.koName} 구매 노트`,
     text,
     url: `${NOTE_URL}${id}`,
   };
@@ -119,7 +119,6 @@ export default async function PurchaseNotePage({
           />
           <Divider />
         </Stack>
-        {/* </Stack> */}
 
         {/* 이미지 */}
         {note.purchaseNote.noteImages && note.purchaseNote.noteImages.length ? (
@@ -131,15 +130,7 @@ export default async function PurchaseNotePage({
             />
           </Box>
         ) : null}
-        {/* 
-      <Stack
-        maxWidth="sm"
-        sx={{
-          margin: "10px 0",
-          padding: 0,
-          gap: "30px",
-        }}
-      > */}
+
         <Stack sx={{ gap: "30px" }}>
           {/* 주류 정보 */}
           <Stack sx={{ gap: "8px" }}>

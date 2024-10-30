@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { useRef, useState } from "react";
 import useObserver from "@/hooks/useObserver";
-import { formatDateTime } from "@/utils/format";
+import { formatDateTime, formatFullDateTime } from "@/utils/format";
 import Image from "next/image";
 
 export default function TastingNoteCard({ note }: { note: TastingNote }) {
@@ -41,7 +41,7 @@ export default function TastingNoteCard({ note }: { note: TastingNote }) {
               {note.user.profileNickname}님이 {note.liquor.koName}을 마셨어요.
             </ContentTypography>
             <Typography sx={{ fontSize: { xs: "10px", md: "12px" } }}>
-              {formatDateTime(note.createdAt)}
+              {formatFullDateTime(note.createdAt)}
             </Typography>
           </Box>
 

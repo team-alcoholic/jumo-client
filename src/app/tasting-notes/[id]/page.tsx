@@ -1,11 +1,16 @@
-import React from "react";
-import { Box, Container, Stack, Typography } from "@mui/material";
-import { GiNoseSide, GiTongue } from "react-icons/gi";
+import React, { Fragment } from "react";
+import {
+  Box,
+  Chip,
+  Container,
+  Divider,
+  Rating,
+  Stack,
+  styled,
+  Typography,
+} from "@mui/material";
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
-import { HiOutlineLightBulb } from "react-icons/hi";
-import NotesSection from "@/components/TastingNotesComponent/NotesSection";
-import { MdOutlineStickyNote2 } from "react-icons/md";
-import { formatDate } from "@/utils/format";
+import { formatDate, formatFullDate } from "@/utils/format";
 import EditButton from "@/components/TastingNotesComponent/EditButton";
 import { notFound } from "next/navigation";
 import ShareButton from "@/components/Button/ShareButton";
@@ -13,9 +18,14 @@ import { Metadata } from "next";
 import Link from "next/link";
 import TastingNotesButton from "@/components/Button/tastingNotesButton";
 import PageTitleComponent from "@/components/LayoutComponents/PageTitleComponent";
+import { LiquorList } from "@/components/NoteComponent/LiquorList";
+import ImageSlider from "@/components/ImageSlider/ImageSlider";
+import UserInfoComponent from "@/components/NoteComponent/UserInfoComponent";
+import { LiquorInfoComponent } from "@/components/NoteComponent/LiquorInfoComponent";
+import KeyValueInfoComponent from "@/components/KeyValueInfoComponent/KeyValueInfoComponent";
 
 const NOTE_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/v2/notes/";
-const NOTE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/tasting-notes/";
+const NOTE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/purchase-notes/";
 const LIQUOR_URL = process.env.NEXT_PUBLIC_BASE_URL + "/liquors/";
 
 /** 노트 상세 조회 API 호출 함수 */
@@ -44,7 +54,7 @@ export async function generateMetadata({
   const { user, createdAt, liquor } = note.tastingNote;
 
   const title = `${liquor.koName} 테이스팅 노트`;
-  const description = `${user.profileNickname}님이 ${formatDate(createdAt)}에 작성한 ${liquor.koName} 리뷰`;
+  const description = `${user.profileNickname}님이 ${formatDate(createdAt)}에 작성한 ${liquor.koName} 테이스팅 노트`;
   const url = `${NOTE_URL}${params.id}`;
 
   return {
@@ -80,12 +90,11 @@ export async function generateMetadata({
 export default async function TastingNotePage({
   params: { id },
 }: PostPageProps) {
-  const note = await getNote(id);
+  const note: Note = await getNote(id);
 
-  const { score, nose, palate, finish, content, user, createdAt, liquor } =
-    note.tastingNote;
+  const { content, user, createdAt, liquor } = note.tastingNote;
 
-  const text = `${user.profileNickname}님이 ${formatDate(createdAt)}에 작성한 ${liquor.koName} 리뷰`;
+  const text = `${user.profileNickname}님이 ${formatFullDate(createdAt)}에 작성한 ${liquor.koName} 테이스팅 노트`;
 
   const shareData = {
     title: `${liquor.koName} 테이스팅 노트`,
@@ -94,105 +103,304 @@ export default async function TastingNotePage({
   };
 
   return (
-    <Stack>
+    <Stack sx={{ marginBottom: "50px" }}>
       <PageTitleComponent title="테이스팅 노트" />
-      <Container maxWidth="sm" sx={{ margin: "20px 0", padding: 0 }}>
-        <Link
-          href={LIQUOR_URL + liquor.id}
-          passHref
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <LiquorTitle
-            thumbnailImageUrl={liquor?.thumbnailImageUrl}
-            koName={liquor.koName}
-            type={liquor?.type || null}
-            abv={liquor?.abv || null}
-            volume={liquor?.volume || null}
-            country={liquor?.country || null}
-            region={liquor?.region || null}
-            grapeVariety={liquor?.grapeVariety || null}
+      <Stack
+        maxWidth="sm"
+        sx={{
+          margin: "10px 0",
+          padding: 0,
+          gap: "30px",
+        }}
+      >
+        {/* 사용자 정보 */}
+        <Stack sx={{ gap: "10px" }}>
+          <UserInfoComponent
+            user={user}
+            createdAt={note.tastingNote.createdAt}
           />
-        </Link>
+          <Divider />
+        </Stack>
 
-        <ShareButton
+        {/* 이미지 */}
+        {note.tastingNote.noteImages && note.tastingNote.noteImages.length ? (
+          <Box>
+            <ImageSlider
+              images={note.tastingNote.noteImages.map((image) => image.fileUrl)}
+            />
+          </Box>
+        ) : null}
+
+        <Stack sx={{ gap: "30px" }}>
+          {/* 주류 정보 */}
+          <Stack sx={{ gap: "8px" }}>
+            <Typography
+              sx={{
+                padding: "0 10px",
+                fontSize: { xs: "18px", md: "20px" },
+                fontWeight: "600",
+              }}
+            >
+              감상한 주류
+            </Typography>
+            <Link
+              href={LIQUOR_URL + liquor.id}
+              passHref
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <LiquorInfoComponent
+                thumbnailImageUrl={liquor?.thumbnailImageUrl}
+                koName={liquor.koName}
+                type={liquor?.type || null}
+                abv={liquor?.abv || null}
+                volume={liquor?.volume || null}
+                country={liquor?.country || null}
+                region={liquor?.region || null}
+                grapeVariety={liquor?.grapeVariety || null}
+              />
+            </Link>
+          </Stack>
+
+          {/* 테이스팅 정보 */}
+          <Stack sx={{ padding: "0 10px", gap: "8px" }}>
+            <Typography
+              sx={{ fontSize: { xs: "18px", md: "20px" }, fontWeight: "600" }}
+            >
+              테이스팅 정보
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "row", gap: "5px" }}>
+              <KeyValueInfoComponent
+                keyContent={"테이스팅 일자"}
+                valueContent={
+                  note.tastingNote.tastingAt
+                    ? formatFullDate(note.tastingNote.tastingAt)
+                    : "-"
+                }
+                keyMinWidth={85}
+              />
+            </Box>
+            <Box sx={{ display: "flex", flexDirection: "row", gap: "5px" }}>
+              <KeyValueInfoComponent
+                keyContent={"테이스팅 장소"}
+                valueContent={
+                  note.tastingNote.place ? note.tastingNote.place : "-"
+                }
+                keyMinWidth={85}
+              />
+            </Box>
+            <Box sx={{ display: "flex", flexDirection: "row", gap: "5px" }}>
+              <KeyValueInfoComponent
+                keyContent={"테이스팅 방법"}
+                valueContent={
+                  note.tastingNote.method ? note.tastingNote.method : "-"
+                }
+                keyMinWidth={85}
+              />
+            </Box>
+          </Stack>
+
+          {/* 테이스팅 노트 */}
+          <Stack sx={{ gap: "8px" }}>
+            <Typography
+              sx={{
+                padding: "0 10px",
+                fontSize: { xs: "18px", md: "20px" },
+                fontWeight: "600",
+              }}
+            >
+              테이스팅 노트
+            </Typography>
+
+            {/* 점수 */}
+            <Box
+              sx={{
+                padding: "0 10px",
+                display: "flex",
+                flexDirection: "row",
+                gap: "20px",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "15px", md: "18px" },
+                  color: "gray",
+                  // overflow: "hidden",
+                  // whiteSpace: "nowrap",
+                  // textOverflow: "ellipsis",
+                }}
+              >
+                점수
+              </Typography>
+              <Rating
+                name="read-only"
+                value={note.tastingNote.score}
+                size="small"
+                readOnly
+              />
+            </Box>
+
+            {/* 테이스팅 칩 */}
+            <Box
+              sx={{
+                padding: "10px",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 0.5,
+                width: "100%",
+                backgroundColor: "whitesmoke",
+                borderRadius: "5px",
+              }}
+            >
+              {note.tastingNote.noteAromas &&
+              note.tastingNote.noteAromas.length ? (
+                note.tastingNote.noteAromas.map((aroma: Aroma, index) => (
+                  <Chip
+                    sx={{ margin: "2px", color: "black", fontSize: "12px" }}
+                    // size="small"
+                    key={index}
+                    label={aroma.name}
+                  />
+                ))
+              ) : (
+                <Typography
+                  color="textSecondary" // 연한 색상 사용
+                  align="center"
+                  sx={{ fontSize: "12px", fontWeight: 400 }} // 크기를 더 작게 설정
+                >
+                  선택된 아로마가 없습니다.
+                </Typography>
+              )}
+            </Box>
+
+            {/* 본문 */}
+            {!note.tastingNote.isDetail ? (
+              <Box
+                sx={{
+                  padding: "20px",
+                  borderRadius: "5px",
+                  backgroundColor: "whitesmoke",
+                }}
+              >
+                <Typography sx={{ fontSize: { xs: "15px", md: "18px" } }}>
+                  {note.tastingNote.content}
+                </Typography>
+              </Box>
+            ) : null}
+          </Stack>
+        </Stack>
+
+        {/* 상세 테이스팅 노트 */}
+        {note.tastingNote.isDetail ? (
+          <Stack sx={{ gap: "8px" }}>
+            <Typography
+              sx={{
+                padding: "0 10px",
+                fontSize: { xs: "18px", md: "20px" },
+                fontWeight: "600",
+              }}
+            >
+              상세 테이스팅 노트
+            </Typography>
+
+            {/* 노즈 */}
+            <Stack
+              sx={{
+                padding: "20px",
+                borderRadius: "5px",
+                backgroundColor: "whitesmoke",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "15px", md: "18px" },
+                  color: "gray",
+                  fontStyle: "italic",
+                }}
+              >
+                Nose
+              </Typography>
+              <Typography sx={{ fontSize: { xs: "15px", md: "18px" } }}>
+                {note.tastingNote.nose ? note.tastingNote.nose : "-"}
+              </Typography>
+            </Stack>
+
+            {/* 팔레트 */}
+            <Stack
+              sx={{
+                padding: "20px",
+                borderRadius: "5px",
+                backgroundColor: "whitesmoke",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "15px", md: "18px" },
+                  color: "gray",
+                  fontStyle: "italic",
+                }}
+              >
+                Palate
+              </Typography>
+              <Typography sx={{ fontSize: { xs: "15px", md: "18px" } }}>
+                {note.tastingNote.palate ? note.tastingNote.palate : "-"}
+              </Typography>
+            </Stack>
+
+            {/* 피니시 */}
+            <Stack
+              sx={{
+                padding: "20px",
+                borderRadius: "5px",
+                backgroundColor: "whitesmoke",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "15px", md: "18px" },
+                  color: "gray",
+                  fontStyle: "italic",
+                }}
+              >
+                Finish
+              </Typography>
+              <Typography sx={{ fontSize: { xs: "15px", md: "18px" } }}>
+                {note.tastingNote.finish ? note.tastingNote.finish : "-"}
+              </Typography>
+            </Stack>
+
+            {/* 총평 */}
+            <Stack
+              sx={{
+                padding: "20px",
+                borderRadius: "5px",
+                backgroundColor: "whitesmoke",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "15px", md: "18px" },
+                  color: "gray",
+                  fontStyle: "italic",
+                }}
+              >
+                Overall
+              </Typography>
+              <Typography sx={{ fontSize: { xs: "15px", md: "18px" } }}>
+                {note.tastingNote.content ? note.tastingNote.content : "-"}
+              </Typography>
+            </Stack>
+          </Stack>
+        ) : null}
+
+        {/* 버튼 그룹 */}
+        {/* <ShareButton
           title={shareData.title}
           text={shareData.text}
           url={shareData.url}
         />
-        <TastingNotesButton link={NOTE_URL + "new?liquorId=" + liquor.id} />
-
-        <Typography
-          variant="body2"
-          gutterBottom
-          sx={{
-            paddingTop: "5px",
-            paddingBottom: "5px",
-            textAlign: "right",
-            color: "grey.600",
-            fontStyle: "italic",
-          }}
-        >
-          {user.profileNickname}님이 {formatDate(createdAt)}에 작성함
-        </Typography>
-        <NotesSection
-          title="향 (Nose)"
-          icon={
-            <Box
-              component="span"
-              sx={{ verticalAlign: "middle", marginRight: 1 }}
-            >
-              <GiNoseSide />
-            </Box>
-          }
-          score={score}
-          notes={[]}
-          formattedDescription={nose}
-        />
-        <NotesSection
-          title="맛 (Palate)"
-          icon={
-            <Box
-              component="span"
-              sx={{ verticalAlign: "middle", marginRight: 1 }}
-            >
-              <GiTongue />
-            </Box>
-          }
-          score={score}
-          notes={[]}
-          formattedDescription={palate}
-        />
-        <NotesSection
-          title="여운 (Finish)"
-          icon={
-            <Box
-              component="span"
-              sx={{ verticalAlign: "middle", marginRight: 1 }}
-            >
-              <HiOutlineLightBulb />
-            </Box>
-          }
-          score={score}
-          notes={[]}
-          formattedDescription={finish}
-        />
-        <NotesSection
-          title="총평"
-          icon={
-            <Box
-              component="span"
-              sx={{ verticalAlign: "middle", marginRight: 1 }}
-            >
-              <MdOutlineStickyNote2 />
-            </Box>
-          }
-          notes={[]}
-          score={score}
-          formattedDescription={content}
-        />
-        {/* {mood && <MoodSelectedComponent mood={mood} />} */}
-        <EditButton user={user} />
-      </Container>
+        <TastingNotesButton link={NOTE_URL + "new?liquorId=" + liquor.id} /> */}
+        {/* <EditButton user={user} /> */}
+      </Stack>
     </Stack>
   );
 }

@@ -21,6 +21,7 @@ import PurchaseNoteCard from "@/components/NoteCard/PurchaseNoteCard";
 import TastingNoteCard from "@/components/NoteCard/TastingNoteCard";
 import { ShoppingCartOutlined, WineBarOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
+import NoteCardSkeleton from "@/components/NoteCard/NoteCardSkeleton";
 
 /** MeetingListResponse와 MeetingInfo 타입 정의 (필요한 경우 추가) */
 interface pageParamType {
@@ -171,7 +172,7 @@ export default function NotesFeedPage() {
             return (
               <List>
                 {Array.from({ length: 30 }).map((_, i) => (
-                  <MeetingCardSkeleton key={i} />
+                  <NoteCardSkeleton key={i} />
                 ))}
               </List>
             );
@@ -208,7 +209,7 @@ export default function NotesFeedPage() {
       {isFetchingNextPage && (
         <div>
           {Array.from({ length: 30 }).map((_, i) => (
-            <MeetingCardSkeleton key={i} />
+            <NoteCardSkeleton key={i} />
           ))}
         </div>
       )}

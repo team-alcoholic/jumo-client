@@ -426,7 +426,7 @@ export default function NewTastingNotePage() {
 
         {/* 감상 방법 */}
         <Stack sx={{ gap: "10px" }}>
-          <Typography>어떻게 마셨나요?</Typography>
+          <Typography>어떤 방법으로 마셨나요?</Typography>
           <TextField
             label="감상 방법"
             variant="outlined"
@@ -496,7 +496,7 @@ export default function NewTastingNotePage() {
 
         {/* 본문 및 이미지 */}
         <Stack sx={{ gap: "10px" }}>
-          <Typography>후기를 자유롭게 작성해주세요.</Typography>
+          <Typography>테이스팅 노트를 자유롭게 작성해주세요.</Typography>
 
           {/* 이미지 목록 */}
           {noteImages.length ? (

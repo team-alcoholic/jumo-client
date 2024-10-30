@@ -3,7 +3,7 @@
 import { Box, Link, Stack, styled, Typography } from "@mui/material";
 import { useRef, useState } from "react";
 import useObserver from "@/hooks/useObserver";
-import { formatDateTime } from "@/utils/format";
+import { formatDateTime, formatFullDateTime } from "@/utils/format";
 import Image from "next/image";
 
 export default function PurchaseNoteCard({ note }: { note: PurchaseNote }) {
@@ -32,7 +32,7 @@ export default function PurchaseNoteCard({ note }: { note: PurchaseNote }) {
               {note.user.profileNickname}님이 {note.liquor.koName}을 구매했어요.
             </ContentTypography>
             <Typography sx={{ fontSize: { xs: "10px", md: "12px" } }}>
-              {formatDateTime(note.createdAt)}
+              {formatFullDateTime(note.createdAt)}
             </Typography>
           </Box>
 
