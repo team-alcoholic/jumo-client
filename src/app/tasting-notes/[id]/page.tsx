@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Container, Stack, Typography } from "@mui/material";
 import { GiNoseSide, GiTongue } from "react-icons/gi";
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
 import { HiOutlineLightBulb } from "react-icons/hi";
@@ -12,6 +12,7 @@ import ShareButton from "@/components/Button/ShareButton";
 import { Metadata } from "next";
 import Link from "next/link";
 import TastingNotesButton from "@/components/Button/tastingNotesButton";
+import PageTitleComponent from "@/components/LayoutComponents/PageTitleComponent";
 
 const NOTE_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/v2/notes/";
 const NOTE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/tasting-notes/";
@@ -93,102 +94,105 @@ export default async function TastingNotePage({
   };
 
   return (
-    <Container maxWidth="sm" sx={{ margin: "40px 0", padding: 0 }}>
-      <Link
-        href={LIQUOR_URL + liquor.id}
-        passHref
-        style={{ textDecoration: "none", color: "inherit" }}
-      >
-        <LiquorTitle
-          thumbnailImageUrl={liquor?.thumbnailImageUrl}
-          koName={liquor.koName}
-          type={liquor?.type || null}
-          abv={liquor?.abv || null}
-          volume={liquor?.volume || null}
-          country={liquor?.country || null}
-          region={liquor?.region || null}
-          grapeVariety={liquor?.grapeVariety || null}
+    <Stack>
+      <PageTitleComponent title="테이스팅 노트" />
+      <Container maxWidth="sm" sx={{ margin: "20px 0", padding: 0 }}>
+        <Link
+          href={LIQUOR_URL + liquor.id}
+          passHref
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <LiquorTitle
+            thumbnailImageUrl={liquor?.thumbnailImageUrl}
+            koName={liquor.koName}
+            type={liquor?.type || null}
+            abv={liquor?.abv || null}
+            volume={liquor?.volume || null}
+            country={liquor?.country || null}
+            region={liquor?.region || null}
+            grapeVariety={liquor?.grapeVariety || null}
+          />
+        </Link>
+
+        <ShareButton
+          title={shareData.title}
+          text={shareData.text}
+          url={shareData.url}
         />
-      </Link>
+        <TastingNotesButton link={NOTE_URL + "new?liquorId=" + liquor.id} />
 
-      <ShareButton
-        title={shareData.title}
-        text={shareData.text}
-        url={shareData.url}
-      />
-      <TastingNotesButton link={NOTE_URL + "new?liquorId=" + liquor.id} />
-
-      <Typography
-        variant="body2"
-        gutterBottom
-        sx={{
-          paddingTop: "5px",
-          paddingBottom: "5px",
-          textAlign: "right",
-          color: "grey.600",
-          fontStyle: "italic",
-        }}
-      >
-        {user.profileNickname}님이 {formatDate(createdAt)}에 작성함
-      </Typography>
-      <NotesSection
-        title="향 (Nose)"
-        icon={
-          <Box
-            component="span"
-            sx={{ verticalAlign: "middle", marginRight: 1 }}
-          >
-            <GiNoseSide />
-          </Box>
-        }
-        score={score}
-        notes={[]}
-        formattedDescription={nose}
-      />
-      <NotesSection
-        title="맛 (Palate)"
-        icon={
-          <Box
-            component="span"
-            sx={{ verticalAlign: "middle", marginRight: 1 }}
-          >
-            <GiTongue />
-          </Box>
-        }
-        score={score}
-        notes={[]}
-        formattedDescription={palate}
-      />
-      <NotesSection
-        title="여운 (Finish)"
-        icon={
-          <Box
-            component="span"
-            sx={{ verticalAlign: "middle", marginRight: 1 }}
-          >
-            <HiOutlineLightBulb />
-          </Box>
-        }
-        score={score}
-        notes={[]}
-        formattedDescription={finish}
-      />
-      <NotesSection
-        title="총평"
-        icon={
-          <Box
-            component="span"
-            sx={{ verticalAlign: "middle", marginRight: 1 }}
-          >
-            <MdOutlineStickyNote2 />
-          </Box>
-        }
-        notes={[]}
-        score={score}
-        formattedDescription={content}
-      />
-      {/* {mood && <MoodSelectedComponent mood={mood} />} */}
-      <EditButton user={user} />
-    </Container>
+        <Typography
+          variant="body2"
+          gutterBottom
+          sx={{
+            paddingTop: "5px",
+            paddingBottom: "5px",
+            textAlign: "right",
+            color: "grey.600",
+            fontStyle: "italic",
+          }}
+        >
+          {user.profileNickname}님이 {formatDate(createdAt)}에 작성함
+        </Typography>
+        <NotesSection
+          title="향 (Nose)"
+          icon={
+            <Box
+              component="span"
+              sx={{ verticalAlign: "middle", marginRight: 1 }}
+            >
+              <GiNoseSide />
+            </Box>
+          }
+          score={score}
+          notes={[]}
+          formattedDescription={nose}
+        />
+        <NotesSection
+          title="맛 (Palate)"
+          icon={
+            <Box
+              component="span"
+              sx={{ verticalAlign: "middle", marginRight: 1 }}
+            >
+              <GiTongue />
+            </Box>
+          }
+          score={score}
+          notes={[]}
+          formattedDescription={palate}
+        />
+        <NotesSection
+          title="여운 (Finish)"
+          icon={
+            <Box
+              component="span"
+              sx={{ verticalAlign: "middle", marginRight: 1 }}
+            >
+              <HiOutlineLightBulb />
+            </Box>
+          }
+          score={score}
+          notes={[]}
+          formattedDescription={finish}
+        />
+        <NotesSection
+          title="총평"
+          icon={
+            <Box
+              component="span"
+              sx={{ verticalAlign: "middle", marginRight: 1 }}
+            >
+              <MdOutlineStickyNote2 />
+            </Box>
+          }
+          notes={[]}
+          score={score}
+          formattedDescription={content}
+        />
+        {/* {mood && <MoodSelectedComponent mood={mood} />} */}
+        <EditButton user={user} />
+      </Container>
+    </Stack>
   );
 }

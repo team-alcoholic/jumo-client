@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -12,7 +14,8 @@ export default function PageTitleComponent({ title }: { title: string }) {
     <Stack>
       <Box
         sx={{
-          padding: "30px 0",
+          paddingTop: "30px",
+          paddingBottom: "10px",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
@@ -29,7 +32,7 @@ export default function PageTitleComponent({ title }: { title: string }) {
         </Typography>
       </Box>
 
-      <Divider />
+      {/* <Divider /> */}
     </Stack>
   );
 }

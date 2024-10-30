@@ -9,6 +9,7 @@ export default function KeyValueInfoComponent({
     <Box sx={{ display: "flex", flexDirection: "row", gap: "20px" }}>
       <Typography
         sx={{
+          fontSize: { xs: "15px", md: "18px" },
           minWidth: `${keyMinWidth}px`,
           color: "gray",
           overflow: "hidden",
@@ -20,6 +21,7 @@ export default function KeyValueInfoComponent({
       </Typography>
       <Typography
         sx={{
+          fontSize: { xs: "15px", md: "18px" },
           overflow: "hidden",
           whiteSpace: "nowrap",
           textOverflow: "ellipsis",
