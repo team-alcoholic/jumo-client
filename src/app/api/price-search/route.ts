@@ -59,7 +59,8 @@ type StoreType =
   | "traders"
   | "getju"
   | "emart"
-  | "lottemart";
+  | "lottemart"
+  | "biccamera";
 
 export async function GET(request: NextRequest) {
   const params = {
@@ -98,8 +99,10 @@ export async function GET(request: NextRequest) {
   try {
     let searchResult = await performSearch(params);
 
-    if (params.store === "mukawa" && searchResult) {
-      // 상품명만 번역하도록 수정
+    if (
+      (params.store === "mukawa" || params.store === "biccamera") &&
+      searchResult
+    ) {
       searchResult = await translateProductNames(searchResult);
     }
 
@@ -112,7 +115,10 @@ export async function GET(request: NextRequest) {
           ...params,
           query: firstValidWord,
         });
-        if (params.store === "mukawa" && searchResult) {
+        if (
+          (params.store === "mukawa" || params.store === "biccamera") &&
+          searchResult
+        ) {
           searchResult = await translateProductNames(searchResult);
         }
       }
@@ -220,6 +226,8 @@ function getSearchUrl(
       `https://hbsinvtje8.execute-api.ap-northeast-2.amazonaws.com/ps/search/products?offset=${
         (p - 1) * ps
       }&limit=${ps}&store_id=1090&biztp=1100&search_term=${encodeURIComponent(q)}&sort_type=sale`,
+    biccamera: (q: string) =>
+      `https://www.biccamera.com/bc/category/?q=${encodeURIComponent(q.replace(/ /g, "+"))}`,
   };
 
   const urlGenerator = urls[store];
@@ -424,6 +432,20 @@ async function performSearch({
     const buffer = await response.arrayBuffer();
     const decodedHtml = iconv.decode(Buffer.from(buffer), "euc-jp");
     results = parseMukawaHtml(decodedHtml);
+  } else if (store === "biccamera") {
+    response = await fetch(url, {
+      headers: {
+        "User-Agent": "PostmanRuntime/7.42.0",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`빅카메라 API 요청 실패: ${response.status}`);
+    }
+
+    const buffer = await response.arrayBuffer();
+    const decodedHtml = iconv.decode(Buffer.from(buffer), "shift-jis");
+    results = parseBiccameraHtml(decodedHtml);
   } else {
     // dailyshot, traders, emart는 기존 방식 유지
     response = await fetch(url);
@@ -483,6 +505,32 @@ function parseMukawaHtml(html: string) {
   });
 
   return results;
+}
+
+// 빅카메라 HTML 파싱 함수 추가
+function parseBiccameraHtml(html: string) {
+  const dom = new JSDOM(html);
+  const document = dom.window.document;
+  const productItems = document.querySelectorAll(".prod_box");
+
+  const results = Array.from(productItems).map((item) => {
+    const element = item as Element;
+    const name = element.querySelector(".bcs_title a")?.textContent?.trim();
+    const priceText = element
+      .querySelector(".bcs_price .val")
+      ?.textContent?.trim();
+    const price = priceText ? parseInt(priceText.replace(/[^0-9]/g, "")) : 0;
+    // URL 중복 제거
+    const urlPath =
+      element.querySelector(".bcs_title a")?.getAttribute("href") || "";
+    const url = urlPath.startsWith("http")
+      ? urlPath
+      : `https://www.biccamera.com${urlPath}`;
+
+    return { name, price, url };
+  });
+
+  return results.filter((item) => item.name && item.price);
 }
 
 interface SearchItem {

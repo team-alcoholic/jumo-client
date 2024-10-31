@@ -23,7 +23,8 @@ interface PriceInfoProps {
     | "cu"
     | "getju"
     | "lottemart"
-    | "emart";
+    | "emart"
+    | "biccamera";
 }
 
 const storeDisplayName = {
@@ -34,6 +35,7 @@ const storeDisplayName = {
   getju: "겟주",
   lottemart: "롯데마트",
   emart: "이마트",
+  biccamera: "빅카메라",
 };
 
 const PriceInfo: React.FC<PriceInfoProps> = ({
@@ -102,7 +104,7 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
       {store !== "traders" && store !== "lottemart" && store !== "emart" && (
         <Typography variant="body2" sx={{ mb: 1, color: "text.secondary" }}>
           클릭시 상세 페이지로 이동합니다.
-          {store === "mukawa" &&
+          {(store === "mukawa" || store === "biccamera") &&
             " 일본 사이트에서 정보를 가져와 번역하기에 오래 걸립니다."}
         </Typography>
       )}
@@ -133,7 +135,7 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
                     {item.name}
                   </TableCell>
                   <TableCell align="right">
-                    {store === "mukawa"
+                    {store === "mukawa" || store === "biccamera"
                       ? `${item.price.toLocaleString()} 엔`
                       : `${item.price.toLocaleString()} 원`}
                   </TableCell>
