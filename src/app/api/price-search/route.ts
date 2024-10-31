@@ -292,6 +292,70 @@ function parseLottemartHtml(html: string) {
   return results.filter((item) => item.name && item.price);
 }
 
+// 롯데마트 지점 정보 정의
+const LOTTEMART_STORES = [
+  { area: "서울", market: "301" },
+  { area: "경기", market: "471" },
+  { area: "서울", market: "334" },
+  { area: "서울", market: "307" },
+  { area: "경기", market: "415" },
+];
+
+async function performLottemartSearch(
+  query: string
+): Promise<SearchResultItem[]> {
+  const url =
+    "https://company.lottemart.com/mobiledowa/product/search_product.asp";
+
+  // 모든 지점에 대한 검색 요청을 병렬로 실행
+  const searchPromises = LOTTEMART_STORES.map(async ({ area, market }) => {
+    const formData = new URLSearchParams({
+      p_area: area,
+      p_market: market,
+      p_schWord: query,
+    });
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        console.error(
+          `롯데마트 ${area} ${market} 검색 실패: ${response.status}`
+        );
+        return [];
+      }
+
+      const html = await response.text();
+      return parseLottemartHtml(html);
+    } catch (error) {
+      console.error(`롯데마트 ${area} ${market} 검색 오류:`, error);
+      return [];
+    }
+  });
+
+  // 모든 검색 결과 대기
+  const allResults = await Promise.all(searchPromises);
+
+  // 결과 합치기 및 중복 제거 (상품명 기준)
+  const uniqueResults = new Map<string, SearchResultItem>();
+
+  allResults.flat().forEach((item) => {
+    const existingItem = uniqueResults.get(item.name);
+    if (!existingItem || item.price < existingItem.price) {
+      // 같은 상품이 있는 경우 더 낮은 가격으로 업데이트
+      uniqueResults.set(item.name, item);
+    }
+  });
+
+  return Array.from(uniqueResults.values());
+}
+
 async function performSearch({
   store,
   query,
@@ -303,6 +367,10 @@ async function performSearch({
   page: number;
   pageSize: number;
 }): Promise<SearchResultItem[]> {
+  if (store === "lottemart") {
+    return performLottemartSearch(query);
+  }
+
   const url = getSearchUrl(store, query, page, pageSize);
   if (!url) {
     throw new Error("지원하지 않는 스토어입니다.");
