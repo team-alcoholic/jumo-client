@@ -33,7 +33,7 @@ export default function NavigationComponent() {
   /** 네비게이션 바 옵션 객체 */
   const NAV_OPTIONS = [
     {
-      title: "JUMO",
+      title: "홈",
       link: "/",
       icon: function () {
         return (
@@ -75,25 +75,11 @@ export default function NavigationComponent() {
       },
     },
     {
-      title: "주류 가격 비교",
-      link: "/liquors",
+      title: "마이페이지",
+      link: "/mypage",
       icon: function () {
         return (
-          <Search
-            sx={{
-              fontSize: "20px",
-              color: pathName.startsWith(this.link) ? "black" : "gray",
-            }}
-          />
-        );
-      },
-    },
-    {
-      title: "주모 레포트",
-      link: "/report",
-      icon: function () {
-        return (
-          <EditNote
+          <AccountCircle
             sx={{
               fontSize: "20px",
               color: pathName.startsWith(this.link) ? "black" : "gray",
