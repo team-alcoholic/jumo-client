@@ -206,6 +206,7 @@ export default function ServiceIntroductionComponent() {
                   "CU",
                   "겟주",
                   "롯데마트",
+                  "이마트",
                 ].map((store) => (
                   <Chip
                     key={store}
@@ -267,7 +268,7 @@ export default function ServiceIntroductionComponent() {
                   color: "#E65100",
                 }}
               >
-                New! 겟주, 롯데마트 가격 비교 추가
+                New! 겟주, 롯데마트, 이마트 가격 비교 추가
               </Typography>
               <Typography
                 sx={{
@@ -276,7 +277,7 @@ export default function ServiceIntroductionComponent() {
                   letterSpacing: "-0.01em",
                 }}
               >
-                이제 겟주, 롯데마트의 주류 가격도 실시간으로 비교하실 수
+                이제 겟주, 롯데마트, 이마트의 주류 가격도 실시간으로 비교하실 수
                 있습니다. 더 많은 선택지에서 최저가를 찾아보세요!
               </Typography>
             </Box>
