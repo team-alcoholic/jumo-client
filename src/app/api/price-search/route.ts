@@ -58,6 +58,7 @@ type StoreType =
   | "cu"
   | "traders"
   | "getju"
+  | "emart"
   | "lottemart";
 
 export async function GET(request: NextRequest) {
@@ -218,6 +219,10 @@ function getSearchUrl(
       `https://www.getju.co.kr/shop/search_result.php?search_str=${encodeURIComponent(q)}`,
     lottemart: () =>
       `https://company.lottemart.com/mobiledowa/product/search_product.asp`,
+    emart: (q: string, p: number, ps: number) =>
+      `https://hbsinvtje8.execute-api.ap-northeast-2.amazonaws.com/ps/search/products?offset=${
+        (p - 1) * ps
+      }&limit=${ps}&store_id=1090&biztp=1100&search_term=${encodeURIComponent(q)}&sort_type=sale`,
   };
 
   const urlGenerator = urls[store];
@@ -449,7 +454,7 @@ async function performSearch({
       const decodedHtml = iconv.decode(Buffer.from(buffer), "euc-jp");
       results = parseMukawaHtml(decodedHtml);
     } else {
-      // dailyshot, traders는 기존 방식 유지
+      // dailyshot, traders, emart는 기존 방식 유지
       response = await fetch(url);
       if (!response.ok) {
         throw new Error(`API 요청 실패: ${response.status}`);
@@ -458,8 +463,12 @@ async function performSearch({
       const data = await response.json();
       if (store === "dailyshot") {
         results = data.results || [];
-      } else if (store === "traders") {
-        results = data.data || [];
+      } else if (store === "traders" || store === "emart") {
+        results = data.data.map((item: any) => ({
+          name: item.sku_nm,
+          price: item.sell_price,
+          soldOut: item.stock_status === "NO_STOCK",
+        }));
       } else {
         results = [];
       }
