@@ -37,7 +37,7 @@ export default async function LiquorDetailPage({
 }) {
   // 주류 데이터
   const liquor = await getLiquorInfo(id);
-  const userProfileNickname = liquor?.user?.profileNickname || "";
+  const userProfileNickname = liquor.user.profileNickname || "";
 
   return (
     <Stack
@@ -69,7 +69,7 @@ export default async function LiquorDetailPage({
         <Stack>
           <Stack sx={{ padding: "10px" }}>
             <Typography sx={{ color: "gray", fontSize: "10px" }}>
-              {userProfileNickname === "데일리샷" || !userProfileNickname
+              {userProfileNickname === "데일리샷"
                 ? "데일리샷 정보"
                 : userProfileNickname + "님이 등록한 정보"}
             </Typography>
