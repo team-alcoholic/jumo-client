@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(cachedResult.data);
   }
 
-  // 무카와인 경우 위스키 이름을 일본어로 번역
+  // ��카와인 경우 위스��� 이름을 일본어로 번역
   if (params.store === "mukawa" && params.query) {
     const translatedQuery = translateWhiskyNameToJapenese(params.query);
     params.query = translatedQuery.japanese || params.query;
@@ -133,6 +133,7 @@ interface SearchResultItem {
   price: number;
   url?: string;
   description?: string;
+  soldOut?: boolean;
   original?: {
     name: string;
   };
@@ -188,96 +189,8 @@ interface CUItem {
   };
 }
 
-async function performSearch({
-  store,
-  query,
-  page,
-  pageSize,
-}: {
-  store: "dailyshot" | "mukawa" | "cu" | "traders";
-  query: string;
-  page: number;
-  pageSize: number;
-}): Promise<SearchResultItem[]> {
-  const url = getSearchUrl(store, query, page, pageSize);
-  if (!url) {
-    throw new Error("지원하지 않는 스토어입니다.");
-  }
-
-  let response;
-  let results;
-
-  if (store === "cu") {
-    // CU는 POST 방식 사용
-    response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        searchWord: query,
-        prevSearchWord: query.split(" ")[0], // 첫 단어를 prevSearchWord로 사용
-        spellModifyUseYn: "Y",
-        offset: (page - 1) * pageSize,
-        limit: pageSize,
-        searchSort: "recom",
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`CU API 요청 실패: ${response.status}`);
-    }
-
-    const data = (await response.json()) as CUApiResponse;
-    results = data.data.cubarResult.result.rows.map((item: CUItem) => {
-      const fields = item.fields;
-      return {
-        name: fields.item_nm,
-        price: parseInt(fields.hyun_maega, 10),
-        url: `https://www.pocketcu.co.kr${fields.link_url}`,
-      };
-    });
-  } else if (store === "mukawa") {
-    // 무카와는 HTML 파싱을 사용
-    response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`무카와 API 요청 실패: ${response.status}`);
-    }
-
-    const buffer = await response.arrayBuffer();
-    const decodedHtml = iconv.decode(Buffer.from(buffer), "euc-jp");
-    results = parseMukawaHtml(decodedHtml);
-  } else {
-    // dailyshot, traders는 기존 방식 유지
-    response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`API 요청 실패: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (store === "dailyshot") {
-      results = data.results || [];
-    } else if (store === "traders") {
-      results = data.data || [];
-    } else {
-      results = [];
-    }
-  }
-
-  // 통일된 형식으로 변환
-  return results.map((item: SearchItem) => ({
-    name: item.name || item.sku_nm,
-    price: item.price || item.sell_price,
-    url: item.url || item.web_url || undefined,
-    description: item.description,
-    original: {
-      name: item.name,
-    },
-  }));
-}
-
 function getSearchUrl(
-  store: "dailyshot" | "mukawa" | "cu" | "traders",
+  store: "dailyshot" | "mukawa" | "cu" | "traders" | "getju",
   query: string,
   page: number,
   pageSize: number
@@ -292,10 +205,141 @@ function getSearchUrl(
       }&limit=${ps}&store_id=2006&biztp=1200&search_term=${q}&sort_type=recommend`,
     mukawa: (q: string) =>
       `https://mukawa-spirit.com/?mode=srh&cid=&keyword=${toEUCJPEncoding(q)}`,
+    getju: (q: string) =>
+      `https://www.getju.co.kr/shop/search_result.php?search_str=${encodeURIComponent(q)}`,
   };
 
   const urlGenerator = urls[store];
   return urlGenerator ? urlGenerator(query, page, pageSize) : null;
+}
+
+// getju HTML 파싱 함수 추가
+function parseGetjuHtml(html: string) {
+  const dom = new JSDOM(html);
+  const document = dom.window.document;
+  const productItems = document.querySelectorAll("#prd_basic li");
+
+  const results = Array.from(productItems).map((item) => {
+    const element = item as Element;
+    const name = element.querySelector(".info .name a")?.textContent?.trim();
+    const priceText = element
+      .querySelector(".price .sell strong")
+      ?.textContent?.trim();
+    const price = priceText ? parseInt(priceText.replace(/[^0-9]/g, "")) : 0;
+    const url =
+      "https://www.getju.co.kr" +
+      element.querySelector(".info .name a")?.getAttribute("href");
+    const type = element.querySelector(".info .type")?.textContent?.trim();
+    const isSoldOut = element.querySelector(".soldout") !== null;
+
+    return {
+      name,
+      price,
+      url,
+      type,
+      isSoldOut,
+    };
+  });
+
+  return results.filter((item) => item.name && item.price);
+}
+
+async function performSearch({
+  store,
+  query,
+  page,
+  pageSize,
+}: {
+  store: "dailyshot" | "mukawa" | "cu" | "traders" | "getju";
+  query: string;
+  page: number;
+  pageSize: number;
+}): Promise<SearchResultItem[]> {
+  const url = getSearchUrl(store, query, page, pageSize);
+  if (!url) {
+    throw new Error("지원하지 않는 스토어입니다.");
+  }
+
+  let response;
+  let results;
+
+  if (store === "getju") {
+    response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`겟주 API 요청 실패: ${response.status}`);
+    }
+    const html = await response.text();
+    results = parseGetjuHtml(html);
+  } else {
+    if (store === "cu") {
+      // CU는 POST 방식 사용
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          searchWord: query,
+          prevSearchWord: query.split(" ")[0], // 첫 단어를 prevSearchWord로 사용
+          spellModifyUseYn: "Y",
+          offset: (page - 1) * pageSize,
+          limit: pageSize,
+          searchSort: "recom",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`CU API 요청 실패: ${response.status}`);
+      }
+
+      const data = (await response.json()) as CUApiResponse;
+      results = data.data.cubarResult.result.rows.map((item: CUItem) => {
+        const fields = item.fields;
+        return {
+          name: fields.item_nm,
+          price: parseInt(fields.hyun_maega, 10),
+          url: `https://www.pocketcu.co.kr${fields.link_url}`,
+        };
+      });
+    } else if (store === "mukawa") {
+      // 무카와는 HTML 파싱을 사용
+      response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`무카와 API 요청 실패: ${response.status}`);
+      }
+
+      const buffer = await response.arrayBuffer();
+      const decodedHtml = iconv.decode(Buffer.from(buffer), "euc-jp");
+      results = parseMukawaHtml(decodedHtml);
+    } else {
+      // dailyshot, traders는 기존 방식 유지
+      response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`API 요청 실패: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (store === "dailyshot") {
+        results = data.results || [];
+      } else if (store === "traders") {
+        results = data.data || [];
+      } else {
+        results = [];
+      }
+    }
+  }
+
+  // 통일된 형식으로 변환
+  return results.map((item: SearchItem & { isSoldOut?: boolean }) => ({
+    name: item.name || item.sku_nm,
+    price: item.price || item.sell_price,
+    url: item.url || item.web_url || undefined,
+    description: item.description,
+    soldOut: item.isSoldOut || false,
+    original: {
+      name: item.name,
+    },
+  }));
 }
 
 function parseMukawaHtml(html: string) {

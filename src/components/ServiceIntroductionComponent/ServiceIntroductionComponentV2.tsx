@@ -199,22 +199,24 @@ export default function ServiceIntroductionComponent() {
                 지원 매장
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                {["트레이더스", "데일리샷", "무카와", "CU"].map((store) => (
-                  <Chip
-                    key={store}
-                    label={store}
-                    sx={{
-                      bgcolor: "grey.100",
-                      color: "grey.900",
-                      fontWeight: 600,
-                      fontSize: "13px",
-                      height: "28px",
-                      "&:hover": {
-                        bgcolor: "grey.200",
-                      },
-                    }}
-                  />
-                ))}
+                {["트레이더스", "데일리샷", "무카와", "CU", "겟주"].map(
+                  (store) => (
+                    <Chip
+                      key={store}
+                      label={store}
+                      sx={{
+                        bgcolor: "grey.100",
+                        color: "grey.900",
+                        fontWeight: 600,
+                        fontSize: "13px",
+                        height: "28px",
+                        "&:hover": {
+                          bgcolor: "grey.200",
+                        },
+                      }}
+                    />
+                  )
+                )}
               </Stack>
             </Box>
           </Box>

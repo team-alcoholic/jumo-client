@@ -16,7 +16,7 @@ import axios from "axios";
 
 interface PriceInfoProps {
   liquorName: string;
-  store?: "dailyshot" | "traders" | "mukawa" | "cu";
+  store?: "dailyshot" | "traders" | "mukawa" | "cu" | "getju";
 }
 
 const storeDisplayName = {
@@ -24,6 +24,7 @@ const storeDisplayName = {
   traders: "트레이더스",
   mukawa: "무카와",
   cu: "CU",
+  getju: "겟주",
 };
 
 const PriceInfo: React.FC<PriceInfoProps> = ({
