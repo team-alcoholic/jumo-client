@@ -64,11 +64,8 @@ type StoreType =
 export async function GET(request: NextRequest) {
   const params = {
     query: request.nextUrl.searchParams.get("q") || "",
-    store: (request.nextUrl.searchParams.get("store") || "dailyshot") as
-      | "dailyshot"
-      | "mukawa"
-      | "cu"
-      | "traders",
+    store: (request.nextUrl.searchParams.get("store") ||
+      "dailyshot") as StoreType,
     page: parseInt(request.nextUrl.searchParams.get("page") || "1"),
     pageSize: parseInt(request.nextUrl.searchParams.get("pageSize") || "12"),
   };
@@ -391,87 +388,60 @@ async function performSearch({
     }
     const html = await response.text();
     results = parseGetjuHtml(html);
-  } else if (store === "lottemart") {
-    const formData = new URLSearchParams({
-      p_area: "서울",
-      p_market: "301",
-      p_schWord: query,
-    });
-
+  } else if (store === "cu") {
+    // CU는 POST 방식 사용
     response = await fetch(url, {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
-      body: formData,
+      body: JSON.stringify({
+        searchWord: query,
+        prevSearchWord: query.split(" ")[0],
+        spellModifyUseYn: "Y",
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
+        searchSort: "recom",
+      }),
     });
 
     if (!response.ok) {
-      throw new Error(`롯데마트 API 요청 실패: ${response.status}`);
+      throw new Error(`CU API 요청 실패: ${response.status}`);
     }
 
-    const html = await response.text();
-    results = parseLottemartHtml(html);
+    const data = (await response.json()) as CUApiResponse;
+    results = data.data.cubarResult.result.rows.map((item: CUItem) => ({
+      name: item.fields.item_nm,
+      price: parseInt(item.fields.hyun_maega, 10),
+      url: `https://www.pocketcu.co.kr${item.fields.link_url}`,
+    }));
+  } else if (store === "mukawa") {
+    response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`무카와 API 요청 실패: ${response.status}`);
+    }
+
+    const buffer = await response.arrayBuffer();
+    const decodedHtml = iconv.decode(Buffer.from(buffer), "euc-jp");
+    results = parseMukawaHtml(decodedHtml);
   } else {
-    if (store === "cu") {
-      // CU는 POST 방식 사용
-      response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          searchWord: query,
-          prevSearchWord: query.split(" ")[0], // 첫 단어를 prevSearchWord로 사용
-          spellModifyUseYn: "Y",
-          offset: (page - 1) * pageSize,
-          limit: pageSize,
-          searchSort: "recom",
-        }),
-      });
+    // dailyshot, traders, emart는 기존 방식 유지
+    response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`API 요청 실패: ${response.status}`);
+    }
 
-      if (!response.ok) {
-        throw new Error(`CU API 요청 실패: ${response.status}`);
-      }
-
-      const data = (await response.json()) as CUApiResponse;
-      results = data.data.cubarResult.result.rows.map((item: CUItem) => {
-        const fields = item.fields;
-        return {
-          name: fields.item_nm,
-          price: parseInt(fields.hyun_maega, 10),
-          url: `https://www.pocketcu.co.kr${fields.link_url}`,
-        };
-      });
-    } else if (store === "mukawa") {
-      // 무카와는 HTML 파싱을 사용
-      response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`무카와 API 요청 실패: ${response.status}`);
-      }
-
-      const buffer = await response.arrayBuffer();
-      const decodedHtml = iconv.decode(Buffer.from(buffer), "euc-jp");
-      results = parseMukawaHtml(decodedHtml);
+    const data = await response.json();
+    if (store === "dailyshot") {
+      results = data.results || [];
+    } else if (store === "traders" || store === "emart") {
+      results = data.data.map((item: any) => ({
+        name: item.sku_nm,
+        price: item.sell_price,
+        soldOut: item.stock_status === "NO_STOCK",
+      }));
     } else {
-      // dailyshot, traders, emart는 기존 방식 유지
-      response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`API 요청 실패: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (store === "dailyshot") {
-        results = data.results || [];
-      } else if (store === "traders" || store === "emart") {
-        results = data.data.map((item: any) => ({
-          name: item.sku_nm,
-          price: item.sell_price,
-          soldOut: item.stock_status === "NO_STOCK",
-        }));
-      } else {
-        results = [];
-      }
+      results = [];
     }
   }
 
