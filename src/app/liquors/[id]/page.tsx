@@ -91,6 +91,10 @@ export default async function LiquorDetailPage({
         <PriceInfo liquorName={liquor.koName || ""} store="dailyshot" />
         <PriceInfo liquorName={liquor.koName || ""} store="mukawa" />
         <PriceInfo liquorName={liquor.koName || ""} store="cu" />
+        <PriceInfo liquorName={liquor.koName || ""} store="getju" />
+        <PriceInfo liquorName={liquor.koName || ""} store="lottemart" />
+        <PriceInfo liquorName={liquor.koName || ""} store="emart" />
+        <PriceInfo liquorName={liquor.enName || ""} store="biccamera" />
       </Stack>
 
       {/* 주류 리뷰 */}
