@@ -122,6 +122,7 @@ export default function LiquorsPage() {
                     "겟주",
                     "롯데마트",
                     "이마트",
+                    "빅카메라",
                   ].map((market) => (
                     <MarketChip key={market}>{market}</MarketChip>
                   ))}
