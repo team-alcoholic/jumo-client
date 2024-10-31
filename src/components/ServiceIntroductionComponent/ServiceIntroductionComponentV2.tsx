@@ -220,6 +220,62 @@ export default function ServiceIntroductionComponent() {
               </Stack>
             </Box>
           </Box>
+
+          {/* 업데이트 소식 */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2.5,
+              p: 2.5,
+              bgcolor: "#FFF4E5", // 주황빛 배경
+              borderRadius: "16px",
+              border: "1px solid",
+              borderColor: "#FFE0B2",
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: "12px",
+                bgcolor: "#FFE0B2",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Box
+                component="span"
+                role="img"
+                aria-label="new"
+                sx={{ fontSize: "24px" }}
+              >
+                🎉
+              </Box>
+            </Box>
+            <Box>
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  fontSize: "15px",
+                  mb: 0.5,
+                  color: "#E65100",
+                }}
+              >
+                New! 겟주(Getju) 가격 비교 추가
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#795548",
+                  fontSize: "14px",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                이제 겟주의 주류 가격도 실시간으로 비교하실 수 있습니다. 더 많은
+                선택지에서 최저가를 찾아보세요!
+              </Typography>
+            </Box>
+          </Box>
           {/* CTA 버튼 */}
           <Box sx={{ textAlign: "center" }}>
             <Link
