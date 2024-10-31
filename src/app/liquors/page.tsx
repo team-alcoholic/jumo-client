@@ -114,7 +114,16 @@ export default function LiquorsPage() {
                   🏪 현재 가격 비교 지원 중인 마켓
                 </MarketInfoTitle>
                 <MarketChipsContainer>
-                  {["트레이더스", "데일리샷", "무카와", "CU"].map((market) => (
+                  {[
+                    "트레이더스",
+                    "데일리샷",
+                    "무카와",
+                    "CU",
+                    "겟주",
+                    "롯데마트",
+                    "이마트",
+                    "빅카메라",
+                  ].map((market) => (
                     <MarketChip key={market}>{market}</MarketChip>
                   ))}
                 </MarketChipsContainer>

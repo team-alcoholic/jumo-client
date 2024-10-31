@@ -55,6 +55,56 @@ export default function ServiceIntroductionComponent() {
               국내외 주요 매장의 가격을 한 눈에 비교하세요
             </Typography>
           </Stack>
+          {/* 업데이트 소식 */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              p: 2.5,
+              bgcolor: "#FFF4E5",
+              borderRadius: "16px",
+              border: "1px solid",
+              borderColor: "#FFE0B2",
+              alignItems: "center",
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: "12px",
+                bgcolor: "#FFE0B2",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Box
+                component="span"
+                role="img"
+                aria-label="new"
+                sx={{
+                  fontSize: "24px",
+                  lineHeight: 1,
+                }}
+              >
+                🎉
+              </Box>
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  fontSize: "15px",
+                  color: "#E65100",
+                  lineHeight: 1.4,
+                }}
+              >
+                New! 빅카메라, 겟주, 롯데마트, 이마트 가격 비교 추가
+              </Typography>
+            </Box>
+          </Box>
 
           {/* 사용 방법 */}
           <Box>
@@ -199,7 +249,16 @@ export default function ServiceIntroductionComponent() {
                 지원 매장
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                {["트레이더스", "데일리샷", "무카와", "CU"].map((store) => (
+                {[
+                  "트레이더스",
+                  "데일리샷",
+                  "무카와",
+                  "CU",
+                  "겟주",
+                  "롯데마트",
+                  "이마트",
+                  "빅카메라",
+                ].map((store) => (
                   <Chip
                     key={store}
                     label={store}
@@ -218,6 +277,7 @@ export default function ServiceIntroductionComponent() {
               </Stack>
             </Box>
           </Box>
+
           {/* CTA 버튼 */}
           <Box sx={{ textAlign: "center" }}>
             <Link
