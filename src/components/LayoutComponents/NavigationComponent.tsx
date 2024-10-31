@@ -75,11 +75,25 @@ export default function NavigationComponent() {
       },
     },
     {
-      title: "마이페이지",
-      link: "/mypage",
+      title: "주류 가격 비교",
+      link: "/liquors",
       icon: function () {
         return (
-          <AccountCircle
+          <Search
+            sx={{
+              fontSize: "20px",
+              color: pathName.startsWith(this.link) ? "black" : "gray",
+            }}
+          />
+        );
+      },
+    },
+    {
+      title: "주모 레포트",
+      link: "/report",
+      icon: function () {
+        return (
+          <EditNote
             sx={{
               fontSize: "20px",
               color: pathName.startsWith(this.link) ? "black" : "gray",
