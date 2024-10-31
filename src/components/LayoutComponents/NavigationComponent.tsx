@@ -5,7 +5,6 @@ import {
   Diversity3,
   LocalBar,
   Warehouse,
-  EditNote,
   Search,
 } from "@mui/icons-material";
 import { Box, Stack, Typography } from "@mui/material";
@@ -62,11 +61,12 @@ export default function NavigationComponent() {
       },
     },
     {
-      title: "주류 생활",
-      link: "/mypage",
+      title: "주류 가격 비교",
+      link: "/liquors",
       icon: function () {
         return (
-          <AccountCircle
+          <Search
+
             sx={{
               fontSize: "20px",
               color: pathName.startsWith(this.link) ? "black" : "gray",
