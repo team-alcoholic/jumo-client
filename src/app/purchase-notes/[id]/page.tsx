@@ -1,10 +1,6 @@
 import React from "react";
-import { Box, Container, Typography } from "@mui/material";
-import { GiNoseSide, GiTongue } from "react-icons/gi";
+import { Container, Typography } from "@mui/material";
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
-import { HiOutlineLightBulb } from "react-icons/hi";
-import NotesSection from "@/components/TastingNotesComponent/NotesSection";
-import { MdOutlineStickyNote2 } from "react-icons/md";
 import { formatDate } from "@/utils/format";
 import EditButton from "@/components/TastingNotesComponent/EditButton";
 import { notFound } from "next/navigation";
@@ -14,7 +10,7 @@ import Link from "next/link";
 import TastingNotesButton from "@/components/Button/tastingNotesButton";
 
 const NOTE_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/v2/notes/";
-const NOTE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/tasting-notes/";
+const NOTE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/purchase-notes/";
 const LIQUOR_URL = process.env.NEXT_PUBLIC_BASE_URL + "/liquors/";
 
 /** 노트 상세 조회 API 호출 함수 */
@@ -40,10 +36,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const note = await getNote(params.id);
 
-  const { user, createdAt, liquor } = note.tastingNote;
+  const { user, createdAt, liquor } = note.purchaseNote;
 
-  const title = `${liquor.koName} 테이스팅 노트`;
-  const description = `${user.profileNickname}님이 ${formatDate(createdAt)}에 작성한 ${liquor.koName} 리뷰`;
+  const title = `${liquor.koName} 구매 노트`;
+  const description = `${user.profileNickname}님이 ${formatDate(createdAt)}에 작성한 ${liquor.koName} 구매 노트`;
   const url = `${NOTE_URL}${params.id}`;
 
   return {
@@ -76,13 +72,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function TastingNotePage({
+export default async function PurchaseNotePage({
   params: { id },
 }: PostPageProps) {
   const note = await getNote(id);
 
-  const { score, nose, palate, finish, content, user, createdAt, liquor } =
-    note.tastingNote;
+  const { content, user, createdAt, liquor } = note.purchaseNote;
 
   const text = `${user.profileNickname}님이 ${formatDate(createdAt)}에 작성한 ${liquor.koName} 리뷰`;
 
@@ -94,6 +89,7 @@ export default async function TastingNotePage({
 
   return (
     <Container maxWidth="sm" sx={{ margin: "40px 0", padding: 0 }}>
+      {/* 주류 정보 */}
       <Link
         href={LIQUOR_URL + liquor.id}
         passHref
@@ -111,6 +107,7 @@ export default async function TastingNotePage({
         />
       </Link>
 
+      {/* 버튼 그룹 */}
       <ShareButton
         title={shareData.title}
         text={shareData.text}
@@ -118,6 +115,7 @@ export default async function TastingNotePage({
       />
       <TastingNotesButton link={NOTE_URL + "new?liquorId=" + liquor.id} />
 
+      {/* 본문 */}
       <Typography
         variant="body2"
         gutterBottom
@@ -131,62 +129,6 @@ export default async function TastingNotePage({
       >
         {user.profileNickname}님이 {formatDate(createdAt)}에 작성함
       </Typography>
-      <NotesSection
-        title="향 (Nose)"
-        icon={
-          <Box
-            component="span"
-            sx={{ verticalAlign: "middle", marginRight: 1 }}
-          >
-            <GiNoseSide />
-          </Box>
-        }
-        score={score}
-        notes={[]}
-        formattedDescription={nose}
-      />
-      <NotesSection
-        title="맛 (Palate)"
-        icon={
-          <Box
-            component="span"
-            sx={{ verticalAlign: "middle", marginRight: 1 }}
-          >
-            <GiTongue />
-          </Box>
-        }
-        score={score}
-        notes={[]}
-        formattedDescription={palate}
-      />
-      <NotesSection
-        title="여운 (Finish)"
-        icon={
-          <Box
-            component="span"
-            sx={{ verticalAlign: "middle", marginRight: 1 }}
-          >
-            <HiOutlineLightBulb />
-          </Box>
-        }
-        score={score}
-        notes={[]}
-        formattedDescription={finish}
-      />
-      <NotesSection
-        title="총평"
-        icon={
-          <Box
-            component="span"
-            sx={{ verticalAlign: "middle", marginRight: 1 }}
-          >
-            <MdOutlineStickyNote2 />
-          </Box>
-        }
-        notes={[]}
-        score={score}
-        formattedDescription={content}
-      />
       {/* {mood && <MoodSelectedComponent mood={mood} />} */}
       <EditButton user={user} />
     </Container>

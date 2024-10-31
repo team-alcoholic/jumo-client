@@ -94,6 +94,7 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
           클릭시 상세 페이지로 이동합니다.
           {store === "mukawa" &&
             " 일본 사이트에서 정보를 가져와 번역하기에 오래 걸립니다."}
+
         </Typography>
       )}
       <TableContainer component={Paper}>

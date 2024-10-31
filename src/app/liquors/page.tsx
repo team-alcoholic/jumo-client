@@ -15,15 +15,17 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useQuery } from "react-query";
 import AddIcon from "@mui/icons-material/Add";
+import debounce from "lodash.debounce";
 
 /** 주류 검색 API 요청 함수 */
 const getLiquorList = async (keyword: string) => {
   if (!keyword) return null;
   const response = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`
+
   );
   return response.data;
 };
@@ -31,16 +33,25 @@ const getLiquorList = async (keyword: string) => {
 export default function LiquorsPage() {
   // 검색 키워드 state
   const [keyword, setKeyword] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState(keyword);
+
+  // 주류 검색 api query
+  const { data, status, isFetching } = useQuery({
+    queryKey: ["liquorList", debouncedKeyword],
+    queryFn: () => getLiquorList(debouncedKeyword),
+    enabled: !!debouncedKeyword,
+  });
+
+  // debounce function
+  const debounceKeywordChange = useCallback(
+    debounce((nextValue: string) => setDebouncedKeyword(nextValue), 300),
+    []
+  );
 
   const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeyword(e.target.value);
+    debounceKeywordChange(e.target.value);
   };
-
-  // 주류 검색 api query
-  const { data, status } = useQuery({
-    queryKey: ["liquorList", keyword],
-    queryFn: () => getLiquorList(keyword),
-  });
 
   return (
     <Box>
@@ -70,8 +81,36 @@ export default function LiquorsPage() {
           }}
         />
       </LiquorSearchBox>
+
+      {/* 초기 화면 */}
+      {status == "idle" && (
+        <SearchResultBox>
+          <Box>
+            <SearchResultTypography>
+              테이스팅 노트 작성을 위해서는
+            </SearchResultTypography>
+            <SearchResultTypography>
+              주류를 선택해야 합니다.
+            </SearchResultTypography>
+            <TipPaper elevation={1}>
+              <TipTypography>💡 Tip: 찾는 주류가 없으신가요?</TipTypography>
+              <Link href="/liquors/new" passHref>
+                <Button
+                  variant="outlined"
+                  startIcon={<AddIcon />}
+                  fullWidth
+                  size="small"
+                >
+                  주류 직접 추가하기
+                </Button>
+              </Link>
+            </TipPaper>
+          </Box>
+        </SearchResultBox>
+      )}
+
       {/* 로딩 UI */}
-      {status === "loading" && (
+      {isFetching && (
         <SearchResultBox>
           <CircularProgress />
           <LoadingTypography>열심히 검색 중...</LoadingTypography>
@@ -85,7 +124,7 @@ export default function LiquorsPage() {
             <LiquorCardLink key={liquor.id} href={`/liquors/${liquor.id}`}>
               <LiquorTitle
                 thumbnailImageUrl={liquor.thumbnail_image_url}
-                koName={liquor.ko_name}
+                koName={liquor.ko_name_origin}
                 type={liquor.type}
                 abv={liquor.abv}
                 volume={liquor.volume}
@@ -142,6 +181,7 @@ const SearchResultBox = styled(Box)({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  gap: "10px",
 });
 
 const SearchResultTypography = styled(Typography)({
@@ -152,7 +192,6 @@ const SearchResultTypography = styled(Typography)({
 const LoadingTypography = styled(Typography)({
   textAlign: "center",
   color: "gray",
-  marginTop: "16px",
 });
 
 const TipPaper = styled(Paper)(({ theme }) => ({
