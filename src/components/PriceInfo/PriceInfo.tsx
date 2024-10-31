@@ -16,7 +16,7 @@ import axios from "axios";
 
 interface PriceInfoProps {
   liquorName: string;
-  store?: "dailyshot" | "traders" | "mukawa" | "cu" | "getju";
+  store?: "dailyshot" | "traders" | "mukawa" | "cu" | "getju" | "lottemart";
 }
 
 const storeDisplayName = {
@@ -25,6 +25,7 @@ const storeDisplayName = {
   mukawa: "무카와",
   cu: "CU",
   getju: "겟주",
+  lottemart: "롯데마트",
 };
 
 const PriceInfo: React.FC<PriceInfoProps> = ({
@@ -90,7 +91,7 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
       <Typography variant="h6" sx={{ mb: 2 }}>
         {storeDisplayName[store]} 가격 정보
       </Typography>
-      {store !== "traders" && (
+      {store !== "traders" && store !== "lottemart" && (
         <Typography variant="body2" sx={{ mb: 1, color: "text.secondary" }}>
           클릭시 상세 페이지로 이동합니다.
           {store === "mukawa" &&

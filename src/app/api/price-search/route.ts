@@ -51,6 +51,15 @@ function toEUCJPEncoding(query: string) {
     .join("");
 }
 
+// store 타입에 lottemart 추가
+type StoreType =
+  | "dailyshot"
+  | "mukawa"
+  | "cu"
+  | "traders"
+  | "getju"
+  | "lottemart";
+
 export async function GET(request: NextRequest) {
   const params = {
     query: request.nextUrl.searchParams.get("q") || "",
@@ -82,7 +91,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(cachedResult.data);
   }
 
-  // ��카와인 경우 위스��� 이름을 일본어로 번역
+  // 카와인 경우 위스 이름을 일본어로 번역
   if (params.store === "mukawa" && params.query) {
     const translatedQuery = translateWhiskyNameToJapenese(params.query);
     params.query = translatedQuery.japanese || params.query;
@@ -190,7 +199,7 @@ interface CUItem {
 }
 
 function getSearchUrl(
-  store: "dailyshot" | "mukawa" | "cu" | "traders" | "getju",
+  store: StoreType,
   query: string,
   page: number,
   pageSize: number
@@ -207,6 +216,8 @@ function getSearchUrl(
       `https://mukawa-spirit.com/?mode=srh&cid=&keyword=${toEUCJPEncoding(q)}`,
     getju: (q: string) =>
       `https://www.getju.co.kr/shop/search_result.php?search_str=${encodeURIComponent(q)}`,
+    lottemart: () =>
+      `https://company.lottemart.com/mobiledowa/product/search_product.asp`,
   };
 
   const urlGenerator = urls[store];
@@ -244,13 +255,50 @@ function parseGetjuHtml(html: string) {
   return results.filter((item) => item.name && item.price);
 }
 
+// 롯데마트 HTML 파싱 함수 추가
+function parseLottemartHtml(html: string) {
+  const dom = new JSDOM(html);
+  const document = dom.window.document;
+  const productItems = document.querySelectorAll(".list-result li");
+
+  const results = Array.from(productItems).map((item) => {
+    const element = item as Element;
+    const name = element.querySelector(".prod-name")?.textContent?.trim();
+    const size = element.querySelector(".prod-count")?.textContent?.trim();
+
+    // layer_popup 내부의 info-list에서 가격 정보 추출
+    const infoList = element.querySelector(".info-list");
+    const rows = infoList?.querySelectorAll("tr");
+
+    let price = 0;
+
+    rows?.forEach((row) => {
+      const label = row.querySelector("th")?.textContent?.trim();
+      const value = row.querySelector("td")?.textContent?.trim();
+
+      if (label?.includes("가격")) {
+        price = value ? parseInt(value.replace(/[^0-9]/g, "")) : 0;
+      }
+    });
+
+    return {
+      name: name ? `${name} ${size || ""}` : "",
+      price,
+      url: undefined,
+      description: undefined,
+    };
+  });
+
+  return results.filter((item) => item.name && item.price);
+}
+
 async function performSearch({
   store,
   query,
   page,
   pageSize,
 }: {
-  store: "dailyshot" | "mukawa" | "cu" | "traders" | "getju";
+  store: StoreType;
   query: string;
   page: number;
   pageSize: number;
@@ -270,6 +318,27 @@ async function performSearch({
     }
     const html = await response.text();
     results = parseGetjuHtml(html);
+  } else if (store === "lottemart") {
+    const formData = new URLSearchParams({
+      p_area: "서울",
+      p_market: "301",
+      p_schWord: query,
+    });
+
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`롯데마트 API 요청 실패: ${response.status}`);
+    }
+
+    const html = await response.text();
+    results = parseLottemartHtml(html);
   } else {
     if (store === "cu") {
       // CU는 POST 방식 사용

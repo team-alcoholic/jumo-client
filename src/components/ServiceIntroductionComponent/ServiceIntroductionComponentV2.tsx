@@ -199,24 +199,29 @@ export default function ServiceIntroductionComponent() {
                 지원 매장
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                {["트레이더스", "데일리샷", "무카와", "CU", "겟주"].map(
-                  (store) => (
-                    <Chip
-                      key={store}
-                      label={store}
-                      sx={{
-                        bgcolor: "grey.100",
-                        color: "grey.900",
-                        fontWeight: 600,
-                        fontSize: "13px",
-                        height: "28px",
-                        "&:hover": {
-                          bgcolor: "grey.200",
-                        },
-                      }}
-                    />
-                  )
-                )}
+                {[
+                  "트레이더스",
+                  "데일리샷",
+                  "무카와",
+                  "CU",
+                  "겟주",
+                  "롯데마트",
+                ].map((store) => (
+                  <Chip
+                    key={store}
+                    label={store}
+                    sx={{
+                      bgcolor: "grey.100",
+                      color: "grey.900",
+                      fontWeight: 600,
+                      fontSize: "13px",
+                      height: "28px",
+                      "&:hover": {
+                        bgcolor: "grey.200",
+                      },
+                    }}
+                  />
+                ))}
               </Stack>
             </Box>
           </Box>
@@ -262,7 +267,7 @@ export default function ServiceIntroductionComponent() {
                   color: "#E65100",
                 }}
               >
-                New! 겟주(Getju) 가격 비교 추가
+                New! 겟주, 롯데마트 가격 비교 추가
               </Typography>
               <Typography
                 sx={{
@@ -271,8 +276,8 @@ export default function ServiceIntroductionComponent() {
                   letterSpacing: "-0.01em",
                 }}
               >
-                이제 겟주의 주류 가격도 실시간으로 비교하실 수 있습니다. 더 많은
-                선택지에서 최저가를 찾아보세요!
+                이제 겟주, 롯데마트의 주류 가격도 실시간으로 비교하실 수
+                있습니다. 더 많은 선택지에서 최저가를 찾아보세요!
               </Typography>
             </Box>
           </Box>
