@@ -5,7 +5,6 @@ import {
   Diversity3,
   LocalBar,
   Warehouse,
-  EditNote,
   Search,
   Forum,
 } from "@mui/icons-material";
@@ -36,7 +35,7 @@ export default function NavigationComponent() {
   /** 네비게이션 바 옵션 객체 */
   const NAV_OPTIONS = [
     {
-      title: "JUMO",
+      title: "홈",
       link: "/",
       icon: function () {
         return (
@@ -64,7 +63,21 @@ export default function NavigationComponent() {
       },
     },
     {
-      title: "주류 검색",
+      title: "모임",
+      link: "/meetings",
+      icon: function () {
+        return (
+          <Diversity3
+            sx={{
+              fontSize: "20px",
+              color: pathName.startsWith(this.link) ? "black" : "gray",
+            }}
+          />
+        );
+      },
+    },
+    {
+      title: "주류 가격 비교",
       link: "/liquors",
       icon: function () {
         return (
@@ -78,7 +91,7 @@ export default function NavigationComponent() {
       },
     },
     {
-      title: "나의 주모",
+      title: "마이페이지",
       link: "/mypage",
       icon: function () {
         return (
