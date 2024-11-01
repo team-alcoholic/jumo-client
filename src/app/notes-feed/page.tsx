@@ -97,8 +97,6 @@ export default function NotesFeedPage() {
 
   // 노트 유형 옵션 상태 관리
   const [typeOption, setTypeOption] = useState("ALL");
-  // 노트 작성 다이얼 옵션
-  const [dialOpen, setDialOpen] = useState(false);
 
   // useInfiniteQuery 설정
   const { data, fetchNextPage, isFetchingNextPage, status } = useInfiniteQuery({
@@ -126,14 +124,6 @@ export default function NotesFeedPage() {
     _event: SyntheticEvent,
     newTypeOption: string
   ) => setTypeOption(newTypeOption);
-
-  /** 다이얼 상태 변경 함수 */
-  const handleDialOpen = () => {
-    setDialOpen(true);
-  };
-  const handleDialClose = () => {
-    setDialOpen(false);
-  };
 
   // return
   return (
@@ -197,13 +187,7 @@ export default function NotesFeedPage() {
       )}
 
       {/* 노트 작성 다이얼 */}
-      <Backdrop open={dialOpen} />
-      <CreateNoteDial
-        dialOpen={dialOpen}
-        handleDialOpen={handleDialOpen}
-        handleDialClose={handleDialClose}
-        offset
-      />
+      <CreateNoteDial offset />
     </ContainerBox>
   );
 }

@@ -1,6 +1,7 @@
 import LiquorInfoCardComponent from "@/components/LiquorInfoCardComponent/LiquorInfoCardComponent";
 import LiquorUserTastingComponent from "@/components/LiquorUserTastingComponent/LiquorUserTastingComponent";
 import {
+  Backdrop,
   Box,
   Button,
   Divider,
@@ -10,11 +11,10 @@ import {
   Typography,
 } from "@mui/material";
 import Image from "next/image";
-import FloatingButton from "@/components/FloatingButton/FloatingButton";
-import { Edit } from "@mui/icons-material";
 import PageTitleComponent from "@/components/LayoutComponents/PageTitleComponent";
 import PriceInfo from "@/components/PriceInfo/PriceInfo";
 import { translateWhiskyNameToJapenese } from "@/utils/translateWhiskyNameToJapenese";
+import CreateNoteDial from "@/components/FloatingButton/CreateNoteDial";
 
 /** 주류 상세정보 API 요청 함수 */
 const getLiquorInfo = async (id: string) => {
@@ -118,8 +118,8 @@ export default async function LiquorDetailPage({
           <LiquorUserTastingComponent liquorId={id} />
         </Stack>
 
-        {/* 테이스팅 리뷰 작성 버튼 */}
-        <FloatingButton link={`/tasting-notes/new?liquorId=${id}`} />
+        {/* 노트 작성 다이얼 */}
+        <CreateNoteDial liquorId={+id} offset={false} />
       </Stack>
     </Stack>
   );

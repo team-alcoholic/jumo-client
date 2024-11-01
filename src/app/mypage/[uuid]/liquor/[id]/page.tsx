@@ -32,16 +32,6 @@ export default function MypageLiquorPage({
 }: {
   params: { uuid: string; id: string };
 }) {
-  // 노트 작성 다이얼 옵션
-  const [dialOpen, setDialOpen] = useState(false);
-  // 다이얼 상태 변경 함수
-  const handleDialOpen = () => {
-    setDialOpen(true);
-  };
-  const handleDialClose = () => {
-    setDialOpen(false);
-  };
-
   // 노트 목록 api query
   const { data, status } = useQuery({
     queryKey: ["userLiquorNoteList", id],
@@ -96,11 +86,7 @@ export default function MypageLiquorPage({
       ) : null}
 
       {/* 노트 작성 다이얼 */}
-      <Backdrop open={dialOpen} />
       <CreateNoteDial
-        dialOpen={dialOpen}
-        handleDialOpen={handleDialOpen}
-        handleDialClose={handleDialClose}
         liquorId={
           status == "success"
             ? data[0].type == "PURCHASE"

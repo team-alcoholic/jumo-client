@@ -1,18 +1,27 @@
+"use client";
+
 import { ShoppingCartOutlined, WineBarOutlined } from "@mui/icons-material";
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface CreateNoteDialProps {
-  dialOpen: boolean;
-  handleDialOpen: () => void;
-  handleDialClose: () => void;
   liquorId?: number;
   offset: boolean;
 }
 
 export default function CreateNoteDial(props: CreateNoteDialProps) {
+  // 노트 작성 다이얼 옵션
+  const [dialOpen, setDialOpen] = useState(false);
+  // 다이얼 상태 변경 함수
+  const handleDialOpen = () => {
+    setDialOpen(true);
+  };
+  const handleDialClose = () => {
+    setDialOpen(false);
+  };
   const router = useRouter();
-  const { dialOpen, handleDialOpen, handleDialClose, liquorId, offset } = props;
+  const { liquorId, offset } = props;
 
   /** 노트 작성 다이얼 옵션 */
   const dialAction = [
