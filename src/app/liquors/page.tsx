@@ -23,7 +23,7 @@ import AddIcon from "@mui/icons-material/Add";
 const getLiquorList = async (keyword: string) => {
   if (!keyword) return null;
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquorsearch?keyword=${keyword}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/liquorsearch?keyword=${keyword}`
   );
   return response.data;
 };
@@ -85,7 +85,7 @@ export default function LiquorsPage() {
             <LiquorCardLink key={liquor.id} href={`/liquors/${liquor.id}`}>
               <LiquorTitle
                 thumbnailImageUrl={liquor.thumbnail_image_url}
-                koName={liquor.ko_name}
+                koName={liquor.ko_name_origin}
                 type={liquor.type}
                 abv={liquor.abv}
                 volume={liquor.volume}

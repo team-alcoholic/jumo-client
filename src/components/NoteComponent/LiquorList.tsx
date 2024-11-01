@@ -1,6 +1,16 @@
 import React from "react";
 import { Avatar, Box, Typography } from "@mui/material";
-import { TitleHeader } from "@/app/tasting-notes/new/StyledComponent";
+
+interface LiquorTitleProps {
+  thumbnailImageUrl: string | undefined;
+  koName: string | null;
+  type: string | null;
+  abv: string | null;
+  volume: string | null;
+  country: string | null;
+  region: string | null;
+  grapeVariety: string | null;
+}
 
 export const LiquorList: React.FC<LiquorTitleProps> = ({
   thumbnailImageUrl,
