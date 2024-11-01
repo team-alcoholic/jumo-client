@@ -337,8 +337,13 @@ function NewTastingNotePageComponent() {
   }, [noteImages]);
 
   const handleSave = async () => {
-    if (!liquorData || !tastingAt) {
+    if (!liquorData) {
       alert("주류를 선택해주세요.");
+      return;
+    }
+
+    if (!tastingAt) {
+      alert("테이스팅 일자를 선택해주세요.");
       return;
     }
 

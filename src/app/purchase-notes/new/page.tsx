@@ -206,8 +206,12 @@ function NewPurchaseNotePageComponent() {
   }, [noteImages]);
 
   const handleSave = async () => {
-    if (!liquorData || !purchaseAt) {
+    if (!liquorData) {
       alert("주류를 선택해주세요.");
+      return;
+    }
+    if (!purchaseAt) {
+      alert("구매 일자를 선택해주세요.");
       return;
     }
 

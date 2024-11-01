@@ -26,7 +26,7 @@ import { LiquorInfoComponent } from "@/components/NoteComponent/LiquorInfoCompon
 import KeyValueInfoComponent from "@/components/KeyValueInfoComponent/KeyValueInfoComponent";
 
 const NOTE_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/v2/notes/";
-const NOTE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/purchase-notes/";
+const NOTE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/tasting-notes/";
 const LIQUOR_URL = process.env.NEXT_PUBLIC_BASE_URL + "/liquors/";
 
 /** 노트 상세 조회 API 호출 함수 */
