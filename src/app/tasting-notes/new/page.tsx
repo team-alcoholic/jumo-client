@@ -1,6 +1,7 @@
 "use client";
 
 import React, {
+  Suspense,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -138,7 +139,7 @@ const createCustomAroma = async (aromaName: string) => {
   }
 };
 
-export default function NewTastingNotePage() {
+function NewTastingNotePageComponent() {
   const { snackbar, showSnackbar, hideSnackbar } = useCustomSnackbar();
   const params = useSearchParams();
   const router = useRouter();
@@ -730,6 +731,14 @@ export default function NewTastingNotePage() {
         </Stack>
       </Stack>
     </Stack>
+  );
+}
+
+export default function NewTastingNotePage() {
+  return (
+    <Suspense>
+      <NewTastingNotePageComponent />
+    </Suspense>
   );
 }
 
