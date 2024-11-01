@@ -31,7 +31,7 @@ export default function LiquorUserTastingComponent({
   });
 
   return (
-    <Stack sx={{ marginBottom: "10px", padding: "20px 0", gap: "15px" }}>
+    <Stack sx={{ marginBottom: "10px", padding: "20px 0" }}>
       {status == "success" &&
         (data && data.length ? (
           data.map(({ type, tastingNote }, idx) =>
