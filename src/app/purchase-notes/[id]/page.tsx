@@ -231,13 +231,21 @@ export default async function PurchaseNotePage({
         </Stack>
 
         {/* 버튼 그룹 */}
-        {/* <ShareButton
-          title={shareData.title}
-          text={shareData.text}
-          url={shareData.url}
-        />
-        <TastingNotesButton link={NOTE_URL + "new?liquorId=" + liquor.id} /> */}
-        {/* <EditButton user={user} /> */}
+        <Stack
+          sx={{
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "20px 0",
+          }}
+        >
+          <ShareButton
+            title={shareData.title}
+            text={shareData.text}
+            url={shareData.url}
+          />
+          {/* <Button link={NOTE_URL + "new?liquorId=" + liquor.id} /> */}
+          {/* <TastingNotesButton user={user} /> */}
+        </Stack>
       </Stack>
     </Stack>
   );

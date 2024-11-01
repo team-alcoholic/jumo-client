@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import {
   Box,
+  Button,
   Chip,
   Container,
   Divider,
@@ -121,7 +122,6 @@ export default async function TastingNotePage({
           />
           <Divider />
         </Stack>
-
         {/* 이미지 */}
         {note.tastingNote.noteImages && note.tastingNote.noteImages.length ? (
           <Box>
@@ -130,7 +130,6 @@ export default async function TastingNotePage({
             />
           </Box>
         ) : null}
-
         <Stack sx={{ gap: "30px" }}>
           {/* 주류 정보 */}
           <Stack sx={{ gap: "8px" }}>
@@ -283,7 +282,6 @@ export default async function TastingNotePage({
             ) : null}
           </Stack>
         </Stack>
-
         {/* 상세 테이스팅 노트 */}
         {note.tastingNote.isDetail ? (
           <Stack sx={{ gap: "8px" }}>
@@ -388,13 +386,21 @@ export default async function TastingNotePage({
         ) : null}
 
         {/* 버튼 그룹 */}
-        {/* <ShareButton
-          title={shareData.title}
-          text={shareData.text}
-          url={shareData.url}
-        />
-        <TastingNotesButton link={NOTE_URL + "new?liquorId=" + liquor.id} /> */}
-        {/* <EditButton user={user} /> */}
+        <Stack
+          sx={{
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "20px 0",
+          }}
+        >
+          <ShareButton
+            title={shareData.title}
+            text={shareData.text}
+            url={shareData.url}
+          />
+          {/* <Button link={NOTE_URL + "new?liquorId=" + liquor.id} /> */}
+          {/* <TastingNotesButton user={user} /> */}
+        </Stack>
       </Stack>
     </Stack>
   );
