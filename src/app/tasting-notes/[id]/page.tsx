@@ -145,7 +145,6 @@ export default async function TastingNotePage({
             </Typography>
             <Link
               href={LIQUOR_URL + liquor.id}
-              passHref
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <LiquorInfoComponent
@@ -153,10 +152,6 @@ export default async function TastingNotePage({
                 koName={liquor.koName}
                 type={liquor?.type || null}
                 abv={liquor?.abv || null}
-                volume={liquor?.volume || null}
-                country={liquor?.country || null}
-                region={liquor?.region || null}
-                grapeVariety={liquor?.grapeVariety || null}
               />
             </Link>
           </Stack>
@@ -273,7 +268,7 @@ export default async function TastingNotePage({
             </Box>
 
             {/* 본문 */}
-            {!note.tastingNote.isDetail ? (
+            {!note.tastingNote.isDetail && note.tastingNote.content ? (
               <Box
                 sx={{
                   padding: "20px",

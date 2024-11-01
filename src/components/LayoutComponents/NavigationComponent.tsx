@@ -24,6 +24,8 @@ export default function NavigationComponent() {
     "/purchase-notes/", // 구매 노트 관련 경로들의 공통 부분
     "/tasting-notes/", // 감상 노트 관련 경로들의 공통 부분
     "/liquors/",
+    "/mypage/",
+    "/join",
   ];
 
   // 현재 경로가 숨길 경로 중 하나로 시작하면 네비게이션 바를 렌더링하지 않음

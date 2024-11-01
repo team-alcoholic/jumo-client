@@ -174,12 +174,23 @@ export default function NewPurchaseNotePage() {
       console.error("Error fetching auth data:", error);
     }
   }, [router]);
+  const getLiquor = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/liquors/${liquorId}`
+      );
+      setLiquorData(await response.json());
+    } catch (error) {
+      console.error("Error fetching auth data:", error);
+    }
+  }, []);
 
   useEffect(() => {
     (async () => {
       await getAuth();
+      if (liquorId) await getLiquor();
     })();
-  }, [getAuth]);
+  }, [getAuth, getLiquor]);
 
   // 컴포넌트 언마운트 시 모든 미리보기 URL 정리
   useEffect(() => {

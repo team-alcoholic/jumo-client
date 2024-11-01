@@ -124,6 +124,20 @@ const getRecommendAroma = async (aromaId: number, exclude: number[]) => {
   }
 };
 
+/** 아로마 추가 API 요청 함수 */
+const createCustomAroma = async (aromaName: string) => {
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/aromas`,
+      { aromaName }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 export default function NewTastingNotePage() {
   const { snackbar, showSnackbar, hideSnackbar } = useCustomSnackbar();
   const params = useSearchParams();
@@ -145,6 +159,7 @@ export default function NewTastingNotePage() {
   const [noteImages, setNoteImages] = useState<FileWithPreview[]>([]);
   const [aromas, setAromas] = useState<Aroma[]>([]);
   const [selectedAromas, setSelectedAromas] = useState<Aroma[]>([]);
+  const [customAroma, setCustomAroma] = useState("");
   const handleTastingAtChange = (value: Dayjs | null) => {
     setTastingAt(value);
   };
@@ -177,6 +192,9 @@ export default function NewTastingNotePage() {
   };
   const handleFinishChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFinish(e.target.value);
+  };
+  const handleCustomAromaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomAroma(e.target.value);
   };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -248,6 +266,15 @@ export default function NewTastingNotePage() {
     }
 
     setSelectedAromas(newSelectedAromas);
+  };
+
+  const handleCustomAromaCreate = async () => {
+    if (customAroma) {
+      const newAroma = await createCustomAroma(customAroma);
+      const isExist = aromas.some((aroma: Aroma) => aroma.id == newAroma.id);
+      if (!isExist) setAromas((prev) => [...prev, newAroma]);
+      setCustomAroma("");
+    }
   };
 
   const getAuth = useCallback(async () => {
@@ -448,6 +475,7 @@ export default function NewTastingNotePage() {
             </Typography>
           </Stack>
 
+          {/* 키워드 선택 */}
           <Box
             sx={{
               padding: "10px 10px",
@@ -463,7 +491,6 @@ export default function NewTastingNotePage() {
               aromas.map((aroma: Aroma, index) => (
                 <StyledChip
                   sx={{ margin: "2px", color: "black", fontSize: "12px" }}
-                  // size="small"
                   key={index}
                   label={aroma.name}
                   onClick={() => handleAromaSelect(aroma)}
@@ -481,6 +508,36 @@ export default function NewTastingNotePage() {
                 추천 키워드가 없습니다.
               </Typography>
             )}
+          </Box>
+
+          {/* 키워드 추가 */}
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              gap: "10px",
+            }}
+          >
+            <TextField
+              fullWidth
+              label="키워드 추가"
+              variant="outlined"
+              size="small"
+              value={customAroma}
+              onChange={handleCustomAromaChange}
+            />
+            <Button
+              variant="outlined"
+              onClick={handleCustomAromaCreate}
+              style={{
+                width: "16px",
+                height: "40px",
+                padding: 0,
+              }}
+            >
+              <Add />
+            </Button>
           </Box>
         </Stack>
 

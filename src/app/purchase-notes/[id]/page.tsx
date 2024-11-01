@@ -145,7 +145,6 @@ export default async function PurchaseNotePage({
             </Typography>
             <Link
               href={LIQUOR_URL + liquor.id}
-              passHref
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <LiquorInfoComponent
@@ -153,10 +152,6 @@ export default async function PurchaseNotePage({
                 koName={liquor.koName}
                 type={liquor?.type || null}
                 abv={liquor?.abv || null}
-                volume={liquor?.volume || null}
-                country={liquor?.country || null}
-                region={liquor?.region || null}
-                grapeVariety={liquor?.grapeVariety || null}
               />
             </Link>
           </Stack>

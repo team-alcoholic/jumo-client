@@ -160,7 +160,7 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
           borderColor: "divider",
         }}
       >
-        <Tabs
+        {/* <Tabs
           value={noteTabOption}
           onChange={handleNoteTabOptionChange}
           variant="fullWidth"
@@ -168,21 +168,22 @@ export default function MyPageContentsComponent({ user }: { user: User }) {
         >
           <Tab value="group" label="주류" />
           <Tab value="list" label="피드" />
-        </Tabs>
+        </Tabs> */}
       </Box>
 
       {/* 사용자 활동 정보 */}
       {status == "success" &&
         (data.list.length && data.group.length ? (
-          <>
-            {noteTabOption === "group" && (
-              <UserNoteGroupComponent data={data.group} />
-            )}
-            {noteTabOption === "list" && (
-              <UserTastingComponent data={data.list} />
-            )}
-          </>
+          <UserNoteGroupComponent data={data.group} userUuid={user.userUuid} />
         ) : (
+          // <>
+          //   {noteTabOption === "group" && (
+          //     <UserNoteGroupComponent data={data.group} />
+          //   )}
+          //   {noteTabOption === "list" && (
+          //     <UserTastingComponent data={data.list} />
+          //   )}
+          // </>
           <Stack sx={{ padding: "30px 0", gap: "5px" }}>
             <Typography sx={{ color: "gray", textAlign: "center" }}>
               아직 작성된 테이스팅 노트가 없습니다.

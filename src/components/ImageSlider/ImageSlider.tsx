@@ -63,7 +63,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
                   aspectRatio: "1/1",
                   objectFit: "cover",
                   objectPosition: "center",
-                  borderRadius: "10px",
+                  borderRadius: "5px",
                 }}
               />
             </Box>

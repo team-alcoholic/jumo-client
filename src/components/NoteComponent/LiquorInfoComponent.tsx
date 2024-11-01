@@ -1,17 +1,12 @@
 import React from "react";
 import { Avatar, Box, Typography } from "@mui/material";
-import { TitleHeader } from "@/app/tasting-notes/new/StyledComponent";
 
-export const LiquorInfoComponent: React.FC<LiquorTitleProps> = ({
+export const LiquorInfoComponent = ({
   thumbnailImageUrl,
   koName,
   type,
   abv,
-  volume,
-  country,
-  region,
-  grapeVariety,
-}) => {
+}: Pick<Liquor, "thumbnailImageUrl" | "koName" | "type" | "abv">) => {
   return (
     <Box
       sx={{

@@ -8,11 +8,15 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function UserNoteGroupComponent({
   data,
+  userUuid,
 }: {
   data: UserNoteGroup[];
+  userUuid: string;
 }) {
   return (
     <Stack sx={{ marginBottom: "10px", padding: "20px 0", gap: "15px" }}>
@@ -24,7 +28,7 @@ export default function UserNoteGroupComponent({
           textAlign: "center",
         }}
       >
-        내가 감상한 주류
+        나의 주류
       </Typography>
 
       {/* 감상 주류 목록 */}
@@ -35,53 +39,60 @@ export default function UserNoteGroupComponent({
       >
         {data.map((group: UserNoteGroup, idx) => (
           <Grid item key={idx} xs={4} sm={4} md={4}>
-            <Card sx={{ maxWidth: 345, height: { xs: "165px", md: "270px" } }}>
-              {/* 주류 사진 */}
-              <CardMedia
-                component="img"
-                image={group.liquor.thumbnailImageUrl}
-                sx={{ height: { xs: "100px", md: "200px" } }}
-              />
+            <Link
+              href={`/mypage/${userUuid}/liquor/${group.liquor.id}`}
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              <Card
+                sx={{ maxWidth: 345, height: { xs: "165px", md: "270px" } }}
+              >
+                {/* 주류 사진 */}
+                <CardMedia
+                  component="img"
+                  image={group.liquor.thumbnailImageUrl}
+                  sx={{ height: { xs: "100px", md: "200px" } }}
+                />
 
-              {/* 주류 정보 */}
-              <CardContent sx={{ padding: "10px", height: "65px" }}>
-                <Typography
-                  sx={{
-                    fontSize: { xs: "10px", md: "12px" },
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {group.liquor.koName}
-                </Typography>
-                {group.liquor.enName && (
+                {/* 주류 정보 */}
+                <CardContent sx={{ padding: "10px", height: "65px" }}>
                   <Typography
                     sx={{
-                      fontSize: { xs: "8px", md: "10px" },
+                      fontSize: { xs: "10px", md: "12px" },
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {group.liquor.koName}
+                  </Typography>
+                  {group.liquor.enName && (
+                    <Typography
+                      sx={{
+                        fontSize: { xs: "8px", md: "10px" },
+                        color: "gray",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {group.liquor.enName}
+                    </Typography>
+                  )}
+                  <Typography
+                    sx={{
+                      paddingTop: "5px",
+                      fontSize: { xs: "10px", md: "10px" },
                       color: "gray",
                       overflow: "hidden",
                       whiteSpace: "nowrap",
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {group.liquor.enName}
+                    {group.notesCount}개의 노트
                   </Typography>
-                )}
-                <Typography
-                  sx={{
-                    paddingTop: "5px",
-                    fontSize: { xs: "10px", md: "10px" },
-                    color: "gray",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {group.notesCount}개의 노트
-                </Typography>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           </Grid>
         ))}
       </Grid>

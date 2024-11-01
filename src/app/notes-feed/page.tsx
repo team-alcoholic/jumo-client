@@ -16,12 +16,12 @@ import {
 import axios from "axios";
 import { SyntheticEvent, useRef, useState } from "react";
 import { useInfiniteQuery } from "react-query";
-import MeetingCardSkeleton from "@/components/MeetingCard/MeetingCardSkeleton";
 import PurchaseNoteCard from "@/components/NoteCard/PurchaseNoteCard";
 import TastingNoteCard from "@/components/NoteCard/TastingNoteCard";
 import { ShoppingCartOutlined, WineBarOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import NoteCardSkeleton from "@/components/NoteCard/NoteCardSkeleton";
+import CreateNoteDial from "@/components/FloatingButton/CreateNoteDial";
 
 /** MeetingListResponse와 MeetingInfo 타입 정의 (필요한 경우 추가) */
 interface pageParamType {
@@ -127,24 +127,6 @@ export default function NotesFeedPage() {
     newTypeOption: string
   ) => setTypeOption(newTypeOption);
 
-  /** 노트 작성 다이얼 옵션 */
-  const dialAction = [
-    {
-      icon: <WineBarOutlined />,
-      name: "마셨어요",
-      onClick: () => {
-        router.push("/tasting-notes/new");
-      },
-    },
-    {
-      icon: <ShoppingCartOutlined />,
-      name: "구매했어요",
-      onClick: () => {
-        router.push("/purchase-notes/new");
-      },
-    },
-  ];
-
   /** 다이얼 상태 변경 함수 */
   const handleDialOpen = () => {
     setDialOpen(true);
@@ -216,33 +198,12 @@ export default function NotesFeedPage() {
 
       {/* 노트 작성 다이얼 */}
       <Backdrop open={dialOpen} />
-      <SpeedDial
-        sx={{
-          position: "fixed",
-          bottom: 72,
-          right: 12,
-          "& .MuiSpeedDial-fab": {
-            // 메인 버튼 설정
-            width: 45,
-            height: 45,
-          },
-        }}
-        icon={<SpeedDialIcon />}
-        onClose={handleDialClose}
-        onOpen={handleDialOpen}
-        open={dialOpen}
-        ariaLabel="dial"
-      >
-        {dialAction.map((action) => (
-          <SpeedDialAction
-            key={action.name}
-            icon={action.icon}
-            tooltipTitle={action.name}
-            tooltipOpen
-            onClick={action.onClick}
-          />
-        ))}
-      </SpeedDial>
+      <CreateNoteDial
+        dialOpen={dialOpen}
+        handleDialOpen={handleDialOpen}
+        handleDialClose={handleDialClose}
+        offset
+      />
     </ContainerBox>
   );
 }

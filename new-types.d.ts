@@ -193,18 +193,6 @@ interface aiNotes {
 
 // Props Types
 
-/** LiquorTitle 컴포넌트 호출 시 사용되는 props type */
-interface LiquorTitleProps {
-  thumbnailImageUrl: string | undefined;
-  koName: string | null;
-  type: string | null;
-  abv: string | null;
-  volume: string | null;
-  country: string | null;
-  region: string | null;
-  grapeVariety: string | null;
-}
-
 /** KeyValueInfoComponent 호출 시 사용되는 props type */
 interface KeyValueInfoProps {
   keyContent: string | null;
