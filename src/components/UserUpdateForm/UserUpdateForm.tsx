@@ -11,7 +11,8 @@ export default function UserUpdateForm() {
   const router = useRouter();
   const [user, setUser] = useState<User>(); // 응답받은 user 객체 관리
   const [nickname, setNickname] = useState(""); // 이름
-  const [profileImage, setProfileImage] = useState(""); // 이미지
+  const [profileImage, setProfileImage] = useState(""); // 이미지: 직접 업로드
+  const [defaultImage, setDefaultImage] = useState(""); // 이미지: 기본 이미지
 
   /** 초기 사용자 정보 요청 api */
   const getUserInfo = async () => {
@@ -35,6 +36,7 @@ export default function UserUpdateForm() {
       const formData = new FormData();
       formData.append("userUuid", user.userUuid);
       formData.append("profileNickname", nickname);
+      if (defaultImage) formData.append("defaultImage", defaultImage);
 
       // 호출 경로에 따라 동작 구분 (회원가입 시 정보 입력 or 회원 정보 수정)
       try {
@@ -73,12 +75,17 @@ export default function UserUpdateForm() {
     }
   };
 
+  /** 사용자 정보 변경 취소 */
+  const handleCancle = () => {
+    router.push("/mypage");
+  };
+
   /** 랜덤 프로필 이미지 요청 api */
   const getRandomImage = async () => {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users/random-image`
     );
-    setProfileImage(response.data);
+    setDefaultImage(response.data);
   };
 
   /** 랜덤 사용자 이름 요청 api */
@@ -109,34 +116,108 @@ export default function UserUpdateForm() {
   return (
     user && (
       <Stack
-        sx={{ justifyContent: "center", alignItems: "center", gap: "20px" }}
+        sx={{ alignItems: "center", gap: "60px", justifyContent: "center" }}
       >
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography>프로필 사진</Typography>
-          <Button size="small" variant="contained" onClick={getRandomImage}>
-            변경
+        {/* 이미지 설정 */}
+        <Stack
+          sx={{
+            width: "80%",
+            gap: "15px",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: "15px",
+            }}
+          >
+            <Typography
+              sx={{ fontSize: { xs: "18px", md: "20px" }, fontWeight: "600" }}
+            >
+              프로필 사진
+            </Typography>
+            <Button size="small" variant="contained" onClick={getRandomImage}>
+              자동생성
+            </Button>
+          </Box>
+          <Image
+            src={defaultImage ? defaultImage : profileImage}
+            alt="profile image"
+            width={0}
+            height={0}
+            sizes="100vw"
+            style={{
+              width: "100%",
+              height: "auto",
+              aspectRatio: "1/1",
+              objectFit: "cover",
+              objectPosition: "center",
+              borderRadius: "5px",
+            }}
+          />
+        </Stack>
+
+        {/* 이름 설정 */}
+        <Stack
+          sx={{
+            width: "80%",
+            gap: "15px",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: "15px",
+            }}
+          >
+            <Typography
+              sx={{ fontSize: { xs: "18px", md: "20px" }, fontWeight: "600" }}
+            >
+              이름
+            </Typography>
+            <Button
+              size="small"
+              variant="contained"
+              onClick={getRandomNickname}
+            >
+              자동생성
+            </Button>
+          </Box>
+          <TextField
+            variant="standard"
+            value={nickname}
+            onChange={handleNicknameChange}
+            sx={{ width: "100%" }}
+          />
+        </Stack>
+
+        {/* 버튼 그룹 */}
+        <Stack sx={{ gap: "10px", width: "80%" }}>
+          <Button
+            onClick={updateUserInfo}
+            size="small"
+            variant="contained"
+            sx={{ width: "100%" }}
+          >
+            완료
           </Button>
-        </Box>
-        <Image
-          src={profileImage}
-          alt="profile image"
-          width={255}
-          height={255}
-        />
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography>이름</Typography>
-          <Button size="small" variant="contained" onClick={getRandomNickname}>
-            자동생성
+          <Button
+            onClick={handleCancle}
+            size="small"
+            variant="contained"
+            sx={{ width: "100%" }}
+          >
+            취소
           </Button>
-        </Box>
-        <TextField
-          variant="standard"
-          value={nickname}
-          onChange={handleNicknameChange}
-        />
-        <Button onClick={updateUserInfo} size="small" variant="contained">
-          완료
-        </Button>
+        </Stack>
       </Stack>
     )
   );

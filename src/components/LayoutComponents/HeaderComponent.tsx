@@ -29,20 +29,22 @@ export default function HeaderComponent() {
     };
   }, [handleScroll, lastScrollY]);
 
+  /** 현재 경로 */
   const pathName = usePathname();
 
   // 네비게이션 바를 숨길 경로 패턴
   const hideNavPaths = [
+    "/purchase-notes/new",
     "/tasting-notes/new",
-    /^\/tasting-notes\/\d+\/edit$/, // 동적 ID를 포함한 edit 경로
+    "/purchase-notes/", // 구매 노트 관련 경로들의 공통 부분
+    "/tasting-notes/", // 감상 노트 관련 경로들의 공통 부분
+    "/liquors/",
+    "/mypage/",
+    "/join",
   ];
 
-  // 현재 경로가 숨길 경로 중 하나와 일치하면 네비게이션 바를 렌더링하지 않음
-  if (
-    hideNavPaths.some((path) =>
-      typeof path === "string" ? pathName === path : path.test(pathName),
-    )
-  ) {
+  // 현재 경로가 숨길 경로 중 하나로 시작하면 네비게이션 바를 렌더링하지 않음
+  if (hideNavPaths.some((path) => pathName.startsWith(path))) {
     return null;
   }
 

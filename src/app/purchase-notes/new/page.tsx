@@ -1,26 +1,16 @@
 "use client";
 
-import React, {
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
-  Checkbox,
-  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControlLabel,
   IconButton,
-  Rating,
   Stack,
   styled,
   TextField,
@@ -42,19 +32,14 @@ import Image from "next/image";
 import axios from "axios";
 
 /** 구매 노트 생성 요청 type */
-interface TastingNoteReq {
+interface PurchaseNoteReq {
   liquorId: number;
   noteImages: File[];
-  noteAromas: number[];
-  tastingAt: string;
+  purchaseAt: string;
   place: string;
-  method: string;
-  score: number;
+  price: number;
+  volume: number;
   content: string;
-  isDetail: boolean;
-  nose: string;
-  palate: string;
-  finish: string;
 }
 
 /** 이미지 미리보기 */
@@ -64,28 +49,21 @@ interface FileWithPreview {
   id: string;
 }
 
-const saveTastingNote = async (data: TastingNoteReq) => {
+const savePurchaseNote = async (data: PurchaseNoteReq) => {
   const formData = new FormData();
   formData.append("liquorId", `${data.liquorId}`);
-  formData.append("tastingAt", data.tastingAt);
+  formData.append("purchaseAt", data.purchaseAt);
   formData.append("place", data.place);
-  formData.append("method", data.method);
-  formData.append("score", `${data.score}`);
+  formData.append("price", `${data.price}`);
+  formData.append("volume", `${data.volume}`);
   formData.append("content", data.content);
-  formData.append("isDetail", `${data.isDetail}`);
-  formData.append("nose", data.nose);
-  formData.append("palate", data.palate);
-  formData.append("finish", data.finish);
   data.noteImages.forEach((image) => {
     formData.append("noteImages", image);
-  });
-  data.noteAromas.forEach((aroma) => {
-    formData.append("noteAromas", `${aroma}`);
   });
 
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/notes/tasting`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/notes/purchase`,
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
@@ -98,103 +76,35 @@ const saveTastingNote = async (data: TastingNoteReq) => {
   }
 };
 
-/** 주류 상세정보 API 요청 함수 */
-const getLiquor = async (liquorId: number) => {
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/liquors/${liquorId}`
-    );
-    return response.data;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-/** 아로마 추천 API 요청 함수 */
-const getRecommendAroma = async (aromaId: number, exclude: number[]) => {
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/aromas/similar`,
-      { params: { aromaId, exclude: exclude.join(",") } }
-    );
-    console.log(response.data);
-    return response.data;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-/** 아로마 추가 API 요청 함수 */
-const createCustomAroma = async (aromaName: string) => {
-  try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/aromas`,
-      { aromaName }
-    );
-    console.log(response.data);
-    return response.data;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-export default function NewTastingNotePage() {
+export default function NewPurchaseNotePage() {
   const { snackbar, showSnackbar, hideSnackbar } = useCustomSnackbar();
   const params = useSearchParams();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const liquorIdParam = params.get("liquorId");
+  const liquorId = params.get("liquorId");
 
   // states
-  const [tastingAt, setTastingAt] = useState<Dayjs | null>();
+  const [purchaseAt, setPurchaseAt] = useState<Dayjs | null>();
   const [place, setPlace] = useState("");
-  const [method, setMethod] = useState("");
-  const [score, setScore] = useState<number>(0);
+  const [price, setPrice] = useState<number>(0);
+  const [volume, setVolume] = useState<number>(0);
   const [content, setContent] = useState("");
-  const [isDetail, setIsDetail] = useState(false);
-  const [nose, setNose] = useState("");
-  const [palate, setPalate] = useState("");
-  const [finish, setFinish] = useState("");
   const [noteImages, setNoteImages] = useState<FileWithPreview[]>([]);
-  const [aromas, setAromas] = useState<Aroma[]>([]);
-  const [selectedAromas, setSelectedAromas] = useState<Aroma[]>([]);
-  const [customAroma, setCustomAroma] = useState("");
-  const handleTastingAtChange = (value: Dayjs | null) => {
-    setTastingAt(value);
+  const handlePurchaseAtChange = (value: Dayjs | null) => {
+    setPurchaseAt(value);
   };
   const handlePlaceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPlace(e.target.value);
   };
-  const handleMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMethod(e.target.value);
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPrice(+e.target.value);
   };
-  const handleScoreChange = (
-    e: SyntheticEvent<Element, Event>,
-    value: number | null
-  ) => {
-    if (value) setScore(value);
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVolume(+e.target.value);
   };
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setContent(e.target.value);
-  };
-  const handleIsDetailChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    checked: boolean
-  ) => {
-    setIsDetail(checked);
-  };
-  const handleNoseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNose(e.target.value);
-  };
-  const handlePalateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPalate(e.target.value);
-  };
-  const handleFinishChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFinish(e.target.value);
-  };
-  const handleCustomAromaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomAroma(e.target.value);
   };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -241,42 +151,6 @@ export default function NewTastingNotePage() {
     router.back();
   };
 
-  /** 테이스팅 칩 선택 처리 */
-  const handleAromaSelect = async (newAroma: Aroma) => {
-    let deleted = false;
-
-    const newSelectedAromas = selectedAromas.filter((aroma) => {
-      if (aroma.id === newAroma.id) {
-        deleted = true;
-        return false;
-      }
-      return true;
-    });
-
-    if (!deleted) {
-      // selectedAromas에 newAroma 추가
-      newSelectedAromas.push(newAroma);
-
-      // 아로마 추천 API 호출
-      const recommendedAromas = await getRecommendAroma(
-        newAroma.id,
-        aromas.map((aroma) => aroma.id)
-      );
-      setAromas([...aromas, ...recommendedAromas]);
-    }
-
-    setSelectedAromas(newSelectedAromas);
-  };
-
-  const handleCustomAromaCreate = async () => {
-    if (customAroma) {
-      const newAroma = await createCustomAroma(customAroma);
-      const isExist = aromas.some((aroma: Aroma) => aroma.id == newAroma.id);
-      if (!isExist) setAromas((prev) => [...prev, newAroma]);
-      setCustomAroma("");
-    }
-  };
-
   const getAuth = useCallback(async () => {
     try {
       const response = await fetch(
@@ -300,33 +174,23 @@ export default function NewTastingNotePage() {
       console.error("Error fetching auth data:", error);
     }
   }, [router]);
-
-  const loadLiquorData = useCallback(async () => {
+  const getLiquor = useCallback(async () => {
     try {
-      if (liquorIdParam) {
-        const data = await fetchLiquorData(liquorIdParam);
-        setLiquorData(data);
-      }
-    } catch (err) {
-      console.error(err);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/liquors/${liquorId}`
+      );
+      setLiquorData(await response.json());
+    } catch (error) {
+      console.error("Error fetching auth data:", error);
     }
-  }, [liquorIdParam, router]);
+  }, []);
 
   useEffect(() => {
     (async () => {
       await getAuth();
-      await loadLiquorData();
+      if (liquorId) await getLiquor();
     })();
-  }, [getAuth]);
-
-  useEffect(() => {
-    (async () => {
-      if (liquorData) {
-        const result: Liquor = await getLiquor(liquorData.id);
-        setAromas(result.liquorAromas);
-      } else setAromas([]);
-    })();
-  }, [liquorData]);
+  }, [getAuth, getLiquor]);
 
   // 컴포넌트 언마운트 시 모든 미리보기 URL 정리
   useEffect(() => {
@@ -336,31 +200,26 @@ export default function NewTastingNotePage() {
   }, [noteImages]);
 
   const handleSave = async () => {
-    if (!liquorData || !tastingAt) {
+    if (!liquorData || !purchaseAt) {
       alert("주류를 선택해주세요.");
       return;
     }
 
-    const noteSavingData: TastingNoteReq = {
+    const noteSavingData: PurchaseNoteReq = {
       liquorId: liquorData.id,
       noteImages: noteImages.map((image) => image.file),
-      noteAromas: selectedAromas.map((aroma) => aroma.id),
-      tastingAt: tastingAt?.format("YYYY-MM-DD"),
+      purchaseAt: purchaseAt?.format("YYYY-MM-DD"),
       place,
-      method,
-      score,
+      price,
+      volume,
       content,
-      isDetail,
-      nose,
-      palate,
-      finish,
     };
 
     setSaving(true);
 
     try {
-      const noteId = await saveTastingNote(noteSavingData);
-      router.push(`/tasting-notes/${noteId}`);
+      const noteId = await savePurchaseNote(noteSavingData);
+      router.push(`/purchase-notes/${noteId}`);
       showSnackbar("저장에 성공했습니다.", "success");
     } catch (error: unknown) {
       const errorMessage =
@@ -375,7 +234,7 @@ export default function NewTastingNotePage() {
 
   return (
     <Stack>
-      <PageTitleComponent title="테이스팅 노트 작성하기" />
+      <PageTitleComponent title="구매 노트 작성하기" />
       <Stack sx={{ margin: "30px 0", gap: "30px" }}>
         {/* 주류 선택 */}
         <Stack sx={{ gap: "5px" }}>
@@ -386,7 +245,7 @@ export default function NewTastingNotePage() {
               alignItems: "center",
             }}
           >
-            <Typography>어떤 주류를 마셨나요?</Typography>
+            <Typography>어떤 주류를 구매했나요?</Typography>
             <Button size="small" onClick={handleClearLiquorData}>
               초기화
             </Button>
@@ -427,11 +286,11 @@ export default function NewTastingNotePage() {
           />
         </Stack>
 
-        {/* 감상 장소 */}
+        {/* 구매 장소 */}
         <Stack sx={{ gap: "10px" }}>
-          <Typography>어디서 마셨나요?</Typography>
+          <Typography>어디서 구매했나요?</Typography>
           <TextField
-            label="감상 장소"
+            label="구매 장소"
             variant="outlined"
             size="small"
             value={place}
@@ -439,121 +298,42 @@ export default function NewTastingNotePage() {
           />
         </Stack>
 
-        {/* 감상 일자 */}
         <Stack sx={{ gap: "10px" }}>
-          <Typography>언제 마셨나요?</Typography>
+          <Typography>언제 구매했나요?</Typography>
           <DatePicker
-            label="감상 일자"
+            label="구매 일자"
             format="YYYY년 MM월 DD일"
             slotProps={{ textField: { size: "small" } }}
-            value={tastingAt}
-            onChange={handleTastingAtChange}
+            value={purchaseAt}
+            onChange={handlePurchaseAtChange}
           />
         </Stack>
 
-        {/* 감상 방법 */}
         <Stack sx={{ gap: "10px" }}>
-          <Typography>어떤 방법으로 마셨나요?</Typography>
+          <Typography>얼마에 구매했나요?</Typography>
           <TextField
-            label="감상 방법"
+            label="가격"
             variant="outlined"
             size="small"
-            value={method}
-            onChange={handleMethodChange}
+            value={price}
+            onChange={handlePriceChange}
           />
         </Stack>
 
-        {/* 아로마 선택 */}
         <Stack sx={{ gap: "10px" }}>
-          <Stack>
-            <Typography>어떤 향이 느껴졌나요?</Typography>
-            <Typography
-              color="textSecondary" // 연한 색상 사용
-              sx={{ fontSize: "12px", fontWeight: 400 }} // 크기를 더 작게 설정
-            >
-              키워드를 선택하면, 인공지능이 계속해서 추천해줍니다.
-            </Typography>
-          </Stack>
-
-          {/* 키워드 선택 */}
-          <Box
-            sx={{
-              padding: "10px 10px",
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 0.5,
-              width: "100%",
-              backgroundColor: "whitesmoke",
-              borderRadius: "5px",
-            }}
-          >
-            {aromas && aromas.length ? (
-              aromas.map((aroma: Aroma, index) => (
-                <StyledChip
-                  sx={{ margin: "2px", color: "black", fontSize: "12px" }}
-                  key={index}
-                  label={aroma.name}
-                  onClick={() => handleAromaSelect(aroma)}
-                  selected={selectedAromas.some(
-                    (selectedAroma) => selectedAroma.id === aroma.id
-                  )}
-                />
-              ))
-            ) : (
-              <Typography
-                color="textSecondary" // 연한 색상 사용
-                align="center"
-                sx={{ fontSize: "12px", fontWeight: 400 }} // 크기를 더 작게 설정
-              >
-                추천 키워드가 없습니다.
-              </Typography>
-            )}
-          </Box>
-
-          {/* 키워드 추가 */}
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "row",
-              gap: "10px",
-            }}
-          >
-            <TextField
-              fullWidth
-              label="키워드 추가"
-              variant="outlined"
-              size="small"
-              value={customAroma}
-              onChange={handleCustomAromaChange}
-            />
-            <Button
-              variant="outlined"
-              onClick={handleCustomAromaCreate}
-              style={{
-                width: "16px",
-                height: "40px",
-                padding: 0,
-              }}
-            >
-              <Add />
-            </Button>
-          </Box>
-        </Stack>
-
-        {/* 점수 */}
-        <Stack sx={{ gap: "10px" }}>
-          <Typography>점수를 매겨주세요!</Typography>
-          <Rating
-            name="simple-controlled"
-            value={score}
-            onChange={handleScoreChange}
+          <Typography>용량은 얼마인가요?</Typography>
+          <TextField
+            label="용량"
+            variant="outlined"
+            size="small"
+            value={volume}
+            onChange={handleVolumeChange}
           />
         </Stack>
 
         {/* 본문 및 이미지 */}
         <Stack sx={{ gap: "10px" }}>
-          <Typography>테이스팅 노트를 자유롭게 작성해주세요.</Typography>
+          <Typography>후기를 자유롭게 작성해주세요.</Typography>
 
           {/* 이미지 목록 */}
           {noteImages.length ? (
@@ -630,36 +410,6 @@ export default function NewTastingNotePage() {
           />
 
           {/* 본문 */}
-          {isDetail ? (
-            <Stack sx={{ gap: "5px" }}>
-              <TextField
-                label="Nose"
-                variant="outlined"
-                size="medium"
-                multiline
-                value={nose}
-                onChange={handleNoseChange}
-              />
-              <TextField
-                label="Palate"
-                variant="outlined"
-                size="medium"
-                multiline
-                value={palate}
-                onChange={handlePalateChange}
-              />
-              <TextField
-                label="Finish"
-                variant="outlined"
-                size="medium"
-                multiline
-                value={finish}
-                onChange={handleFinishChange}
-              />
-            </Stack>
-          ) : null}
-
-          {/* 본문 */}
           <TextField
             label="본문"
             variant="outlined"
@@ -667,18 +417,6 @@ export default function NewTastingNotePage() {
             multiline
             value={content}
             onChange={handleContentChange}
-          />
-
-          {/* 상세작성 버튼 */}
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                value={isDetail}
-                onChange={handleIsDetailChange}
-              />
-            }
-            label="상세작성"
           />
         </Stack>
 
@@ -746,11 +484,3 @@ const SaveButton = styled(Button)({
     backgroundColor: "#303f9f",
   },
 });
-
-const StyledChip = styled(Chip)<{ selected: boolean }>(({ selected }) => ({
-  backgroundColor: selected ? "#ffeb3b" : "#e0e0e0",
-  // 호버링 애니메이션 제거
-  "&:hover": {
-    backgroundColor: selected ? "#ffeb3b" : "#e0e0e0",
-  },
-}));

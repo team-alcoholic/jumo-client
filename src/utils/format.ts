@@ -41,6 +41,19 @@ export const formatDate = (dateString: string): string => {
   return `${("0" + (date.getUTCMonth() + 1)).slice(-2)}.${("0" + date.getUTCDate()).slice(-2)}(${day})`;
 };
 
+export const formatFullDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const day = days[date.getUTCDay()];
+  return `${date.getUTCFullYear()}년 ${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
+};
+
+export const formatFullDateTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  const hours = ("0" + date.getHours()).slice(-2);
+  const minutes = ("0" + date.getMinutes()).slice(-2);
+  return `${date.getUTCFullYear()}년 ${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일 ${hours}:${minutes}`;
+};
+
 export const formatDateWithoutDay = (dateString: string): string => {
   const date = new Date(dateString);
   return `${("0" + (date.getUTCMonth() + 1)).slice(-2)}.${("0" + date.getUTCDate()).slice(-2)}`;
