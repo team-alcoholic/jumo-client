@@ -40,7 +40,9 @@ export default function TastingNoteCard({ note }: { note: TastingNote }) {
             >
               {note.user.profileNickname}님이 {note.liquor.koName}을 마셨어요.
             </ContentTypography>
-            <Typography sx={{ fontSize: { xs: "10px", md: "12px" } }}>
+            <Typography
+              sx={{ color: "gray", fontSize: { xs: "10px", md: "12px" } }}
+            >
               {formatFullDateTime(note.createdAt)}
             </Typography>
           </Box>
@@ -84,59 +86,95 @@ export default function TastingNoteCard({ note }: { note: TastingNote }) {
             </Box>
           ) : null}
 
-          {/* 점수 및 본문 */}
-          <Box>
-            {/* 점수 */}
-            <Rating name="read-only" value={note.score} size="small" readOnly />
-
-            {/* 본문 내용 */}
-            <ContentTypography
+          {/* 점수 */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: { xs: "5px", md: "10px" },
+            }}
+          >
+            <Typography
               sx={{
-                padding: "5px",
+                width: { xs: "25px", md: "30px" },
+                color: "gray",
                 fontSize: { xs: "12px", md: "15px" },
-                WebkitLineClamp: 5, // 표시할 줄 수
               }}
             >
-              {note.content}
-            </ContentTypography>
+              점수
+            </Typography>
+            <Rating
+              name="read-only"
+              value={note.score}
+              size="small"
+              readOnly
+              sx={{ padding: "0 2px" }}
+            />
+          </Box>
 
-            {/* 상세작성 내용 */}
-            {note.isDetail && (
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  padding: "5px",
-                  gap: "5px",
-                }}
-              >
+          {/* 본문 */}
+          {note.content ? (
+            <Box
+              sx={{
+                padding: "5px",
+                borderRadius: "5px",
+                backgroundColor: "whitesmoke",
+              }}
+            >
+              {/* 본문 내용 */}
+              <Box>
                 <ContentTypography
                   sx={{
-                    fontSize: { xs: "10px", md: "12px" },
-                    WebkitLineClamp: 2, // 표시할 줄 수
+                    padding: "5px",
+                    fontSize: { xs: "12px", md: "15px" },
+                    WebkitLineClamp: 5, // 표시할 줄 수
                   }}
                 >
-                  NOSE: {note.nose}
-                </ContentTypography>
-                <ContentTypography
-                  sx={{
-                    fontSize: { xs: "10px", md: "12px" },
-                    WebkitLineClamp: 2, // 표시할 줄 수
-                  }}
-                >
-                  PALATE: {note.palate}
-                </ContentTypography>
-                <ContentTypography
-                  sx={{
-                    fontSize: { xs: "10px", md: "12px" },
-                    WebkitLineClamp: 2, // 표시할 줄 수
-                  }}
-                >
-                  FINISH: {note.finish}
+                  {note.content}
                 </ContentTypography>
               </Box>
-            )}
-          </Box>
+
+              {/* 상세작성 내용 */}
+              {note.isDetail && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: "5px",
+                    gap: "5px",
+                    borderRadius: "5px",
+                    backgroundColor: "whitesmoke",
+                  }}
+                >
+                  <ContentTypography
+                    sx={{
+                      fontSize: { xs: "10px", md: "12px" },
+                      WebkitLineClamp: 2, // 표시할 줄 수
+                    }}
+                  >
+                    NOSE: {note.nose}
+                  </ContentTypography>
+                  <ContentTypography
+                    sx={{
+                      fontSize: { xs: "10px", md: "12px" },
+                      WebkitLineClamp: 2, // 표시할 줄 수
+                    }}
+                  >
+                    PALATE: {note.palate}
+                  </ContentTypography>
+                  <ContentTypography
+                    sx={{
+                      fontSize: { xs: "10px", md: "12px" },
+                      WebkitLineClamp: 2, // 표시할 줄 수
+                    }}
+                  >
+                    FINISH: {note.finish}
+                  </ContentTypography>
+                </Box>
+              )}
+            </Box>
+          ) : null}
         </Stack>
       )}
     </LinkButton>

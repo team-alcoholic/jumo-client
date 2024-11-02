@@ -31,7 +31,9 @@ export default function PurchaseNoteCard({ note }: { note: PurchaseNote }) {
             >
               {note.user.profileNickname}님이 {note.liquor.koName}을 구매했어요.
             </ContentTypography>
-            <Typography sx={{ fontSize: { xs: "10px", md: "12px" } }}>
+            <Typography
+              sx={{ color: "gray", fontSize: { xs: "10px", md: "12px" } }}
+            >
               {formatFullDateTime(note.createdAt)}
             </Typography>
           </Box>
@@ -55,27 +57,71 @@ export default function PurchaseNoteCard({ note }: { note: PurchaseNote }) {
           ) : null}
 
           {/* 구매 정보 */}
-          <Box>
-            <Typography sx={{ fontSize: { xs: "12px", md: "15px" } }}>
-              구매처 {note.place}
-            </Typography>
-            <Typography sx={{ fontSize: { xs: "12px", md: "15px" } }}>
-              가격 {note.price}
-            </Typography>
+          <Box sx={{ padding: "0 5px" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: { xs: "5px", md: "10px" },
+              }}
+            >
+              <Typography
+                sx={{
+                  width: { xs: "40px", md: "60px" },
+                  color: "gray",
+                  fontSize: { xs: "12px", md: "15px" },
+                }}
+              >
+                구매처
+              </Typography>
+              <Typography sx={{ fontSize: { xs: "12px", md: "15px" } }}>
+                {note.place ? note.place : "-"}
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: { xs: "5px", md: "10px" },
+              }}
+            >
+              <Typography
+                sx={{
+                  width: { xs: "40px", md: "60px" },
+                  color: "gray",
+                  fontSize: { xs: "12px", md: "15px" },
+                }}
+              >
+                가격
+              </Typography>
+              <Typography sx={{ fontSize: { xs: "12px", md: "15px" } }}>
+                {note.price ? `${note.price}원` : "-"}
+              </Typography>
+            </Box>
           </Box>
 
           {/* 본문 내용 */}
-          <Box>
-            <ContentTypography
+          {note.content ? (
+            <Box
               sx={{
                 padding: "5px",
-                fontSize: { xs: "12px", md: "15px" },
-                WebkitLineClamp: 5, // 표시할 줄 수
+                borderRadius: "5px",
+                backgroundColor: "whitesmoke",
               }}
             >
-              {note.content}
-            </ContentTypography>
-          </Box>
+              <ContentTypography
+                sx={{
+                  padding: "2px 5px",
+                  fontSize: { xs: "12px", md: "15px" },
+                  WebkitLineClamp: 3, // 표시할 줄 수
+                }}
+              >
+                {note.content}
+              </ContentTypography>
+            </Box>
+          ) : null}
         </Stack>
       )}
     </LinkButton>
@@ -89,7 +135,7 @@ const LinkButton = styled(Link)({
   justifyContent: "space-between",
   gap: "2px",
   margin: "15px 0",
-  padding: "15px 15px",
+  padding: "15px",
   // maxWidth: "800px",
   minHeight: "150px",
   // border: "0.5px solid",
