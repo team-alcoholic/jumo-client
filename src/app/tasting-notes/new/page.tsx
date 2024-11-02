@@ -95,7 +95,9 @@ const saveTastingNote = async (data: TastingNoteReq) => {
     );
     return response.data.id;
   } catch (err) {
-    console.error(err);
+    if (axios.isAxiosError(err) && err.response?.status === 413) {
+      return -1;
+    } else console.error(err);
   }
 };
 
@@ -366,8 +368,12 @@ function NewTastingNotePageComponent() {
 
     try {
       const noteId = await saveTastingNote(noteSavingData);
-      router.push(`/tasting-notes/${noteId}`);
-      showSnackbar("저장에 성공했습니다.", "success");
+      if (noteId == -1) {
+        alert("10MB 이내의 파일을 선택해주세요.");
+      } else {
+        router.push(`/tasting-notes/${noteId}`);
+        showSnackbar("저장에 성공했습니다.", "success");
+      }
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
@@ -623,7 +629,7 @@ function NewTastingNotePageComponent() {
           >
             <Add />
             <Typography sx={{ fontSize: { xs: "15px" } }}>
-              이미지 추가하기
+              이미지 추가하기 (10MB 이내)
             </Typography>
           </Button>
           <input
