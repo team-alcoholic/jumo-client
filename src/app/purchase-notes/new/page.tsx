@@ -17,8 +17,6 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
-  InputAdornment,
-  OutlinedInput,
   Stack,
   styled,
   TextField,
@@ -45,8 +43,8 @@ interface PurchaseNoteReq {
   noteImages: File[];
   purchaseAt: string;
   place: string;
-  price: number | undefined;
-  volume: number | undefined;
+  price: number;
+  volume: number;
   content: string;
 }
 
