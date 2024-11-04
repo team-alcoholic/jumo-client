@@ -34,14 +34,12 @@ export interface ReviewUpdateData {
   finishNotes: string | null;
 }
 
-const LIQUOR_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/liquors/`;
+const LIQUOR_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/liquors/`;
 const LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/similar-tasting-notes`;
 const AI_LIQUOR_NOTES_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ai-similar-tasting-notes`;
 const SAVE_REVIEW_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasting-notes`;
 
-export const fetchLiquorData = async (
-  liquorId: string,
-): Promise<LiquorData> => {
+export const fetchLiquorData = async (liquorId: string): Promise<Liquor> => {
   const response = await fetch(LIQUOR_URL + liquorId);
   if (!response.ok) throw new Error("Failed to fetch data");
 
@@ -56,10 +54,10 @@ export const fetchAiNotes = async (liquorId: string): Promise<aiNotes> => {
 
 export const fetchRelatedNotes = async (
   note: string,
-  exclude: string,
+  exclude: string
 ): Promise<string[]> => {
   const response = await fetch(
-    `${LIQUOR_NOTES_URL}?keyword=${encodeURIComponent(note)}&exclude=${encodeURIComponent(exclude)}&limit=5`,
+    `${LIQUOR_NOTES_URL}?keyword=${encodeURIComponent(note)}&exclude=${encodeURIComponent(exclude)}&limit=5`
   );
 
   if (!response.ok) return [];
@@ -84,7 +82,7 @@ export const saveReviewData = async (data: ReviewSavingData): Promise<void> => {
 };
 
 export const updateReviewData = async (
-  data: ReviewUpdateData,
+  data: ReviewUpdateData
 ): Promise<void> => {
   const response = await fetch(SAVE_REVIEW_URL + "/" + data.id, {
     method: "PUT",
@@ -104,11 +102,11 @@ export const updateReviewData = async (
 export const checkUserPermission = async (user: User) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users`,
       {
         method: "GET",
         credentials: "include",
-      },
+      }
     );
     const fetchedUser = await response.json();
     return fetchedUser.userUuid === user.userUuid;

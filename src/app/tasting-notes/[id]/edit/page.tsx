@@ -1,4 +1,7 @@
 "use client";
+
+// 임시 비활성화
+
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import {
   Button,
@@ -85,7 +88,7 @@ const TastingNotesEditPageComponent = ({
   const [totalScore, setTotalScore] = useState<string>("");
   const [overallNote, setOverallNote] = useState<string>("");
   const [mood, setMood] = useState<string>("");
-  const [liquorData, setLiquorData] = useState<LiquorData | null>(null);
+  const [liquorData, setLiquorData] = useState<Liquor | null>(null);
 
   const loadReviewData = useCallback(async () => {
     try {
@@ -125,35 +128,35 @@ const TastingNotesEditPageComponent = ({
         new Set(tastingNotesTaste),
         new Set(tastingNotesFinish),
       ]);
-      tastingNotesAroma = [
-        ...tastingNotesAroma,
-        ...(liquor.tastingNotesAroma
-          ? liquor.tastingNotesAroma.split(", ")
-          : []),
-        ...(liquor.aiNotes?.tastingNotesAroma
-          ? liquor.aiNotes.tastingNotesAroma.split(", ")
-          : []),
-      ];
+      // tastingNotesAroma = [
+      //   ...tastingNotesAroma,
+      //   ...(liquor.tastingNotesAroma
+      //     ? liquor.tastingNotesAroma.split(", ")
+      //     : []),
+      //   ...(liquor.aiNotes?.tastingNotesAroma
+      //     ? liquor.aiNotes.tastingNotesAroma.split(", ")
+      //     : []),
+      // ];
 
-      tastingNotesTaste = [
-        ...tastingNotesTaste,
-        ...(liquor.tastingNotesTaste
-          ? liquor.tastingNotesTaste.split(", ")
-          : []),
-        ...(liquor.aiNotes?.tastingNotesTaste
-          ? liquor.aiNotes.tastingNotesTaste.split(", ")
-          : []),
-      ];
+      // tastingNotesTaste = [
+      //   ...tastingNotesTaste,
+      //   ...(liquor.tastingNotesTaste
+      //     ? liquor.tastingNotesTaste.split(", ")
+      //     : []),
+      //   ...(liquor.aiNotes?.tastingNotesTaste
+      //     ? liquor.aiNotes.tastingNotesTaste.split(", ")
+      //     : []),
+      // ];
 
-      tastingNotesFinish = [
-        ...tastingNotesFinish,
-        ...(liquor.tastingNotesFinish
-          ? liquor.tastingNotesFinish.split(", ")
-          : []),
-        ...(liquor.aiNotes?.tastingNotesFinish
-          ? liquor.aiNotes.tastingNotesFinish.split(", ")
-          : []),
-      ];
+      // tastingNotesFinish = [
+      //   ...tastingNotesFinish,
+      //   ...(liquor.tastingNotesFinish
+      //     ? liquor.tastingNotesFinish.split(", ")
+      //     : []),
+      //   ...(liquor.aiNotes?.tastingNotesFinish
+      //     ? liquor.aiNotes.tastingNotesFinish.split(", ")
+      //     : []),
+      // ];
       setRelatedNotes([
         new Set(tastingNotesAroma),
         new Set(tastingNotesTaste),
@@ -185,7 +188,7 @@ const TastingNotesEditPageComponent = ({
   };
   const updateSetRelatedNotes = (
     newRelatedNotes: string[],
-    currentTab: number,
+    currentTab: number
   ) => {
     setRelatedNotes((prev) => {
       const updatedRelatedNotes = [...prev];
@@ -369,9 +372,17 @@ export default function TastingNotesEditPage({
 }: {
   params: { id: string };
 }) {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <TastingNotesEditPageComponent id={id} />
-    </Suspense>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    alert("주모 공사중입니다.");
+    router.back();
+  });
+
+  return null;
+  // return (
+  //   <Suspense fallback={<div>Loading...</div>}>
+  //     <TastingNotesEditPageComponent id={id} />
+  //   </Suspense>
+  // );
 }

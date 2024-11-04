@@ -1,100 +1,298 @@
 "use client";
-import React, { Suspense, useCallback, useEffect, useState } from "react";
+
+import React, {
+  Suspense,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
-  Alert,
-  AlertProps,
+  Box,
   Button,
+  Checkbox,
+  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Skeleton,
-  Snackbar,
-  Tab,
-  Tabs,
+  FormControlLabel,
+  IconButton,
+  Rating,
+  Stack,
+  styled,
+  TextField,
+  Typography,
 } from "@mui/material";
-import TabContentComponent from "@/components/TastingNotesComponent/TabContentComponent";
-import TotalScoreComponent from "@/components/TastingNotesComponent/TotalScoreComponent";
-import MoodSelectorComponent from "@/components/TastingNotesComponent/MoodSelectorComponent";
-import {
-  Container,
-  SaveButton,
-  StyledTab,
-  StyledTabs,
-  TabContent,
-} from "@/app/tasting-notes/new/StyledComponent";
 import LiquorTitle from "@/components/TastingNotesComponent/LiquorTitle";
-import { calculateAverageScore } from "@/utils/format";
-import {
-  fetchAiNotes,
-  fetchLiquorData,
-  fetchRelatedNotes,
-  ReviewSavingData,
-  saveReviewData,
-} from "@/api/tastingNotesApi";
+import { fetchLiquorData } from "@/api/tastingNotesApi";
 import { useRouter, useSearchParams } from "next/navigation";
-import TastingNotesSkeleton from "@/components/TastingNotesComponent/TastingNotesSkeleton";
-import { styled } from "@mui/material/styles";
 import {
   CustomSnackbar,
   useCustomSnackbar,
 } from "@/components/Snackbar/CustomSnackbar";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { Add, Close } from "@mui/icons-material";
+import LiquorSelectModal from "@/components/NoteComponent/LiquorSelectModal";
+import { Dayjs } from "dayjs";
+import PageTitleComponent from "@/components/LayoutComponents/PageTitleComponent";
+import Image from "next/image";
+import axios from "axios";
 
-const TastingNotesNewPageComponent = () => {
+/** 구매 노트 생성 요청 type */
+interface TastingNoteReq {
+  liquorId: number;
+  noteImages: File[];
+  noteAromas: number[];
+  tastingAt: string;
+  place: string;
+  method: string;
+  score: number;
+  content: string;
+  isDetail: boolean;
+  nose: string;
+  palate: string;
+  finish: string;
+}
+
+/** 이미지 미리보기 */
+interface FileWithPreview {
+  file: File;
+  preview: string;
+  id: string;
+}
+
+const saveTastingNote = async (data: TastingNoteReq) => {
+  const formData = new FormData();
+  formData.append("liquorId", `${data.liquorId}`);
+  formData.append("tastingAt", data.tastingAt);
+  formData.append("place", data.place);
+  formData.append("method", data.method);
+  formData.append("score", `${data.score}`);
+  formData.append("content", data.content);
+  formData.append("isDetail", `${data.isDetail}`);
+  formData.append("nose", data.nose);
+  formData.append("palate", data.palate);
+  formData.append("finish", data.finish);
+  data.noteImages.forEach((image) => {
+    formData.append("noteImages", image);
+  });
+  data.noteAromas.forEach((aroma) => {
+    formData.append("noteAromas", `${aroma}`);
+  });
+
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/notes/tasting`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      }
+    );
+    return response.data.id;
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 413) {
+      return -1;
+    } else console.error(err);
+  }
+};
+
+/** 주류 상세정보 API 요청 함수 */
+const getLiquor = async (liquorId: number) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/liquors/${liquorId}`
+    );
+    return response.data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+/** 아로마 추천 API 요청 함수 */
+const getRecommendAroma = async (aromaId: number, exclude: number[]) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/aromas/similar`,
+      { params: { aromaId, exclude: exclude.join(",") } }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+/** 아로마 추가 API 요청 함수 */
+const createCustomAroma = async (aromaName: string) => {
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/aromas`,
+      { aromaName }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+function NewTastingNotePageComponent() {
   const { snackbar, showSnackbar, hideSnackbar } = useCustomSnackbar();
-
   const params = useSearchParams();
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const liquorId = params.get("liquorId");
+  const liquorIdParam = params.get("liquorId");
 
+  // states
+  const [tastingAt, setTastingAt] = useState<Dayjs | null>();
+  const [place, setPlace] = useState("");
+  const [method, setMethod] = useState("");
+  const [score, setScore] = useState<number>(0);
+  const [content, setContent] = useState("");
+  const [isDetail, setIsDetail] = useState(false);
+  const [nose, setNose] = useState("");
+  const [palate, setPalate] = useState("");
+  const [finish, setFinish] = useState("");
+  const [noteImages, setNoteImages] = useState<FileWithPreview[]>([]);
+  const [aromas, setAromas] = useState<Aroma[]>([]);
+  const [selectedAromas, setSelectedAromas] = useState<Aroma[]>([]);
+  const [customAroma, setCustomAroma] = useState("");
+  const handleTastingAtChange = (value: Dayjs | null) => {
+    setTastingAt(value);
+  };
+  const handlePlaceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPlace(e.target.value);
+  };
+  const handleMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMethod(e.target.value);
+  };
+  const handleScoreChange = (
+    e: SyntheticEvent<Element, Event>,
+    value: number | null
+  ) => {
+    if (value) setScore(value);
+  };
+  const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setContent(e.target.value);
+  };
+  const handleIsDetailChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    checked: boolean
+  ) => {
+    setIsDetail(checked);
+  };
+  const handleNoseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNose(e.target.value);
+  };
+  const handlePalateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPalate(e.target.value);
+  };
+  const handleFinishChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFinish(e.target.value);
+  };
+  const handleCustomAromaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomAroma(e.target.value);
+  };
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const newFiles = Array.from(e.target.files).map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+      id: `${file.name}-${Date.now()}`,
+    }));
+    setNoteImages((prev) => [...prev, ...newFiles]);
+  };
+  const handleImageRemove = useCallback((indexToRemove: number) => {
+    setNoteImages((prev) => {
+      // 삭제되는 파일의 미리보기 URL 해제
+      URL.revokeObjectURL(prev[indexToRemove].preview);
+      return prev.filter((_, index) => index !== indexToRemove);
+    });
+  }, []);
+  const handleImageButtonClick = (): void => {
+    fileInputRef.current?.click();
+  };
+
+  const [liquorData, setLiquorData] = useState<Liquor | null>(null);
+  const handleClearLiquorData = () => {
+    setLiquorData(null);
+  };
+
+  // 주류 선택 모달 관련 state 및 callback
+  const [openLiquorDialog, setOpenLiquorDialog] = useState(false);
+  const handleOpenLiquorDialog = () => {
+    setOpenLiquorDialog(true);
+  };
+  const handleCloseLiquorDialog = (value: Liquor | null) => {
+    setOpenLiquorDialog(false);
+    setLiquorData(value);
+  };
+
+  const [saving, setSaving] = useState(false); // 추가
   const [openCancelDialog, setopenCancelDialog] = useState(false);
   const handleCancel = () => {
     setopenCancelDialog(true);
   };
   const handleCancelRedirect = () => {
     setopenCancelDialog(false);
-    router.push(`/liquors/${liquorId}`);
+    router.back();
   };
 
-  const [selectedTab, setSelectedTab] = useState(0);
-  const [relatedNotes, setRelatedNotes] = useState<Set<string>[]>([
-    new Set(),
-    new Set(),
-    new Set(),
-  ]);
-  const [selectedNotes, setSelectedNotes] = useState<Set<string>[]>([
-    new Set(),
-    new Set(),
-    new Set(),
-  ]);
+  /** 테이스팅 칩 선택 처리 */
+  const handleAromaSelect = async (newAroma: Aroma) => {
+    let deleted = false;
 
-  const [hasAiNotes, setHasAiNotes] = useState<boolean | null>(null);
+    const newSelectedAromas = selectedAromas.filter((aroma) => {
+      if (aroma.id === newAroma.id) {
+        deleted = true;
+        return false;
+      }
+      return true;
+    });
 
-  const [scores, setScores] = useState<(number | null)[]>([null, null, null]);
-  const [memos, setMemos] = useState<string[]>(["", "", ""]);
+    if (!deleted) {
+      // selectedAromas에 newAroma 추가
+      newSelectedAromas.push(newAroma);
 
-  const [saving, setSaving] = useState(false); // 추가
+      // 아로마 추천 API 호출
+      const recommendedAromas = await getRecommendAroma(
+        newAroma.id,
+        aromas.map((aroma) => aroma.id)
+      );
+      setAromas([...aromas, ...recommendedAromas]);
+    }
 
-  const [totalScore, setTotalScore] = useState<string>("");
-  const [overallNote, setOverallNote] = useState<string>("");
-  const [mood, setMood] = useState<string>("");
-  const [liquorData, setLiquorData] = useState<LiquorData | null>(null);
+    setSelectedAromas(newSelectedAromas);
+  };
+
+  const handleCustomAromaCreate = async () => {
+    if (customAroma) {
+      const newAroma = await createCustomAroma(customAroma);
+      const isExist = aromas.some((aroma: Aroma) => aroma.id == newAroma.id);
+      if (!isExist) setAromas((prev) => [...prev, newAroma]);
+      setCustomAroma("");
+    }
+  };
+
   const getAuth = useCallback(async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/users`,
         {
           method: "GET",
           credentials: "include", // 세션 기반 인증에 필요한 경우 추가
-        },
+        }
       );
 
       if (response.status === 401) {
         alert(
-          "리뷰 작성은 로그인이 필요합니다.(카카오로 1초 로그인 하러 가기)",
+          "노트 작성은 로그인이 필요합니다. 카카오 1초 로그인을 진행해보세요!"
         );
         const redirectUrl = window.location.href;
         router.push(`/login?redirectTo=${encodeURIComponent(redirectUrl)}`);
@@ -108,155 +306,74 @@ const TastingNotesNewPageComponent = () => {
 
   const loadLiquorData = useCallback(async () => {
     try {
-      if (!liquorId) {
-        alert("리뷰 작성을 위해서는 주류 검색이 필요합니다.");
-        router.push("/liquors");
-        return;
+      if (liquorIdParam) {
+        const data = await fetchLiquorData(liquorIdParam);
+        setLiquorData(data);
       }
-      const data = await fetchLiquorData(liquorId);
-      setLiquorData(data);
-
-      let tastingNotesAroma = new Set(
-        data.tastingNotesAroma?.split(", ") || [],
-      );
-      let tastingNotesTaste = new Set(
-        data.tastingNotesTaste?.split(", ") || [],
-      );
-      let tastingNotesFinish = new Set(
-        data.tastingNotesFinish?.split(", ") || [],
-      );
-
-      if (data.aiNotes) {
-        setHasAiNotes(true);
-        data.aiNotes.tastingNotesAroma
-          .split(", ")
-          .forEach((note: string) => tastingNotesAroma.add(note));
-        data.aiNotes.tastingNotesTaste
-          .split(", ")
-          .forEach((note: string) => tastingNotesTaste.add(note));
-        data.aiNotes.tastingNotesFinish
-          .split(", ")
-          .forEach((note: string) => tastingNotesFinish.add(note));
-      } else {
-        getAiNotes(liquorId);
-      }
-
-      setRelatedNotes([
-        tastingNotesAroma,
-        tastingNotesTaste,
-        tastingNotesFinish,
-      ]);
-    } catch (error) {
-      alert("주류 정보를 불러오는데 실패했습니다. 주류를 다시 선택해주세요.");
-      router.push("/liquors");
+    } catch (err) {
+      console.error(err);
     }
-  }, [liquorId, router]);
+  }, [liquorIdParam, router]);
 
   useEffect(() => {
     (async () => {
       await getAuth();
       await loadLiquorData();
     })();
-  }, [getAuth, loadLiquorData]);
-
-  const getAiNotes = async (liquorId: string) => {
-    setHasAiNotes(false);
-    const aiData = await fetchAiNotes(liquorId);
-    setRelatedNotes((prev) => [
-      new Set([...Array.from(prev[0]), ...aiData.noseNotes]),
-      new Set([...Array.from(prev[1]), ...aiData.palateNotes]),
-      new Set([...Array.from(prev[2]), ...aiData.finishNotes]),
-    ]);
-    setHasAiNotes(true);
-  };
+  }, [getAuth]);
 
   useEffect(() => {
-    const averageScore = calculateAverageScore(scores[0], scores[1], scores[2]);
-    setTotalScore(averageScore ? averageScore.toString() : "");
-  }, [scores]);
+    (async () => {
+      if (liquorData) {
+        const result: Liquor = await getLiquor(liquorData.id);
+        setAromas(result.liquorAromas);
+      } else setAromas([]);
+    })();
+  }, [liquorData]);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setSelectedTab(newValue);
-  };
-  const updateSetRelatedNotes = (
-    newRelatedNotes: string[],
-    currentTab: number,
-  ) => {
-    setRelatedNotes((prev) => {
-      const updatedRelatedNotes = [...prev];
-      updatedRelatedNotes[currentTab] = new Set([
-        ...Array.from(prev[currentTab]),
-        ...newRelatedNotes,
-      ]);
-      return updatedRelatedNotes;
-    });
-  };
-
-  const handleNoteClick = async (note: string) => {
-    const currentTab = selectedTab;
-
-    setSelectedNotes((prev) => {
-      const newSelectedNotes = [...prev];
-      const noteSet = newSelectedNotes[currentTab];
-
-      if (noteSet.has(note)) {
-        noteSet.delete(note);
-      } else {
-        noteSet.add(note);
-      }
-
-      return newSelectedNotes;
-    });
-
-    if (selectedNotes[currentTab].has(note)) {
-      const exclude = Array.from(selectedNotes[currentTab]).join(",");
-      const newRelatedNotes = await fetchRelatedNotes(note, exclude);
-
-      updateSetRelatedNotes(newRelatedNotes, currentTab);
-    }
-  };
-
-  const onAddNote = (note: string) => {
-    const currentTab = selectedTab;
-    setRelatedNotes((prev) => {
-      const newRelatedNotes = [...prev];
-      newRelatedNotes[currentTab].add(note);
-      return newRelatedNotes;
-    });
-  };
-
-  if (!liquorId) {
-    return null; // 또는 로딩 인디케이터나 에러 메시지를 표시할 수 있습니다.
-  }
+  // 컴포넌트 언마운트 시 모든 미리보기 URL 정리
+  useEffect(() => {
+    return () => {
+      noteImages.forEach((image) => URL.revokeObjectURL(image.preview));
+    };
+  }, [noteImages]);
 
   const handleSave = async () => {
-    const ReviewSavingData: ReviewSavingData = {
-      liquorId,
-      noseScore: scores[0],
-      palateScore: scores[1],
-      finishScore: scores[2],
-      noseMemo: memos[0] || null,
-      palateMemo: memos[1] || null,
-      finishMemo: memos[2] || null,
-      overallNote: overallNote || null,
-      mood: mood || null,
-      noseNotes: selectedNotes[0].size
-        ? Array.from(selectedNotes[0]).join(", ")
-        : null,
-      palateNotes: selectedNotes[1].size
-        ? Array.from(selectedNotes[1]).join(", ")
-        : null,
-      finishNotes: selectedNotes[2].size
-        ? Array.from(selectedNotes[2]).join(", ")
-        : null,
+    if (!liquorData) {
+      alert("주류를 선택해주세요.");
+      return;
+    }
+
+    if (!tastingAt) {
+      alert("테이스팅 일자를 선택해주세요.");
+      return;
+    }
+
+    const noteSavingData: TastingNoteReq = {
+      liquorId: liquorData.id,
+      noteImages: noteImages.map((image) => image.file),
+      noteAromas: selectedAromas.map((aroma) => aroma.id),
+      tastingAt: tastingAt?.format("YYYY-MM-DD"),
+      place,
+      method,
+      score,
+      content,
+      isDetail,
+      nose,
+      palate,
+      finish,
     };
 
     setSaving(true);
 
     try {
-      const tastingNotesId = await saveReviewData(ReviewSavingData);
-      router.push(`/tasting-notes/${tastingNotesId}`);
-      showSnackbar("저장에 성공했습니다.", "success");
+      const noteId = await saveTastingNote(noteSavingData);
+      if (noteId == -1) {
+        alert("10MB 이내의 파일을 선택해주세요.");
+      } else {
+        router.push(`/tasting-notes/${noteId}`);
+        showSnackbar("저장에 성공했습니다.", "success");
+      }
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
@@ -268,104 +385,392 @@ const TastingNotesNewPageComponent = () => {
     }
   };
 
-  if (!liquorData) {
-    return <TastingNotesSkeleton />;
-  }
-
   return (
-    <Container sx={{ margin: "30px 0" }}>
-      <LiquorTitle
-        thumbnailImageUrl={liquorData.thumbnailImageUrl}
-        koName={liquorData.koName}
-        type={liquorData.type}
-        abv={liquorData.abv}
-        volume={liquorData.volume}
-        country={liquorData.country}
-        region={liquorData.region}
-        grapeVariety={liquorData.grapeVariety}
-      />
+    <Stack>
+      <PageTitleComponent title="테이스팅 노트 작성하기" />
+      <Stack sx={{ margin: "30px 0", gap: "30px" }}>
+        {/* 주류 선택 */}
+        <Stack sx={{ gap: "5px" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Typography>어떤 주류를 마셨나요?</Typography>
+            <Button size="small" onClick={handleClearLiquorData}>
+              초기화
+            </Button>
+          </Box>
+          {liquorData ? (
+            <Box onClick={handleOpenLiquorDialog}>
+              <LiquorTitle
+                thumbnailImageUrl={liquorData.thumbnailImageUrl}
+                koName={liquorData.koName}
+                type={liquorData.type}
+                abv={liquorData.abv}
+                volume={liquorData.volume}
+                country={liquorData.country}
+                region={liquorData.region}
+                grapeVariety={liquorData.grapeVariety}
+              />
+            </Box>
+          ) : (
+            <Button
+              fullWidth
+              sx={{
+                height: "120px",
+                border: "1px dashed",
+                display: "flex",
+                flexDirection: "row",
+                gap: "10px",
+              }}
+              onClick={handleOpenLiquorDialog}
+            >
+              <Add />
+              <Typography>주류를 선택해주세요.</Typography>
+            </Button>
+          )}
+          <LiquorSelectModal
+            open={openLiquorDialog}
+            value={liquorData}
+            onClose={handleCloseLiquorDialog}
+          />
+        </Stack>
 
-      <StyledTabs value={selectedTab} onChange={handleTabChange} centered>
-        <StyledTab label="Nose" />
-        <StyledTab label="Palate" />
-        <StyledTab label="Finish" />
-      </StyledTabs>
+        {/* 감상 장소 */}
+        <Stack sx={{ gap: "10px" }}>
+          <Typography>어디서 마셨나요?</Typography>
+          <TextField
+            label="감상 장소"
+            variant="outlined"
+            size="small"
+            value={place}
+            onChange={handlePlaceChange}
+          />
+        </Stack>
 
-      <TabContent>
-        <TabContentComponent
-          selectedTab={selectedTab}
-          relatedNotes={Array.from(relatedNotes[selectedTab])}
-          selectedNotes={selectedNotes[selectedTab]}
-          onNoteClick={handleNoteClick}
-          score={scores[selectedTab]}
-          hasAiNotes={hasAiNotes}
-          setScore={(value: number | null) =>
-            setScores((prev: (number | null)[]) => {
-              const newScores: (number | null)[] = [...prev];
-              newScores[selectedTab] = value;
-              return newScores;
-            })
-          }
-          memo={memos[selectedTab]}
-          setMemo={(value: string) =>
-            setMemos((prev) => {
-              const newMemos = [...prev];
-              newMemos[selectedTab] = value;
-              return newMemos;
-            })
-          }
-          onAddNote={onAddNote}
-        />
-      </TabContent>
+        {/* 감상 일자 */}
+        <Stack sx={{ gap: "10px" }}>
+          <Typography>언제 마셨나요?</Typography>
+          <DatePicker
+            label="감상 일자"
+            format="YYYY년 MM월 DD일"
+            slotProps={{ textField: { size: "small" } }}
+            value={tastingAt}
+            onChange={handleTastingAtChange}
+          />
+        </Stack>
 
-      <TotalScoreComponent
-        totalScore={totalScore}
-        overallNote={overallNote}
-        setOverallNote={setOverallNote}
-      />
-      <MoodSelectorComponent mood={mood} setMood={setMood} />
-      <SaveButton onClick={handleSave} variant="contained" disabled={saving}>
-        {saving ? <CircularProgress size={24} /> : "저장하기"}
-      </SaveButton>
-      <SaveButton onClick={handleCancel} variant="contained" disabled={saving}>
-        취소하기
-      </SaveButton>
-      <CustomSnackbar
-        isOpen={snackbar.isOpen}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={hideSnackbar}
-      />
-      <Dialog
-        open={openCancelDialog}
-        onClose={() => setopenCancelDialog(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"작성 중인 테이스팅 노트를 취소하시겠습니까?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            현재 작성 중인 테이스팅 노트의 내용이 저장되지 않습니다. 정말로
-            취소하시겠습니까?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setopenCancelDialog(false)}>취소</Button>
-          <Button onClick={handleCancelRedirect} autoFocus>
-            확인
+        {/* 감상 방법 */}
+        <Stack sx={{ gap: "10px" }}>
+          <Typography>어떤 방법으로 마셨나요?</Typography>
+          <TextField
+            label="감상 방법"
+            variant="outlined"
+            size="small"
+            value={method}
+            onChange={handleMethodChange}
+          />
+        </Stack>
+
+        {/* 아로마 선택 */}
+        <Stack sx={{ gap: "10px" }}>
+          <Stack>
+            <Typography>어떤 향이 느껴졌나요?</Typography>
+            <Typography
+              color="textSecondary" // 연한 색상 사용
+              sx={{ fontSize: "12px", fontWeight: 400 }} // 크기를 더 작게 설정
+            >
+              키워드를 선택하면, 인공지능이 계속해서 추천해줍니다.
+            </Typography>
+          </Stack>
+
+          {/* 키워드 선택 */}
+          <Box
+            sx={{
+              padding: "10px 10px",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 0.5,
+              width: "100%",
+              backgroundColor: "whitesmoke",
+              borderRadius: "5px",
+            }}
+          >
+            {aromas && aromas.length ? (
+              aromas.map((aroma: Aroma, index) => (
+                <StyledChip
+                  sx={{ margin: "2px", color: "black", fontSize: "12px" }}
+                  key={index}
+                  label={aroma.name}
+                  onClick={() => handleAromaSelect(aroma)}
+                  selected={selectedAromas.some(
+                    (selectedAroma) => selectedAroma.id === aroma.id
+                  )}
+                />
+              ))
+            ) : (
+              <Typography
+                color="textSecondary" // 연한 색상 사용
+                align="center"
+                sx={{ fontSize: "12px", fontWeight: 400 }} // 크기를 더 작게 설정
+              >
+                추천 키워드가 없습니다.
+              </Typography>
+            )}
+          </Box>
+
+          {/* 키워드 추가 */}
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              gap: "10px",
+            }}
+          >
+            <TextField
+              fullWidth
+              label="키워드 추가"
+              variant="outlined"
+              size="small"
+              value={customAroma}
+              onChange={handleCustomAromaChange}
+            />
+            <Button
+              variant="outlined"
+              onClick={handleCustomAromaCreate}
+              style={{
+                width: "16px",
+                height: "40px",
+                padding: 0,
+              }}
+            >
+              <Add />
+            </Button>
+          </Box>
+        </Stack>
+
+        {/* 점수 */}
+        <Stack sx={{ gap: "10px" }}>
+          <Typography>점수를 매겨주세요!</Typography>
+          <Rating
+            name="simple-controlled"
+            value={score}
+            onChange={handleScoreChange}
+          />
+        </Stack>
+
+        {/* 본문 및 이미지 */}
+        <Stack sx={{ gap: "10px" }}>
+          <Typography>테이스팅 노트를 자유롭게 작성해주세요.</Typography>
+
+          {/* 이미지 목록 */}
+          {noteImages.length ? (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: "10px",
+                overflowX: "auto",
+              }}
+            >
+              {noteImages.map((image, idx) => {
+                return (
+                  <Box
+                    key={image.id}
+                    sx={{
+                      flexShrink: 0, // 이미지가 찌그러지지 않도록
+                      position: "relative", // 삭제 버튼을 위한 설정
+                    }}
+                  >
+                    <Image
+                      src={image.preview}
+                      alt="note image"
+                      width={80}
+                      height={80}
+                      style={{ borderRadius: "5px", objectFit: "cover" }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => handleImageRemove(idx)}
+                      sx={{
+                        position: "absolute",
+                        top: -8,
+                        right: -8,
+                        backgroundColor: "background.paper",
+                        boxShadow: 1,
+                        "&:hover": {
+                          backgroundColor: "background.paper",
+                        },
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
+                  </Box>
+                );
+              })}
+            </Box>
+          ) : null}
+
+          {/* 이미지 버튼 */}
+          <Button
+            fullWidth
+            onClick={handleImageButtonClick}
+            sx={{
+              border: "1px dashed",
+              display: "flex",
+              flexDirection: "row",
+              gap: "10px",
+            }}
+          >
+            <Add />
+            <Typography sx={{ fontSize: { xs: "15px" } }}>
+              이미지 추가하기 (10MB 이내)
+            </Typography>
           </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
-  );
-};
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageChange}
+            style={{ display: "none" }}
+          />
 
-export default function TastingNotesNewPage() {
+          {/* 본문 */}
+          {isDetail ? (
+            <Stack sx={{ gap: "5px" }}>
+              <TextField
+                label="Nose"
+                variant="outlined"
+                size="medium"
+                multiline
+                value={nose}
+                onChange={handleNoseChange}
+              />
+              <TextField
+                label="Palate"
+                variant="outlined"
+                size="medium"
+                multiline
+                value={palate}
+                onChange={handlePalateChange}
+              />
+              <TextField
+                label="Finish"
+                variant="outlined"
+                size="medium"
+                multiline
+                value={finish}
+                onChange={handleFinishChange}
+              />
+            </Stack>
+          ) : null}
+
+          {/* 본문 */}
+          <TextField
+            label="본문"
+            variant="outlined"
+            size="medium"
+            multiline
+            value={content}
+            onChange={handleContentChange}
+          />
+
+          {/* 상세작성 버튼 */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                value={isDetail}
+                onChange={handleIsDetailChange}
+              />
+            }
+            label="상세작성"
+          />
+        </Stack>
+
+        {/* 버튼 그룹 */}
+        <Stack>
+          {/* 버튼 */}
+          <SaveButton
+            onClick={handleSave}
+            variant="contained"
+            disabled={saving}
+          >
+            {saving ? <CircularProgress size={24} /> : "저장하기"}
+          </SaveButton>
+          <SaveButton
+            onClick={handleCancel}
+            variant="contained"
+            disabled={saving}
+          >
+            취소하기
+          </SaveButton>
+          <CustomSnackbar
+            isOpen={snackbar.isOpen}
+            message={snackbar.message}
+            severity={snackbar.severity}
+            onClose={hideSnackbar}
+          />
+
+          {/* 취소 시 dialog */}
+          <Dialog
+            open={openCancelDialog}
+            onClose={() => setopenCancelDialog(false)}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{"작성 취소하기"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                현재 작성 중인 테이스팅 노트의 내용이 저장되지 않습니다. 정말로
+                취소하시겠습니까?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setopenCancelDialog(false)}>취소</Button>
+              <Button onClick={handleCancelRedirect} autoFocus>
+                확인
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Stack>
+      </Stack>
+    </Stack>
+  );
+}
+
+export default function NewTastingNotePage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <TastingNotesNewPageComponent />
+    <Suspense>
+      <NewTastingNotePageComponent />
     </Suspense>
   );
 }
+
+const SaveButton = styled(Button)({
+  marginTop: "20px",
+  width: "100%",
+  padding: "10px",
+  backgroundColor: "#3f51b5",
+  color: "#ffffff",
+  display: "block",
+  marginLeft: "auto",
+  marginRight: "auto",
+  "&:hover": {
+    backgroundColor: "#303f9f",
+  },
+});
+
+const StyledChip = styled(Chip)<{ selected: boolean }>(({ selected }) => ({
+  backgroundColor: selected ? "#ffeb3b" : "#e0e0e0",
+  // 호버링 애니메이션 제거
+  "&:hover": {
+    backgroundColor: selected ? "#ffeb3b" : "#e0e0e0",
+  },
+}));

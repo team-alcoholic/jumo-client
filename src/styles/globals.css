@@ -22,7 +22,6 @@ body::-webkit-scrollbar {
   min-height: 100%;
   margin: 0 auto; /* 중앙 정렬 */
   padding: 0 16px; /* 양쪽 여백 추가 */
-  padding-bottom: 80px;
   display: flex;
   flex-direction: column;
   position: relative;

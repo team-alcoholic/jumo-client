@@ -6,6 +6,7 @@ import {
   LocalBar,
   Warehouse,
   Search,
+  Forum,
 } from "@mui/icons-material";
 import { Box, Stack, Typography } from "@mui/material";
 import Link from "next/link";
@@ -17,16 +18,17 @@ export default function NavigationComponent() {
 
   // 네비게이션 바를 숨길 경로 패턴
   const hideNavPaths = [
+    "/purchase-notes/new",
     "/tasting-notes/new",
-    /^\/tasting-notes\/\d+\/edit$/, // 동적 ID를 포함한 edit 경로
+    "/purchase-notes/", // 구매 노트 관련 경로들의 공통 부분
+    "/tasting-notes/", // 감상 노트 관련 경로들의 공통 부분
+    "/liquors/",
+    "/mypage/",
+    "/join",
   ];
 
-  // 현재 경로가 숨길 경로 중 하나와 일치하면 네비게이션 바를 렌더링하지 않음
-  if (
-    hideNavPaths.some((path) =>
-      typeof path === "string" ? pathName === path : path.test(pathName)
-    )
-  ) {
+  // 현재 경로가 숨길 경로 중 하나로 시작하면 네비게이션 바를 렌더링하지 않음
+  if (hideNavPaths.some((path) => pathName.startsWith(path))) {
     return null;
   }
 
@@ -41,6 +43,20 @@ export default function NavigationComponent() {
             sx={{
               fontSize: "20px",
               color: pathName === this.link ? "black" : "gray",
+            }}
+          />
+        );
+      },
+    },
+    {
+      title: "주모 피드",
+      link: "/notes-feed",
+      icon: function () {
+        return (
+          <Forum
+            sx={{
+              fontSize: "20px",
+              color: pathName.startsWith(this.link) ? "black" : "gray",
             }}
           />
         );
@@ -91,67 +107,70 @@ export default function NavigationComponent() {
   ];
 
   return (
-    <Box
-      sx={{
-        position: "fixed",
-        bottom: 0,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "100%",
-        height: 60,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "white",
-        borderTop: "solid 1px #D9D9D9",
-        zIndex: 1000,
-      }}
-    >
+    <Stack>
       <Box
         sx={{
-          padding: "10px",
-          width: 600,
-          height: "100%",
+          position: "fixed",
+          bottom: 0,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "100%",
+          height: 60,
           display: "flex",
-          justifyContent: "space-around",
+          justifyContent: "center",
           alignItems: "center",
+          backgroundColor: "white",
+          borderTop: "solid 1px #D9D9D9",
+          zIndex: 1000,
         }}
       >
-        {NAV_OPTIONS.map((option, index) => (
-          <Link
-            key={index}
-            href={option.link}
-            style={{
-              color: "inherit",
-              textDecoration: "none",
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Stack
-              sx={{
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "5px",
+        <Box
+          sx={{
+            padding: "10px",
+            width: 600,
+            height: "100%",
+            display: "flex",
+            justifyContent: "space-around",
+            alignItems: "center",
+          }}
+        >
+          {NAV_OPTIONS.map((option, index) => (
+            <Link
+              key={index}
+              href={option.link}
+              style={{
+                color: "inherit",
+                textDecoration: "none",
                 width: "100%",
                 height: "100%",
-                borderRadius: "5px 5px",
-                // "&:hover": {
-                //   backgroundColor: "#cccccc",
-                // },
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              {option.icon()}
-              <Typography sx={{ fontSize: "12px", color: "gray" }}>
-                {option.title}
-              </Typography>
-            </Stack>
-          </Link>
-        ))}
+              <Stack
+                sx={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "5px",
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "5px 5px",
+                  // "&:hover": {
+                  //   backgroundColor: "#cccccc",
+                  // },
+                }}
+              >
+                {option.icon()}
+                <Typography sx={{ fontSize: "12px", color: "gray" }}>
+                  {option.title}
+                </Typography>
+              </Stack>
+            </Link>
+          ))}
+        </Box>
       </Box>
-    </Box>
+      <div style={{ width: "100%", height: "60px" }}></div>
+    </Stack>
   );
 }
