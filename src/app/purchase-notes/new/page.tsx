@@ -106,10 +106,16 @@ function NewPurchaseNotePageComponent() {
     setPlace(e.target.value);
   };
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPrice(+e.target.value);
+    // 빈 문자열이거나 숫자만 있는 경우에만 허용
+    if (e.target.value === "" || /^[0-9]+$/.test(e.target.value)) {
+      setPrice(+e.target.value);
+    }
   };
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVolume(+e.target.value);
+    // 빈 문자열이거나 숫자만 있는 경우에만 허용
+    if (e.target.value === "" || /^[0-9]+$/.test(e.target.value)) {
+      setVolume(+e.target.value);
+    }
   };
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setContent(e.target.value);
@@ -329,9 +335,13 @@ function NewPurchaseNotePageComponent() {
           <Stack sx={{ gap: "10px" }}>
             <Typography>얼마에 구매했나요?</Typography>
             <TextField
-              label="가격"
+              label="가격 (원)"
               variant="outlined"
               size="small"
+              inputProps={{
+                inputMode: "numeric", // 모바일에서 숫자 키패드 표시
+                pattern: "[0-9]*", // HTML5 유효성 검사
+              }}
               value={price}
               onChange={handlePriceChange}
             />
@@ -340,9 +350,13 @@ function NewPurchaseNotePageComponent() {
           <Stack sx={{ gap: "10px" }}>
             <Typography>용량은 얼마인가요?</Typography>
             <TextField
-              label="용량"
+              label="용량 (ml)"
               variant="outlined"
               size="small"
+              inputProps={{
+                inputMode: "numeric", // 모바일에서 숫자 키패드 표시
+                pattern: "[0-9]*", // HTML5 유효성 검사
+              }}
               value={volume}
               onChange={handleVolumeChange}
             />
