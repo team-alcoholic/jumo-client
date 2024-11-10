@@ -5,6 +5,76 @@ import { translateWhiskyNameToJapenese } from "@/utils/translateWhiskyNameToJape
 import fetch from "node-fetch";
 import OpenAI from "openai";
 
+
+export async function GET(request: NextRequest) {
+  try {
+    const query = request.nextUrl.searchParams.get("q") || "";
+    const store = (request.nextUrl.searchParams.get("store") || "dailyshot") as StoreType;
+    const page = parseInt(request.nextUrl.searchParams.get("page") || "1", 10);
+    const pageSize = parseInt(request.nextUrl.searchParams.get("pageSize") || "12", 10);
+
+    const params: SearchParams = { query, store, page, pageSize };
+
+    if (!params.query) {
+      return NextResponse.json(
+          { error: "검색어가 필요합니다." },
+          { status: 400 }
+      );
+    }
+
+    // 캐시 확인
+    const cacheKey = `${params.query}-${params.store}`;
+    const cachedResult = cache[cacheKey];
+    if (cachedResult && Date.now() - cachedResult.timestamp < 24 * 60 * 60 * 1000) {
+      return NextResponse.json(cachedResult.data);
+    }
+
+    // 무카와 스토어의 경우 위스키 이름 번역
+    if (params.store === "mukawa" && params.query) {
+      const translatedQuery = translateWhiskyNameToJapenese(params.query);
+      params.query = translatedQuery.japanese || params.query;
+    }
+
+    let searchResult = await performSearch(params);
+
+    // 무카와/빅카메라 결과 번역
+    if ((params.store === "mukawa" || params.store === "biccamera") && searchResult) {
+      searchResult = await translateProductNames(searchResult);
+    }
+
+    // 검색 결과가 없는 경우 첫 단어로 재검색
+    if (!searchResult?.length) {
+      const firstValidWord = params.query?.split(" ").find((word) => word.length >= 2);
+      if (firstValidWord) {
+        searchResult = await performSearch({
+          ...params,
+          query: firstValidWord,
+        });
+
+        if ((params.store === "mukawa" || params.store === "biccamera") && searchResult) {
+          searchResult = await translateProductNames(searchResult);
+        }
+      }
+    }
+
+    // 캐시 저장
+    cache[cacheKey] = {
+      data: searchResult,
+      timestamp: Date.now(),
+    };
+
+    console.log("검색 결과:", searchResult);
+    return NextResponse.json(searchResult);
+  } catch (error) {
+    console.error("검색 처리 중 오류 발생:", error);
+    return NextResponse.json(
+        { error: "검색 중 오류가 발생했습니다." },
+        { status: 500 }
+    );
+  }
+}
+
+
 // OpenAI 클라이언트 초기화
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -107,75 +177,8 @@ interface SearchParams {
   pageSize: number;
 }
 
-export async function GET(request: NextRequest) {
-  try {
-    const query = request.nextUrl.searchParams.get("q") || "";
-    const store = (request.nextUrl.searchParams.get("store") || "dailyshot") as StoreType;
-    const page = parseInt(request.nextUrl.searchParams.get("page") || "1", 10);
-    const pageSize = parseInt(request.nextUrl.searchParams.get("pageSize") || "12", 10);
 
-    const params: SearchParams = { query, store, page, pageSize };
 
-    if (!params.query) {
-      return NextResponse.json(
-          { error: "검색어가 필요합니다." },
-          { status: 400 }
-      );
-    }
-
-    // 캐시 확인
-    const cacheKey = `${params.query}-${params.store}`;
-    const cachedResult = cache[cacheKey];
-    if (cachedResult && Date.now() - cachedResult.timestamp < 24 * 60 * 60 * 1000) {
-      return NextResponse.json(cachedResult.data);
-    }
-
-    // 무카와 스토어의 경우 위스키 이름 번역
-    if (params.store === "mukawa" && params.query) {
-      const translatedQuery = translateWhiskyNameToJapenese(params.query);
-      params.query = translatedQuery.japanese || params.query;
-    }
-
-    let searchResult = await performSearch(params);
-
-    // 무카와/빅카메라 결과 번역
-    if ((params.store === "mukawa" || params.store === "biccamera") && searchResult) {
-      searchResult = await translateProductNames(searchResult);
-    }
-
-    // 검색 결과가 없는 경우 첫 단어로 재검색
-    if (!searchResult?.length) {
-      const firstValidWord = params.query?.split(" ").find((word) => word.length >= 2);
-      if (firstValidWord) {
-        searchResult = await performSearch({
-          ...params,
-          query: firstValidWord,
-        });
-
-        if ((params.store === "mukawa" || params.store === "biccamera") && searchResult) {
-          searchResult = await translateProductNames(searchResult);
-        }
-      }
-    }
-
-    // 캐시 저장
-    cache[cacheKey] = {
-      data: searchResult,
-      timestamp: Date.now(),
-    };
-
-    return NextResponse.json(searchResult);
-  } catch (error) {
-    console.error("검색 처리 중 오류 발생:", error);
-    return NextResponse.json(
-        { error: "검색 중 오류가 발생했습니다." },
-        { status: 500 }
-    );
-  }
-}
-
-// 나머지 performSearch, parseMukawaHtml, parseBiccameraHtml 등의 함수들은
-// 이전 코드와 동일하게 유지...
 // 검색 결과 아이템의 인터페이스 정의
 interface SearchResultItem {
   name: string;
@@ -262,7 +265,6 @@ function parseGetjuHtml(html: string) {
       ?.textContent?.trim();
     const price = priceText ? parseInt(priceText.replace(/[^0-9]/g, "")) : 0;
     const url =
-      "https://www.getju.co.kr" +
       element.querySelector(".info .name a")?.getAttribute("href");
     const type = element.querySelector(".info .type")?.textContent?.trim();
     const isSoldOut = element.querySelector(".soldout") !== null;
