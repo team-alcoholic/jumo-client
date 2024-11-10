@@ -23,6 +23,7 @@ jobs:
           echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> .env
           echo "NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}" >> .env
           echo "DEEPL_API_KEY=${{ secrets.DEEPL_API_KEY }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
 
 
       - name: Configure AWS credentials
@@ -62,6 +63,7 @@ jobs:
           docker run --rm -it -d -p 80:3000 \
           -e SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
           -e DEEPL_API_KEY=${{ secrets.DEEPL_API_KEY }} \
+          -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
           --name jumo_front_dev ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jumo_front_dev:latest
 
       - name: Clean up unused Docker images after deployment
