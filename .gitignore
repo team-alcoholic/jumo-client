@@ -37,3 +37,5 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+.idea/vcs.xml
+.idea/inspectionProfiles/Project_Default.xml
