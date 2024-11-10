@@ -1,104 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import iconv from "iconv-lite";
-import { JSDOM } from "jsdom";
 import { translateWhiskyNameToJapenese } from "@/utils/translateWhiskyNameToJapenese";
-import fetch from "node-fetch";
-
-// 캐시 타입 정의
-interface CacheItem {
-  data: any;
-  timestamp: number;
-}
-
-// 캐시를 저장할 객체 (In-Memory)
-let cache: Record<string, CacheItem> = {};
-
-async function translateText(text: string): Promise<string> {
-  if (!text) return "";
-
-  try {
-    const response = await fetch("https://api-free.deepl.com/v2/translate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `DeepL-Auth-Key ${process.env.DEEPL_API_KEY}`,
-      },
-      body: new URLSearchParams({
-        text: text,
-        source_lang: "JA",
-        target_lang: "KO",
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Translation API error:", errorData);
-      return text;
-    }
-
-    const data = await response.json();
-    return data.translations[0]?.text || text;
-  } catch (error) {
-    console.error("Translation error:", error);
-    return text;
-  }
-}
-
-function toEUCJPEncoding(query: string) {
-  const eucJPEncoded = iconv.encode(query, "euc-jp");
-  return Array.from(eucJPEncoded)
-    .map((byte) => `%${byte.toString(16).toUpperCase().padStart(2, "0")}`)
-    .join("");
-}
-
-// store 타입에 lottemart 추가
-type StoreType =
-  | "dailyshot"
-  | "mukawa"
-  | "cu"
-  | "traders"
-  | "getju"
-  | "emart"
-  | "lottemart"
-  | "biccamera";
+import { translateProductNames } from "@/utils/translateProductNames"; // 추가된 부분
+import { parseGetjuHtml,parseLottemartHtml, parseMukawaHtml, parseBiccameraHtml } from "@/utils/parseHtml"; // 추가된 부분
 
 export async function GET(request: NextRequest) {
-  const params = {
-    query: request.nextUrl.searchParams.get("q") || "",
-    store: (request.nextUrl.searchParams.get("store") ||
-      "dailyshot") as StoreType,
-    page: parseInt(request.nextUrl.searchParams.get("page") || "1"),
-    pageSize: parseInt(request.nextUrl.searchParams.get("pageSize") || "12"),
-  };
-
-  if (!params.query) {
-    return NextResponse.json(
-      { error: "검색어가 필요합니다." },
-      { status: 400 }
-    );
-  }
-
-  // 캐싱된 결과가 있는지 확인
-  const cacheKey = `${params.query}-${params.store}`;
-  const cachedResult = cache[cacheKey];
-
-  if (
-    cachedResult &&
-    Date.now() - cachedResult.timestamp < 24 * 60 * 60 * 1000
-  ) {
-    // 캐싱된 데이터를 반환
-    return NextResponse.json(cachedResult.data);
-  }
-
-  // 카와인 경우 위스 이름을 일본어로 번역
-  if (params.store === "mukawa" && params.query) {
-    const translatedQuery = translateWhiskyNameToJapenese(params.query);
-    params.query = translatedQuery.japanese || params.query;
-  }
-
   try {
+    const query = request.nextUrl.searchParams.get("q") || "";
+    const store = (request.nextUrl.searchParams.get("store") ||
+      "dailyshot") as StoreType;
+    const page = parseInt(request.nextUrl.searchParams.get("page") || "1", 10);
+    const pageSize = parseInt(
+      request.nextUrl.searchParams.get("pageSize") || "12",
+      10
+    );
+
+    const params: SearchParams = { query, store, page, pageSize };
+
+    if (!params.query) {
+      return NextResponse.json(
+        { error: "검색어가 필요합니다." },
+        { status: 400 }
+      );
+    }
+
+    // 캐시 확인
+    const cacheKey = `${params.query}-${params.store}`;
+    const cachedResult = cache[cacheKey];
+    if (
+      cachedResult &&
+      Date.now() - cachedResult.timestamp < 24 * 60 * 60 * 1000
+    ) {
+      return NextResponse.json(cachedResult.data);
+    }
+
+    // 무카와 스토어의 경우 위스키 이름 번역
+    if (params.store === "mukawa" && params.query) {
+      const translatedQuery = translateWhiskyNameToJapenese(params.query);
+      params.query = translatedQuery.japanese || params.query;
+    }
+
     let searchResult = await performSearch(params);
 
+    // 무카와/빅카메라 결과 번역
     if (
       (params.store === "mukawa" || params.store === "biccamera") &&
       searchResult
@@ -106,6 +50,7 @@ export async function GET(request: NextRequest) {
       searchResult = await translateProductNames(searchResult);
     }
 
+    // 검색 결과가 없는 경우 첫 단어로 재검색
     if (!searchResult?.length) {
       const firstValidWord = params.query
         ?.split(" ")
@@ -115,6 +60,7 @@ export async function GET(request: NextRequest) {
           ...params,
           query: firstValidWord,
         });
+
         if (
           (params.store === "mukawa" || params.store === "biccamera") &&
           searchResult
@@ -124,7 +70,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 캐싱 저장
+    // 캐시 저장
     cache[cacheKey] = {
       data: searchResult,
       timestamp: Date.now(),
@@ -140,6 +86,50 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// 캐시 타입 정의
+interface CacheItem {
+  data: any;
+  timestamp: number;
+}
+
+let cache: Record<string, CacheItem> = {};
+
+// SearchResult 인터페이스 정의
+interface SearchResultItem {
+  name: string;
+  price: number;
+  url?: string;
+  description?: string;
+  soldOut?: boolean;
+  original?: {
+    name: string;
+  };
+}
+
+function toEUCJPEncoding(query: string): string {
+  const eucJPEncoded = iconv.encode(query, "euc-jp");
+  return Array.from(eucJPEncoded)
+    .map((byte) => `%${byte.toString(16).toUpperCase().padStart(2, "0")}`)
+    .join("");
+}
+
+type StoreType =
+  | "dailyshot"
+  | "mukawa"
+  | "cu"
+  | "traders"
+  | "getju"
+  | "emart"
+  | "lottemart"
+  | "biccamera";
+
+interface SearchParams {
+  query: string;
+  store: StoreType;
+  page: number;
+  pageSize: number;
+}
+
 // 검색 결과 아이템의 인터페이스 정의
 interface SearchResultItem {
   name: string;
@@ -152,30 +142,7 @@ interface SearchResultItem {
   };
 }
 
-// 상품명만 번역하는 새로운 함수
-async function translateProductNames(
-  results: SearchResultItem[]
-): Promise<SearchResultItem[]> {
-  const translatedResults: SearchResultItem[] = [];
-
-  for (const item of results) {
-    // Rate limiting 방지를 위한 딜레이
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    const translatedName = await translateText(item.name);
-
-    translatedResults.push({
-      ...item,
-      name: translatedName,
-      original: {
-        name: item.name,
-      },
-    });
-  }
-
-  return translatedResults;
-}
-
+// 나머지 API 함수들은 생략합니다.
 // CU API 응답의 타입을 정의합니다.
 interface CUApiResponse {
   data: {
@@ -234,73 +201,6 @@ function getSearchUrl(
   return urlGenerator ? urlGenerator(query, page, pageSize) : null;
 }
 
-// getju HTML 파싱 함수 추가
-function parseGetjuHtml(html: string) {
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
-  const productItems = document.querySelectorAll("#prd_basic li");
-
-  const results = Array.from(productItems).map((item) => {
-    const element = item as Element;
-    const name = element.querySelector(".info .name a")?.textContent?.trim();
-    const priceText = element
-      .querySelector(".price .sell strong")
-      ?.textContent?.trim();
-    const price = priceText ? parseInt(priceText.replace(/[^0-9]/g, "")) : 0;
-    const url =
-      "https://www.getju.co.kr" +
-      element.querySelector(".info .name a")?.getAttribute("href");
-    const type = element.querySelector(".info .type")?.textContent?.trim();
-    const isSoldOut = element.querySelector(".soldout") !== null;
-
-    return {
-      name,
-      price,
-      url,
-      type,
-      isSoldOut,
-    };
-  });
-
-  return results.filter((item) => item.name && item.price);
-}
-
-// 롯데마트 HTML 파싱 함수 추가
-function parseLottemartHtml(html: string) {
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
-  const productItems = document.querySelectorAll(".list-result li");
-
-  const results = Array.from(productItems).map((item) => {
-    const element = item as Element;
-    const name = element.querySelector(".prod-name")?.textContent?.trim();
-    const size = element.querySelector(".prod-count")?.textContent?.trim();
-
-    // layer_popup 내부의 info-list에서 가격 정보 추출
-    const infoList = element.querySelector(".info-list");
-    const rows = infoList?.querySelectorAll("tr");
-
-    let price = 0;
-
-    rows?.forEach((row) => {
-      const label = row.querySelector("th")?.textContent?.trim();
-      const value = row.querySelector("td")?.textContent?.trim();
-
-      if (label?.includes("가격")) {
-        price = value ? parseInt(value.replace(/[^0-9]/g, "")) : 0;
-      }
-    });
-
-    return {
-      name: name ? `${name} ${size || ""}` : "",
-      price,
-      url: undefined,
-      description: undefined,
-    };
-  });
-
-  return results.filter((item) => item.name && item.price);
-}
 
 // 롯데마트 지점 정보 정의
 const LOTTEMART_STORES = [
@@ -480,58 +380,6 @@ async function performSearch({
   }));
 }
 
-function parseMukawaHtml(html: string) {
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
-  const productItems = document.querySelectorAll(".list-product-item");
-
-  const results = Array.from(productItems).map((item) => {
-    const element = item as Element;
-    const name = element
-      .querySelector(".list-product-item__ttl")
-      ?.textContent?.trim();
-    const priceText = element
-      .querySelector(".list-product-item__price")
-      ?.textContent?.trim();
-    const price = priceText ? parseInt(priceText.replace(/[^0-9]/g, "")) : 0;
-    const description = element
-      .querySelector(".list-product-item__memo")
-      ?.textContent?.trim();
-    const url =
-      "https://mukawa-spirit.com" +
-      element.querySelector("a")?.getAttribute("href");
-
-    return { name, price, description, url };
-  });
-
-  return results;
-}
-
-// 빅카메라 HTML 파싱 함수 추가
-function parseBiccameraHtml(html: string) {
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
-  const productItems = document.querySelectorAll(".prod_box");
-
-  const results = Array.from(productItems).map((item) => {
-    const element = item as Element;
-    const name = element.querySelector(".bcs_title a")?.textContent?.trim();
-    const priceText = element
-      .querySelector(".bcs_price .val")
-      ?.textContent?.trim();
-    const price = priceText ? parseInt(priceText.replace(/[^0-9]/g, "")) : 0;
-    // URL 중복 제거
-    const urlPath =
-      element.querySelector(".bcs_title a")?.getAttribute("href") || "";
-    const url = urlPath.startsWith("http")
-      ? urlPath
-      : `https://www.biccamera.com${urlPath}`;
-
-    return { name, price, url };
-  });
-
-  return results.filter((item) => item.name && item.price);
-}
 
 interface SearchItem {
   name?: string;

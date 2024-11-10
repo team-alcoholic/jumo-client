@@ -56,70 +56,127 @@ export default function ServiceIntroductionComponent() {
               국내외 주요 매장의 가격을 한 눈에 비교하세요
             </Typography>
           </Stack>
-          {/* 업데이트 소식 */}
-          <Stack>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                mb: 1,
-                fontSize: { xs: "15px", md: "18px" },
-                letterSpacing: "-0.01em",
-              }}
-            >
-              업데이트 소식
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                p: { xs: 2, md: 2.5 },
-                bgcolor: "#FFF4E5",
-                borderRadius: "16px",
-                border: "1px solid",
-                borderColor: "#FFE0B2",
-                alignItems: "center",
-              }}
-            >
-              <Box
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "12px",
-                  bgcolor: "#FFE0B2",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <Box
-                  component="span"
-                  role="img"
-                  aria-label="new"
-                  sx={{
-                    fontSize: { xs: "20px", md: "24px" },
-                    lineHeight: 1,
-                  }}
-                >
-                  🎉
-                </Box>
-              </Box>
-              <Box sx={{ flex: 1 }}>
+            {/* 업데이트 소식 */}
+            <Stack spacing={2}>
                 <Typography
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: { xs: "14px", md: "15px" },
-                    color: "#E65100",
-                    lineHeight: 1.4,
-                  }}
+                    variant="h6"
+                    sx={{
+                        fontWeight: 700,
+                        mb: 1,
+                        fontSize: { xs: "15px", md: "18px" },
+                        letterSpacing: "-0.01em",
+                    }}
                 >
-                  New! 주류 구매 노트 작성 기능 추가
+                    업데이트 소식
                 </Typography>
-              </Box>
-            </Box>
-          </Stack>
 
+
+                {/* 새 기능 알림 */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        gap: 2,
+                        p: { xs: 2, md: 2.5 },
+                        bgcolor: "#FFF4E5",
+                        borderRadius: "16px",
+                        border: "1px solid",
+                        borderColor: "#FFE0B2",
+                        alignItems: "center",
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: "12px",
+                            bgcolor: "#FFE0B2",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <Box
+                            component="span"
+                            role="img"
+                            aria-label="new"
+                            sx={{
+                                fontSize: { xs: "20px", md: "24px" },
+                                lineHeight: 1,
+                            }}
+                        >
+                            🎉
+                        </Box>
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography
+                            sx={{
+                                fontWeight: 700,
+                                fontSize: { xs: "14px", md: "15px" },
+                                color: "#E65100",
+                                lineHeight: 1.4,
+                            }}
+                        >
+                            New! 주류 구매 노트 작성 기능 추가
+                        </Typography>
+                    </Box>
+                </Box>
+
+                {/* 버그 수정 알림 */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        gap: 2,
+                        p: { xs: 2, md: 2.5 },
+                        bgcolor: "#F5F5F5",
+                        borderRadius: "16px",
+                        border: "1px solid",
+                        borderColor: "#E0E0E0",
+                        alignItems: "center",
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: "12px",
+                            bgcolor: "#E0E0E0",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <Box
+                            component="span"
+                            role="img"
+                            aria-label="bug-fix"
+                            sx={{
+                                fontSize: { xs: "20px", md: "24px" },
+                                lineHeight: 1,
+                            }}
+                        >
+                            🛠️
+                        </Box>
+                    </Box>
+                    <Stack spacing={1} sx={{ flex: 1 }}>
+                        <Typography
+                            sx={{
+                                fontWeight: 700,
+                                fontSize: { xs: "14px", md: "15px" },
+                                color: "#424242",
+                                lineHeight: 1.4,
+                            }}
+                        >
+                            버그 수정 및 개선
+                        </Typography>
+                        <Box component="ul" sx={{ m: 0, pl: 2.5, fontSize: { xs: "13px", md: "14px" }, color: "#616161" }}>
+                            <li>겟주 URL 오류 수정</li>
+                            <li>일본어 번역 오류 개선</li>
+                        </Box>
+                    </Stack>
+                </Box>
+            </Stack>
           {/* 사용 방법 */}
           <Box>
             <Typography

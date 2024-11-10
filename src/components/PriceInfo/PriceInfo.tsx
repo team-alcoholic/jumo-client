@@ -57,7 +57,7 @@ const PriceInfo: React.FC<PriceInfoProps> = ({
       setIsLoading(true);
       try {
         console.log(`${store}의 가격 정보를 가져오는 중:`, liquorName);
-        const fetchUrl = `/api/price-search?q=${encodeURIComponent(liquorName)}&store=${store}`;
+        const fetchUrl = `/external-api/price-search?q=${encodeURIComponent(liquorName)}&store=${store}`;
         console.log("요청 URL:", fetchUrl);
 
         const response = await axios.get(fetchUrl);
