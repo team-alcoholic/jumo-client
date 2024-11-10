@@ -70,6 +70,7 @@ export default function ServiceIntroductionComponent() {
                     업데이트 소식
                 </Typography>
 
+
                 {/* 새 기능 알림 */}
                 <Box
                     sx={{
