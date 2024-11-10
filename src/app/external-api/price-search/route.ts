@@ -5,7 +5,7 @@ import { translateWhiskyNameToJapenese } from "@/utils/translateWhiskyNameToJape
 import fetch from "node-fetch";
 import OpenAI from "openai";
 
-// Initialize OpenAI client
+// OpenAI 클라이언트 초기화
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -16,123 +16,149 @@ interface CacheItem {
   timestamp: number;
 }
 
-// 캐시를 저장할 객체 (In-Memory)
 let cache: Record<string, CacheItem> = {};
 
-async function translateText(text: string): Promise<string> {
-  console.log("Translating text:", text);
-  if (!text) return "";
+// SearchResult 인터페이스 정의
+interface SearchResultItem {
+  name: string;
+  price: number;
+  url?: string;
+  description?: string;
+  soldOut?: boolean;
+  original?: {
+    name: string;
+  };
+}
+async function translateProductNames(results: SearchResultItem[]): Promise<SearchResultItem[]> {
+  if (!results.length) return [];
+
+  const names = results.map(item => item.name);
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-2024-08-06",
       messages: [
         {
           role: "system",
-          content:
-            "You are a professional translator. Translate the given Japanese text to Korean. Keep any brand names and numbers unchanged. Translate accurately and naturally.",
+          content: "You are a professional translator. Translate the given Japanese product names to Korean. Keep brand names, numbers and units (ml, L) unchanged. Return the translations in the same order as input array."
         },
         {
           role: "user",
-          content: text,
-        },
+          content: JSON.stringify(names)
+        }
       ],
-      temperature: 0.3, // Lower temperature for more consistent translations
+      temperature: 0.3,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "translation_response",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              translations: {
+                type: "array",
+                items: {
+                  type: "string",
+                  description: "Translated product name"
+                }
+              }
+            },
+            required: ["translations"],
+            additionalProperties: false
+          }
+        }
+      }
     });
 
-    console.log(
-      "Translation response:",
-      completion.choices[0]?.message?.content
-    );
+    const content = response.choices[0]?.message?.content;
+    if (content) {
+      const { translations } = JSON.parse(content);
 
-    return completion.choices[0]?.message?.content || text;
+      return results.map((item, index) => ({
+        ...item,
+        name: translations[index],
+        original: {
+          name: item.name
+        }
+      }));
+    }
+
+    return results;
   } catch (error) {
     console.error("Translation error:", error);
-    return text;
+    return results;
   }
 }
 
-function toEUCJPEncoding(query: string) {
+function toEUCJPEncoding(query: string): string {
   const eucJPEncoded = iconv.encode(query, "euc-jp");
   return Array.from(eucJPEncoded)
-    .map((byte) => `%${byte.toString(16).toUpperCase().padStart(2, "0")}`)
-    .join("");
+      .map((byte) => `%${byte.toString(16).toUpperCase().padStart(2, "0")}`)
+      .join("");
 }
 
-// store 타입에 lottemart 추가
-type StoreType =
-  | "dailyshot"
-  | "mukawa"
-  | "cu"
-  | "traders"
-  | "getju"
-  | "emart"
-  | "lottemart"
-  | "biccamera";
+type StoreType = "dailyshot" | "mukawa" | "cu" | "traders" | "getju" | "emart" | "lottemart" | "biccamera";
+
+interface SearchParams {
+  query: string;
+  store: StoreType;
+  page: number;
+  pageSize: number;
+}
 
 export async function GET(request: NextRequest) {
-  const params = {
-    query: request.nextUrl.searchParams.get("q") || "",
-    store: (request.nextUrl.searchParams.get("store") ||
-      "dailyshot") as StoreType,
-    page: parseInt(request.nextUrl.searchParams.get("page") || "1"),
-    pageSize: parseInt(request.nextUrl.searchParams.get("pageSize") || "12"),
-  };
-
-  if (!params.query) {
-    return NextResponse.json(
-      { error: "검색어가 필요합니다." },
-      { status: 400 }
-    );
-  }
-
-  // 캐싱된 결과가 있는지 확인
-  const cacheKey = `${params.query}-${params.store}`;
-  const cachedResult = cache[cacheKey];
-
-  if (
-    cachedResult &&
-    Date.now() - cachedResult.timestamp < 24 * 60 * 60 * 1000
-  ) {
-    // 캐싱된 데이터를 반환
-    return NextResponse.json(cachedResult.data);
-  }
-
-  // 카와인 경우 위스 이름을 일본어로 번역
-  if (params.store === "mukawa" && params.query) {
-    const translatedQuery = translateWhiskyNameToJapenese(params.query);
-    params.query = translatedQuery.japanese || params.query;
-  }
-
   try {
+    const query = request.nextUrl.searchParams.get("q") || "";
+    const store = (request.nextUrl.searchParams.get("store") || "dailyshot") as StoreType;
+    const page = parseInt(request.nextUrl.searchParams.get("page") || "1", 10);
+    const pageSize = parseInt(request.nextUrl.searchParams.get("pageSize") || "12", 10);
+
+    const params: SearchParams = { query, store, page, pageSize };
+
+    if (!params.query) {
+      return NextResponse.json(
+          { error: "검색어가 필요합니다." },
+          { status: 400 }
+      );
+    }
+
+    // 캐시 확인
+    const cacheKey = `${params.query}-${params.store}`;
+    const cachedResult = cache[cacheKey];
+    if (cachedResult && Date.now() - cachedResult.timestamp < 24 * 60 * 60 * 1000) {
+      return NextResponse.json(cachedResult.data);
+    }
+
+    // 무카와 스토어의 경우 위스키 이름 번역
+    if (params.store === "mukawa" && params.query) {
+      const translatedQuery = translateWhiskyNameToJapenese(params.query);
+      params.query = translatedQuery.japanese || params.query;
+    }
+
     let searchResult = await performSearch(params);
 
-    if (
-      (params.store === "mukawa" || params.store === "biccamera") &&
-      searchResult
-    ) {
+    // 무카와/빅카메라 결과 번역
+    if ((params.store === "mukawa" || params.store === "biccamera") && searchResult) {
       searchResult = await translateProductNames(searchResult);
     }
 
+    // 검색 결과가 없는 경우 첫 단어로 재검색
     if (!searchResult?.length) {
-      const firstValidWord = params.query
-        ?.split(" ")
-        .find((word) => word.length >= 2);
+      const firstValidWord = params.query?.split(" ").find((word) => word.length >= 2);
       if (firstValidWord) {
         searchResult = await performSearch({
           ...params,
           query: firstValidWord,
         });
-        if (
-          (params.store === "mukawa" || params.store === "biccamera") &&
-          searchResult
-        ) {
+
+        if ((params.store === "mukawa" || params.store === "biccamera") && searchResult) {
           searchResult = await translateProductNames(searchResult);
         }
       }
     }
 
-    // 캐싱 저장
+    // 캐시 저장
     cache[cacheKey] = {
       data: searchResult,
       timestamp: Date.now(),
@@ -142,12 +168,14 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("검색 처리 중 오류 발생:", error);
     return NextResponse.json(
-      { error: "검색 중 오류가 발생했습니다." },
-      { status: 500 }
+        { error: "검색 중 오류가 발생했습니다." },
+        { status: 500 }
     );
   }
 }
 
+// 나머지 performSearch, parseMukawaHtml, parseBiccameraHtml 등의 함수들은
+// 이전 코드와 동일하게 유지...
 // 검색 결과 아이템의 인터페이스 정의
 interface SearchResultItem {
   name: string;
@@ -160,30 +188,8 @@ interface SearchResultItem {
   };
 }
 
-// 상품명만 번역하는 새로운 함수
-async function translateProductNames(
-  results: SearchResultItem[]
-): Promise<SearchResultItem[]> {
-  const translatedResults: SearchResultItem[] = [];
 
-  for (const item of results) {
-    // Rate limiting 방지를 위한 딜레이
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    const translatedName = await translateText(item.name);
-
-    translatedResults.push({
-      ...item,
-      name: translatedName,
-      original: {
-        name: item.name,
-      },
-    });
-  }
-
-  return translatedResults;
-}
-
+// 나머지 API 함수들은 생략합니다.
 // CU API 응답의 타입을 정의합니다.
 interface CUApiResponse {
   data: {
