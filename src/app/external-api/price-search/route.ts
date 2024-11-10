@@ -3,6 +3,12 @@ import iconv from "iconv-lite";
 import { JSDOM } from "jsdom";
 import { translateWhiskyNameToJapenese } from "@/utils/translateWhiskyNameToJapenese";
 import fetch from "node-fetch";
+import OpenAI from "openai";
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 // 캐시 타입 정의
 interface CacheItem {
@@ -14,30 +20,32 @@ interface CacheItem {
 let cache: Record<string, CacheItem> = {};
 
 async function translateText(text: string): Promise<string> {
+  console.log("Translating text:", text);
   if (!text) return "";
 
   try {
-    const response = await fetch("https://api-free.deepl.com/v2/translate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `DeepL-Auth-Key ${process.env.DEEPL_API_KEY}`,
-      },
-      body: new URLSearchParams({
-        text: text,
-        source_lang: "JA",
-        target_lang: "KO",
-      }),
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a professional translator. Translate the given Japanese text to Korean. Keep any brand names and numbers unchanged. Translate accurately and naturally.",
+        },
+        {
+          role: "user",
+          content: text,
+        },
+      ],
+      temperature: 0.3, // Lower temperature for more consistent translations
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Translation API error:", errorData);
-      return text;
-    }
+    console.log(
+      "Translation response:",
+      completion.choices[0]?.message?.content
+    );
 
-    const data = await response.json();
-    return data.translations[0]?.text || text;
+    return completion.choices[0]?.message?.content || text;
   } catch (error) {
     console.error("Translation error:", error);
     return text;
