@@ -76,7 +76,6 @@ export async function GET(request: NextRequest) {
       timestamp: Date.now(),
     };
 
-    console.log("검색 결과:", searchResult);
     return NextResponse.json(searchResult);
   } catch (error) {
     console.error("검색 처리 중 오류 발생:", error);
