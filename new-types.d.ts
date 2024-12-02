@@ -45,20 +45,20 @@ interface LiquorCategory {
 /** 주류 type: ES 버전 */
 interface LiquorInfo {
   id: number;
-  ko_name: string;
-  ko_name_origin: string;
-  en_name: string;
+  koName: string;
+  koNameOrigin: string;
+  enName: string;
   type: string;
   abv: string;
   volume: string;
   country: string;
-  thumbnail_image_url: string;
-  tasting_notes_Aroma: string;
-  tasting_notes_Taste: string;
-  tasting_notes_Finish: string;
+  thumbnailImageUrl: string;
+  tastingNotesAroma: string;
+  tastingNotesTaste: string;
+  tastingNotesFinish: string;
   region: string;
-  grape_variety: string;
-  notes_count: number;
+  grapeVariety: string;
+  notesCount: number;
   price: string;
 }
 
