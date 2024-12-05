@@ -1,0 +1,46 @@
+name: JUMO client PROD CI/CD
+
+on:
+  push:
+    branches:
+      - "macmini"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL_PROD }}" > .env
+          echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL_PROD }}" >> .env
+          echo "NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID_PROD }}" >> .env
+          echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> .env
+          echo "NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}" >> .env
+          echo "DEEPL_API_KEY=${{ secrets.DEEPL_API_KEY }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+
+      - name: Build Docker image
+        run: |
+          docker build -t macmini/jumo_front_prod:latest .
+
+      - name: Stop existing Docker container (if running)
+        run: |
+          docker stop $(docker ps -q) || true
+
+      - name: Run Docker container
+        run: |
+          docker run --rm -it -d -p 80:3000 \
+            -e SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
+            -e DEEPL_API_KEY=${{ secrets.DEEPL_API_KEY }} \
+            -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+            --name jumo_front_prod macmini/jumo_front_prod:latest
+
+      - name: Clean up unused Docker images
+        run: |
+          docker image prune -a -f || true
