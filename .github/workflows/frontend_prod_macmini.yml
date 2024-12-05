@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: macmini # 로컬 Mac mini에서 실행되도록 설정
     permissions:
       contents: read
       packages: write
