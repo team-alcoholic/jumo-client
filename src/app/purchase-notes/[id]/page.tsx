@@ -22,7 +22,7 @@ import UserInfoComponent from "@/components/NoteComponent/UserInfoComponent";
 import { LiquorInfoComponent } from "@/components/NoteComponent/LiquorInfoComponent";
 import KeyValueInfoComponent from "@/components/KeyValueInfoComponent/KeyValueInfoComponent";
 
-const NOTE_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL + "/v2/notes/";
+const NOTE_API_URL = process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL + "/v2/notes/";
 const NOTE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/purchase-notes/";
 const LIQUOR_URL = process.env.NEXT_PUBLIC_BASE_URL + "/liquors/";
 
