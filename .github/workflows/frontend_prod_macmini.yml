@@ -17,13 +17,13 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL_MACMINI }}" > ~/jumo/.env
-          echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL_MACMINI }}" >> ~/jumo/.env
-          echo "NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID_PROD }}" >> ~/jumo/.env
-          echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> ~/jumo/.env
-          echo "NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}" >> ~/jumo/.env
-          echo "DEEPL_API_KEY=${{ secrets.DEEPL_API_KEY }}" >> ~/jumo/.env
-          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> ~/jumo/.env
+          echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL_PROD }}" > .env
+          echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL_PROD }}" >> .env
+          echo "NEXT_PUBLIC_GA_ID=${{ secrets.NEXT_PUBLIC_GA_ID_PROD }}" >> .env
+          echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> .env
+          echo "NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}" >> .env
+          echo "DEEPL_API_KEY=${{ secrets.DEEPL_API_KEY }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
 
       - name: Build Docker image
         run: |
