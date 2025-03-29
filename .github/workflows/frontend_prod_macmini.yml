@@ -32,6 +32,7 @@ jobs:
       - name: Stop existing Docker container (if running)
         run: |
           docker kill jumo_front_prod || true
+          docker rm jumo_front_prod || true
 
       - name: Run Docker container
         run: |
