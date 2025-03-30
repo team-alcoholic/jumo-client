@@ -19,7 +19,7 @@ import CreateNoteDial from "@/components/FloatingButton/CreateNoteDial";
 /** 주류 상세정보 API 요청 함수 */
 const getLiquorInfo = async (id: string) => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/v2/liquors/${id}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL_LOCAL}/v2/liquors/${id}`
   );
   if (!res.ok) {
     if (res.status === 404) {

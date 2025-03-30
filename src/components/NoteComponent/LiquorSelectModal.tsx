@@ -65,18 +65,18 @@ export default function LiquorSelectModal(props: LiquorSelectModalProps) {
   const handleLiquorListClick = (newValue: LiquorInfo) => {
     const result: Liquor = {
       id: newValue.id,
-      koName: newValue.ko_name_origin,
-      enName: newValue.en_name,
+      koName: newValue.koNameOrigin,
+      enName: newValue.enName,
       type: newValue.type,
       abv: newValue.abv,
       volume: newValue.volume,
       country: newValue.country,
-      thumbnailImageUrl: newValue.thumbnail_image_url,
-      tastingNotesAroma: newValue.tasting_notes_Aroma,
-      tastingNotesTaste: newValue.tasting_notes_Taste,
-      tastingNotesFinish: newValue.tasting_notes_Finish,
+      thumbnailImageUrl: newValue.thumbnailImageUrl,
+      tastingNotesAroma: newValue.tastingNotesAroma,
+      tastingNotesTaste: newValue.tastingNotesTaste,
+      tastingNotesFinish: newValue.tastingNotesFinish,
       region: newValue.region,
-      grapeVariety: newValue.grape_variety,
+      grapeVariety: newValue.grapeVariety,
       category: null,
       liquorAromas: [],
       user: null,
@@ -174,14 +174,14 @@ export default function LiquorSelectModal(props: LiquorSelectModalProps) {
               onClick={() => handleLiquorListClick(liquor)}
             >
               <LiquorList
-                thumbnailImageUrl={liquor.thumbnail_image_url}
-                koName={liquor.ko_name_origin}
+                thumbnailImageUrl={liquor.thumbnailImageUrl}
+                koName={liquor.koNameOrigin}
                 type={liquor.type}
                 abv={liquor.abv}
                 volume={liquor.volume}
                 country={liquor.country}
                 region={liquor.region}
-                grapeVariety={liquor.grape_variety}
+                grapeVariety={liquor.grapeVariety}
               />
             </Box>
           ))

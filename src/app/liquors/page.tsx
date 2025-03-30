@@ -84,14 +84,14 @@ export default function LiquorsPage() {
           data.map((liquor: LiquorInfo) => (
             <LiquorCardLink key={liquor.id} href={`/liquors/${liquor.id}`}>
               <LiquorTitle
-                thumbnailImageUrl={liquor.thumbnail_image_url}
-                koName={liquor.ko_name_origin}
+                thumbnailImageUrl={liquor.thumbnailImageUrl}
+                koName={liquor.koNameOrigin}
                 type={liquor.type}
                 abv={liquor.abv}
                 volume={liquor.volume}
                 country={liquor.country}
                 region={liquor.region}
-                grapeVariety={liquor.grape_variety}
+                grapeVariety={liquor.grapeVariety}
               />
             </LiquorCardLink>
           ))
